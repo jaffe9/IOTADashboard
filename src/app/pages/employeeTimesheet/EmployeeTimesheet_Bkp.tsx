@@ -24,7 +24,7 @@ console.log(allUserInfo);
 const profileDetailsSchema = Yup.object().shape({
   sEmployee: Yup.string().required("Please select an employee from list"),
   fName: Yup.string().required("First name is required"),
-  lName: Yup.string().required("Last name is required"),
+  fName: Yup.string().required("Last name is required"),
   company: Yup.string().required("Company name is required"),
   contactPhone: Yup.string().required("Contact phone is required"),
   companySite: Yup.string().required("Company site is required"),
@@ -53,7 +53,7 @@ const EmployeeTimesheet: FC = () => {
       setLoading(true);
       setTimeout(() => {
         values.fName = allUserInfo.first_name;
-        values.lName = allUserInfo.last_name;
+        values.fName = allUserInfo.last_name;
         const updatedData = Object.assign(data, values);
         setData(updatedData);
         setLoading(false);
@@ -138,12 +138,12 @@ const EmployeeTimesheet: FC = () => {
                             type="text"
                             className="form-control form-control-lg form-control-solid"
                             placeholder="Last name"
-                            {...formik.getFieldProps("lName")}
+                            {...formik.getFieldProps("fName")}
                           />
-                          {formik.touched.lName && formik.errors.lName && (
+                          {formik.touched.fName && formik.errors.fName && (
                             <div className="fv-plugins-message-container">
                               <div className="fv-help-block">
-                                {formik.errors.lName}
+                                {formik.errors.fName}
                               </div>
                             </div>
                           )}
@@ -209,11 +209,11 @@ const EmployeeTimesheet: FC = () => {
                         placeholder="Phone number"
                         {...formik.getFieldProps("contactPhone")}
                       />
-                      {formik.touched.month &&
-                        formik.errors.month && (
+                      {formik.touched.monthyear &&
+                        formik.errors.monthyear && (
                           <div className="fv-plugins-message-container">
                             <div className="fv-help-block">
-                              {formik.errors.month}
+                              {formik.errors.monthyear}
                             </div>
                           </div>
                         )}
@@ -232,11 +232,11 @@ const EmployeeTimesheet: FC = () => {
                         placeholder="Company website"
                         {...formik.getFieldProps("companySite")}
                       />
-                      {formik.touched.year &&
-                        formik.errors.year && (
+                      {formik.touched.monthyear &&
+                        formik.errors.monthyear && (
                           <div className="fv-plugins-message-container">
                             <div className="fv-help-block">
-                              {formik.errors.year}
+                              {formik.errors.monthyear}
                             </div>
                           </div>
                         )}
