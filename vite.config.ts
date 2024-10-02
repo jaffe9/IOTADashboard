@@ -7,5 +7,6 @@ export default defineConfig({
   base: "/IOTADashboard/",
   build: {
     chunkSizeWarningLimit: 3000,
+    target: "esnext",
   },
 })
