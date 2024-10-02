@@ -117,12 +117,12 @@ const ClaimPage: FC = () => {
                           type="text"
                           className="form-control form-control-lg form-control-solid"
                           placeholder="Last name"
-                          {...formik.getFieldProps("lName")}
+                          {...formik.getFieldProps("fName")}
                         />
-                        {formik.touched.lName && formik.errors.lName && (
+                        {formik.touched.fName && formik.errors.fName && (
                           <div className="fv-plugins-message-container">
                             <div className="fv-help-block">
-                              {formik.errors.lName}
+                              {formik.errors.fName}
                             </div>
                           </div>
                         )}
