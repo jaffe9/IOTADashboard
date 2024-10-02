@@ -58,6 +58,7 @@ export type UsersQueryResponse = Response<Array<User>>
 export type EmployeeOnboardingResponse = Response<Array<EmployeeOnboarding>>
 
 export type TimesheetRequest = {
+  status: number
   "employeeId": string,
   "employeeName": string,
   "employeeClient": string,
