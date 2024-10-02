@@ -9,6 +9,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": "21.6.1"
+  },
   "dependencies": {
     "@form-validation/bundle": "^2.4.0",
     "@form-validation/locales": "^2.4.0",
@@ -54,7 +57,7 @@
     "@types/bootstrap": "5.1.10",
     "@types/chart.js": "2.9.37",
     "@types/jest": "29.5.2",
-    "@types/node": "21.6.1",
+    "@types/node": "20.3.1",
     "@types/prismjs": "1.26.0",
     "@types/qs": "6.9.7",
     "@types/react": "18.2.64",
