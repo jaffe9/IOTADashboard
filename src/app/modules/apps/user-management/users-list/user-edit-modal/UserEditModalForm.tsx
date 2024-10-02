@@ -81,7 +81,7 @@ let [userForEdit] = useState<User & Salary>({
     total_net_salary: total_net_salary.toString(),
     payslilpOptionSelected: salary.payslilpOptionSelected
   })
-  const selectedUser = userForEdit["0"]
+  const selectedUser = userForEdit
   const cancel = (withRefresh?: boolean) => 
     {
       alert("Cancelled")
