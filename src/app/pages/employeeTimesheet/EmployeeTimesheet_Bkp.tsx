@@ -24,7 +24,6 @@ console.log(allUserInfo);
 const profileDetailsSchema = Yup.object().shape({
   sEmployee: Yup.string().required("Please select an employee from list"),
   fName: Yup.string().required("First name is required"),
-  fName: Yup.string().required("Last name is required"),
   company: Yup.string().required("Company name is required"),
   contactPhone: Yup.string().required("Contact phone is required"),
   companySite: Yup.string().required("Company site is required"),
@@ -187,10 +186,10 @@ const EmployeeTimesheet: FC = () => {
                           dateFormat: "d-m-Y",
                         }}
                       ></Flatpickr>
-                      {formik.touched.location && formik.errors.location && (
+                      {formik.touched.fName && formik.errors.fName && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
-                            {formik.errors.location}
+                            {formik.errors.fName}
                           </div>
                         </div>
                       )}
