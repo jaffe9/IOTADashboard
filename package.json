@@ -51,9 +51,7 @@
     "react-topbar-progress-indicator": "4.1.1",
     "socicon": "3.0.5",
     "winston": "^3.13.0",
-    "yup": "^1.0.0"
-  },
-  "devDependencies": {
+    "yup": "^1.0.0",
     "@types/bootstrap": "5.1.10",
     "@types/chart.js": "2.9.37",
     "@types/jest": "29.5.2",
