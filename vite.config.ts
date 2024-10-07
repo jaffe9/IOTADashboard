@@ -9,4 +9,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 3000,
     target: "esnext",
   },
+  server: {
+    port: 5173 // change here
+  },
 })
