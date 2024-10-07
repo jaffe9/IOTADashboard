@@ -21,6 +21,7 @@ const GET_USER_SALARY_DETAIL_URL = `${API_URL}/salaryDetails`;
 const GET_USER_BILLING_URL = `${API_URL}/billing`;
 const GET_EMPLOYEEONBOARDING_URL = `${API_URL}/employeeOnboarding`;
 const GET_EMPLOYEEINVOICE_URL = `${API_URL}/invoice`;
+const GET_TIMESHEET_URL = `${API_URL}/employeeTimesheet`;
 const DIGITAL_OCEAN_SECRET_KEY = `XbcuQv5Z/NiKom3Q4domcuCjr5yCRXYd/SvkQ/EDLqI`;
 const DIGITAL_OCEAN_ACCESS_KEY = `DO00J84DXXRHLZHJBHJF`;
 const DIGITAL_OCEAN_PERSONAL_ACCESS_TOKEN = `dop_v1_8812d0f4fbefad3d4a7e9317bc8be87ac1a14c22d20e8ad6b7876ea07b7cc80b`;
@@ -196,6 +197,33 @@ export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<Time
         return error
       });
       return response;
+}
+
+export const getEmployeeTimesheet = async () : Promise<ListOfTimesheet> => {
+  let response: ListOfTimesheet = {
+    status: 0,
+    createdAt: "",
+    employeeId: "",
+    employeeName: "",
+    employeeClient: "",
+    timesheetMonthYear: "",
+    workingDays: "",
+    workingDates: "",
+    holidayDays: "",
+    holidayDates: "",
+    leaveDays: "",
+    leaveDates: "",
+    createdBy: "",
+    approved: false,
+    approvedDate: new Date,
+    sentToFinance: false,
+    timesheetFileLocation: "",
+    length: 0
+  }
+  const d = await axios
+    .get(`${GET_TIMESHEET_URL}?approved=eq.FALSE`);
+  response = d.data;
+  return response;
 }
 
 export * as apiHelper from './apiHelper.ts';
