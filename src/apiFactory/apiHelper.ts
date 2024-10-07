@@ -1,6 +1,6 @@
 import axios from "axios";
 import { resourceLimits } from "worker_threads";
-import { EmployeeOnboardingResponse, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { EmployeeOnboardingResponse, ListOfTimesheet, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { create } from "domain";
 
