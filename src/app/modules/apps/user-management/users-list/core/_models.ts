@@ -57,6 +57,21 @@ export type UsersQueryResponse = Response<Array<User>>
 
 export type EmployeeOnboardingResponse = Response<Array<EmployeeOnboarding>>
 
+export type TimesheetRequest = {
+  status: number
+  "employeeId": string,
+  "employeeName": string,
+  "employeeClient": string,
+  "timesheetMonthYear": string,
+  "workingDays": string,
+  "workingDates": string,
+  "holidayDays": string,
+  "holidayDates": string,
+  "leaveDays": string,
+  "leaveDates": string,
+  "createdBy": string
+}
+
 export type ListOfTimesheet = {
   length: number,
   status: number,
