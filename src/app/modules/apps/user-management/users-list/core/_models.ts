@@ -57,8 +57,10 @@ export type UsersQueryResponse = Response<Array<User>>
 
 export type EmployeeOnboardingResponse = Response<Array<EmployeeOnboarding>>
 
-export type TimesheetRequest = {
-  status: number
+export type ListOfTimesheet = {
+  length: number,
+  status: number,
+  "createdAt": string,
   "employeeId": string,
   "employeeName": string,
   "employeeClient": string,
@@ -69,7 +71,11 @@ export type TimesheetRequest = {
   "holidayDates": string,
   "leaveDays": string,
   "leaveDates": string,
-  "createdBy": string
+  "createdBy": string,
+  "approved": boolean,
+  "approvedDate": Date,
+  "sentToFinance": boolean,
+  "timesheetFileLocation": string
 }
 
 export const initialUser: User = {
