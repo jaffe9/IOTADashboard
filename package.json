@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "start": "npm run dev"
   },
-  "homepage": ".",
+  "homepage": "",
   "engines": {
     "node": "20.x"
   },
