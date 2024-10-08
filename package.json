@@ -11,7 +11,7 @@
     "start": "npm run dev"
   },
   "engines": {
-    "node": "21.6.1"
+    "node": "20.x"
   },
   "dependencies": {
     "@form-validation/bundle": "^2.4.0",
