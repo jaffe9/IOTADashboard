@@ -35,7 +35,7 @@ const AppRoutes: FC = () => {
           ) : (
             <>{console.log("User:" + currentUser)}
               <Route path='auth/*' element={<AuthPage />} />
-              <Route path='*' element={<Navigate to='/auth' />} />
+              <Route path='/*' element={<Navigate to='/auth' />} />
             </>
           )}
         </Route>
