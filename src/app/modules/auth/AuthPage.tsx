@@ -3,7 +3,7 @@ import {Registration} from './components/Registration'
 import {ForgotPassword} from './components/ForgotPassword'
 import {Login} from './components/Login'
 import {AuthLayout} from './AuthLayout'
-
+console.log("here")
 const AuthPage = () => (
   <Routes>
     <Route element={<AuthLayout />}>
