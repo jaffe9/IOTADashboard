@@ -43,5 +43,5 @@ const AppRoutes: FC = () => {
     </BrowserRouter>
   )
 }
-
+console.log("App Routes End")
 export {AppRoutes}
