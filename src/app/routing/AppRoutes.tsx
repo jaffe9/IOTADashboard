@@ -11,6 +11,7 @@ import {PrivateRoutes} from './PrivateRoutes'
 import {ErrorsPage} from '../modules/errors/ErrorsPage'
 import {Logout, AuthPage, useAuth} from '../modules/auth'
 import {App} from '../App'
+import { HashRouter } from "react-router-dom";
 
 /**
  * Base URL of the website.
@@ -22,7 +23,7 @@ const {BASE_URL} = import.meta.env
 const AppRoutes: FC = () => {
   const {currentUser} = useAuth()
   return (
-    <BrowserRouter basename={BASE_URL}>
+    <HashRouter basename={BASE_URL}>
       <Routes>
         <Route element={<App />}>
           <Route path='error/*' element={<ErrorsPage />} />
@@ -40,7 +41,7 @@ const AppRoutes: FC = () => {
           )}
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
