@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "start": "npm run build && npm run dev"
   },
-  "homepage": "",
+  "homepage": ".",
   "engines": {
     "node": "18.20.4"
   },
