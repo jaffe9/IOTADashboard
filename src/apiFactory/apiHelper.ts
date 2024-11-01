@@ -100,10 +100,11 @@ export const getSalaryInfoByEmployee = async (employeeId: string) => {
   }
 };
 
-export const getAllEmployees = async (): Promise<UsersQueryResponse | null> => {
-  //const d = await axios
-    //.get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
-  return null;
+export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
+  const d = await axios
+    .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
+  console.log("Query Response:" + d);
+  return d;
 };
 
 export const getPeerEmployees = async (clientId: string): Promise<UsersQueryResponse> => {
