@@ -48,7 +48,7 @@ export function requestPassword(email: string) {
 }
 
 export async function getUserByToken(token: string) {
-  return await axios.post<UserModel>(`${GET_USER_BY_ACCESSTOKEN_URL}?loginId=eq.${token}&select=*`);
+  return await axios.get<UserModel>(`${GET_USER_BY_ACCESSTOKEN_URL}?loginId=eq.${token}&select=*`);
 }
 
 const getUsersByLoginId = (login_id: string): Promise<UserModel> => {
