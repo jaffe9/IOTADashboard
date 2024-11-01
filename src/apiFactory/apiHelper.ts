@@ -103,7 +103,7 @@ export const getSalaryInfoByEmployee = async (employeeId: string) => {
 export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
   const d = await axios
     .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
-  console.log("Query Response:" + d);
+  console.log("Query Response:" + JSON.stringify(d));
   return d;
 };
 
