@@ -47,3 +47,4 @@ if (container) {
     </QueryClientProvider>
   )
 }
+console.log("Loaded Successfully")
