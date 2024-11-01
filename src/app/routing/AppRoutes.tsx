@@ -11,7 +11,6 @@ import {PrivateRoutes} from './PrivateRoutes'
 import {ErrorsPage} from '../modules/errors/ErrorsPage'
 import {Logout, AuthPage, useAuth} from '../modules/auth'
 import {App} from '../App'
-import { HashRouter } from "react-router-dom";
 
 /**
  * Base URL of the website.
@@ -19,11 +18,11 @@ import { HashRouter } from "react-router-dom";
  * @see https://facebook.github.io/create-react-app/docs/using-the-public-folder
  */
 const {BASE_URL} = import.meta.env
-
+console.log("App Routes")
 const AppRoutes: FC = () => {
   const {currentUser} = useAuth()
   return (
-    <HashRouter basename={BASE_URL}>
+    <BrowserRouter basename={BASE_URL}>
       <Routes>
         <Route element={<App />}>
           <Route path='error/*' element={<ErrorsPage />} />
@@ -41,7 +40,7 @@ const AppRoutes: FC = () => {
           )}
         </Route>
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   )
 }
 
