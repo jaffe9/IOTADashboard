@@ -28,12 +28,12 @@ const AppRoutes: FC = () => {
           <Route path='error/*' element={<ErrorsPage />} />
           <Route path='logout' element={<Logout />} />
           {currentUser ? (
-            <>
+            <>{console.log("User:" + currentUser)}
               <Route path='/*' element={<PrivateRoutes />} />
               <Route index element={<Navigate to='/dashboard' />} />
             </>
           ) : (
-            <>
+            <>{console.log("User:" + currentUser)}
               <Route path='auth/*' element={<AuthPage />} />
               <Route path='*' element={<Navigate to='/auth' />} />
             </>
