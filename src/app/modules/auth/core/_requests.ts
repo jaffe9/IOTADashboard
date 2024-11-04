@@ -1,7 +1,5 @@
 import axios, { AxiosResponse } from "axios";
 import { AuthModel, UserModel } from "./_models";
-//import { User } from "../../apps/user-management/users-list/core/_models";
-console.log("2")
 const API_URL = import.meta.env.VITE_APP_API_URL;
 
 //export const GET_USER_BY_ACCESSTOKEN_URL = `${API_URL}/verify_token`;

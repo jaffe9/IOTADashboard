@@ -1,14 +1,42 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import * as Yup from 'yup'
 import clsx from 'clsx'
-import {Link} from 'react-router-dom'
+import {Link, createRoutesFromChildren, matchRoutes, useLocation, useNavigationType} from 'react-router-dom'
 import {useFormik} from 'formik'
 import {requestPassword} from '../core/_requests'
+import * as Sentry from "@sentry/react";
+Sentry.init({
+  dsn: "https://b8235ec584255d0244d60f4e68e12082@o294107.ingest.us.sentry.io/4508230518046720",
+  integrations: [
+    // See docs for support of different versions of variation of react router
+    // https://docs.sentry.io/platforms/javascript/guides/react/configuration/integrations/react-router/
+    Sentry.reactRouterV6BrowserTracingIntegration({
+      useEffect,
+      useLocation,
+      useNavigationType,
+      createRoutesFromChildren,
+      matchRoutes,
+    }),
+    Sentry.replayIntegration(),
+  ],
 
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for tracing.
+  tracesSampleRate: 1.0,
+
+  // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
+  tracePropagationTargets: [/^\//, /^https:\/\/yourserver\.io\/api/],
+
+  // Capture Replay for 10% of all sessions,
+  // plus for 100% of sessions with an error
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
+Sentry.startSession();
 const initialValues = {
   email: 'admin@demo.com',
 }
-
+Sentry.captureMessage("Forgot Password Trigerred")
 const forgotPasswordSchema = Yup.object().shape({
   email: Yup.string()
     .email('Wrong email format')

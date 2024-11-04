@@ -3,7 +3,6 @@ import {Registration} from './components/Registration'
 import {ForgotPassword} from './components/ForgotPassword'
 import {Login} from './components/Login'
 import {AuthLayout} from './AuthLayout'
-console.log("3")
 const AuthPage = () => (
   <Routes>
     <Route element={<AuthLayout />}>
