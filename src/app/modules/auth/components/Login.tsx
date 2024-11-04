@@ -1,12 +1,13 @@
 
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import * as Yup from 'yup'
 import clsx from 'clsx'
-import {Link} from 'react-router-dom'
+import {Link, createRoutesFromChildren, matchRoutes, useLocation, useNavigationType} from 'react-router-dom'
 import {useFormik} from 'formik'
 import {getUsersByLoginId, login} from '../core/_requests'
 import {toAbsoluteUrl} from '../../../../_metronic/helpers'
 import {useAuth} from '../core/Auth'
+import * as Sentry from "@sentry/react";
 console.log("4")
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -19,12 +20,37 @@ const loginSchema = Yup.object().shape({
     .max(50, 'Maximum 50 symbols')
     .required('Password is required'),
 })
+Sentry.init({
+  dsn: "https://b8235ec584255d0244d60f4e68e12082@o294107.ingest.us.sentry.io/4508230518046720",
+  integrations: [
+    // See docs for support of different versions of variation of react router
+    // https://docs.sentry.io/platforms/javascript/guides/react/configuration/integrations/react-router/
+    Sentry.reactRouterV6BrowserTracingIntegration({
+      useEffect,
+      useLocation,
+      useNavigationType,
+      createRoutesFromChildren,
+      matchRoutes,
+    }),
+  ],
 
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for tracing.
+  tracesSampleRate: 1.0,
+
+  // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
+  tracePropagationTargets: [/^\//, /^https:\/\/yourserver\.io\/api/],
+
+  // Capture Replay for 10% of all sessions,
+  // plus for 100% of sessions with an error
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 const initialValues = {
   email: 'jaffar@innovwayz.com',
   password: 'InnovwayzJA',
 }
-
+Sentry.startSession();
 /*
   Formik+YUP+Typescript:
   https://jaredpalmer.com/formik/docs/tutorial#getfieldprops
@@ -41,12 +67,15 @@ export function Login() {
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setLoading(true)
       try {
+        Sentry.captureMessage("User Login Attempt:" + values.email)
         const {data: auth} = await login(values.email, values.password)
         saveAuth(auth)
         //const {login_id: user} = await getUsersByLoginId(auth.user.id)
         //console.log("User:" + JSON.stringify(user));
         setCurrentUser(await getUsersByLoginId(auth.user.id))
       } catch (error:any) {
+        Sentry.reactErrorHandler(error)
+        Sentry.captureException(error)
         console.error(error)
         saveAuth(undefined)
         if(error.response.status == 200)
