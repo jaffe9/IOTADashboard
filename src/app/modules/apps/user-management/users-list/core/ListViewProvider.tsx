@@ -41,7 +41,7 @@ const ListViewProvider: FC<WithChildren> = ({children}) => {
         },
       }}
     >
-      {children} 
+      {children}
     </ListViewContext.Provider>
   )
 }

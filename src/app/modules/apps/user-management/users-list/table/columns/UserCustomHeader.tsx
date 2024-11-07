@@ -53,7 +53,7 @@ const UserCustomHeader: FC<Props> = ({className, title, tableProps}) => {
       style={{cursor: 'pointer'}}
       onClick={sortColumn}
     >
-      {title} 
+      {title}
     </th>
   )
 }

@@ -66,8 +66,6 @@ const TablesWidget9O: React.FC<Props> = ({className}) => {
       <div className='card-body py-3'>
         {/* begin::Table container */}
         <div className='table-responsive'>
-
-          
           {/* begin::Table */}
           <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
             {/* begin::Table head */}
