@@ -44,6 +44,18 @@ export const getUserCount = async () => {
     return null
   }
 };
+//*****************BEGIN *********************** */
+// Fetch National ID // Function to fetch records from the nationalIdInfo table
+export const getNationalIdExp = async () => {
+  try {
+    const response = await axiosInstance.get('nationalIdInfo?select=*,associated_user_id(username)');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching national_id data:', error);
+    return null
+  }
+};
+//*****************END ************************* */
 
 // Billing Data
 

@@ -16,7 +16,7 @@ import {
   ListsWidget26,
   EngageWidget10,
   ChartsWidget1
-} from '../../../_metronic/partials/widgets'
+} from '../../../_metronic/partials/widgets'//
 import { ToolbarWrapper } from '../../../_metronic/layout/components/toolbar'
 import { Content } from '../../../_metronic/layout/components/content'
 import ReactDOM, { render } from 'react-dom'
