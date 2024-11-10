@@ -57,6 +57,17 @@ export const getBillingTotalValue = async () => {
   }
 };
 
+// Fetching the data related to national_id
+export const getNationalIdExp = async () => {
+  try{
+    const response = await axiosInstance.get('nationalIdInfo?select=*,associated_user_id(username)');
+    return response.data;
+  }catch (error){
+    console.error('Error fetching national_id data:', error);
+    return null
+  }
+}
+
 // Opportunities Data
 export const getAllOpportunities = async () => {
   try {
