@@ -1,4 +1,12 @@
 export interface IProfileDetails {
+  invoice_url:string,
+  invoice_date:string,
+  internal_invoice_no:string,
+  external_invoice_no:string,
+  invoice_value:string,
+  client_id: any;
+  workingDays: any;
+  contract_id:string;
   sEmployee: string;
   fName: string;
   client: string;
@@ -9,12 +17,33 @@ export interface IProfileDetails {
   leavesStr: string;
   holidays: string;
   holidaysStr: string;
+  invoice_paid_status:boolean;
   communications:
   {
     email: boolean;
     phone: boolean;
   }
   loadDefault: boolean;
+}
+
+export interface IProfileDetailsInvoice {
+  associated_user_id: any;
+  invoice_paid_amount: string;
+  invoice_url:string,
+  invoice_date:string,
+  internal_invoice_no:string,
+  external_invoice_no:string,
+  invoice_value:string,
+  client_id: any;
+  contract_id:string;
+  invoice_paid_date:string;
+  invoice_paid_status:boolean;
+
+  communications:
+  {
+    email: boolean;
+    phone: boolean;
+  }
 }
 
 export interface IUpdateEmail {
@@ -83,20 +112,46 @@ export const profileDetailsInitValues: IProfileDetails = {
   sEmployee: "",
   fName: "",
   client: "",
+  workingDays: "",
   monthyear: "",
   holidays: "0",
   holidaysStr: "",
   leaves: "0",
   leavesStr: "",
-  dates:"",
-  datesStr:"",
-  communications:{
-    email:true,
+  dates: "",
+  datesStr: "",
+  communications: {
+    email: true,
     phone: true
   },
-  loadDefault: true
+  loadDefault: true,
+  invoice_paid_status: false,
+  client_id: "",
+  contract_id: "",
+  internal_invoice_no: "",
+  external_invoice_no: "",
+  invoice_value: "",
+  invoice_url: "",
+  invoice_date: ""
 };
 
+export const profileDetailsInitValuesInvoice: IProfileDetailsInvoice = {
+  invoice_paid_status: false,
+  client_id: "",
+  contract_id: "",
+  internal_invoice_no: "",
+  external_invoice_no: "",
+  invoice_value: "",
+  invoice_url: "",
+  invoice_date: "",
+  communications: {
+    email: true,
+    phone: true
+  },
+  invoice_paid_date: "",
+  invoice_paid_amount: "",
+  associated_user_id: "",
+};
 export const updateEmail: IUpdateEmail = {
   newEmail: "support@keenthemes.com",
   confirmPassword: "",

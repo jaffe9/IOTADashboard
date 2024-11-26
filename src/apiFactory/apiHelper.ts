@@ -1,8 +1,9 @@
 import axios from "axios";
 import { resourceLimits } from "worker_threads";
-import { EmployeeOnboardingResponse, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { EmployeeOnboardingResponse, InvoiceRequest, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+
 import { create } from "domain";
 
 class getUserDataParams {
@@ -19,7 +20,7 @@ const API_URL = `https://zhplktaovpyenmypkjql.supabase.co/rest/v1`;
 const GET_USERS_URL = `${API_URL}/user`;
 const GET_USER_SALARY_URL = `${API_URL}/salary`;
 const GET_USER_SALARY_DETAIL_URL = `${API_URL}/salaryDetails`;
-const GET_USER_BILLING_URL = `${API_URL}/billing`;
+const GET_USER_CONTRACT_URL = `${API_URL}/contract`;
 const GET_EMPLOYEEONBOARDING_URL = `${API_URL}/employeeOnboarding`;
 const GET_EMPLOYEEINVOICE_URL = `${API_URL}/invoice`;
 const GET_TIMESHEET_URL = `${API_URL}/employeeTimesheet`;
@@ -45,22 +46,31 @@ export const getUserCount = async () => {
   }
 };
 
-// Billing Data
+// Contract Data
 
-export const getBillingTotalValue = async () => {
+export const getInvoiceTotalValue = async () => {
   try {
-    const response = await axiosInstance.get('billing?select=*');
+    const response = await axiosInstance.get('invoice?select=*');//changed 18 Nov
     return response;
   } catch (error) {
     console.error('Error fetching data:', error);
     return null
   }
 };
-
+//Fetching the Contract Expiries
+export const getContractExpiries = async () => {
+  try {
+    const response = await axiosInstance.get('contract?select=*,associated_user_id(username,companyName)');
+    return response.data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return null
+      }
+}
 // Fetching the data related to national_id
 export const getNationalIdExp = async () => {
   try{
-    const response = await axiosInstance.get('nationalIdInfo?select=*,associated_user_id(username)');
+    const response = await axiosInstance.get('nationalIdInfo?select=*,associated_user_id(username,companyName)');
     return response.data;
   }catch (error){
     console.error('Error fetching national_id data:', error);
@@ -93,7 +103,7 @@ export const getAllSalaries = async () => {
 //Billing Data
 export const getAllBilling = async () => {
   try {
-    const response = await axiosInstance.get('salary?billing=*, user(id,*), client(id,*)', { timeout: 1500 });
+    const response = await axiosInstance.get('salary?contract=*, user(id,*), client(id,*)', { timeout: 1500 });
     return response;
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -113,13 +123,13 @@ export const getSalaryInfoByEmployee = async (employeeId: string) => {
 
 export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
   const d = await axios
-    .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
+    .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
   return d;
 };
 
 export const getPeerEmployees = async (clientId: string): Promise<UsersQueryResponse> => {
   const d = await axios
-    .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,salary(user_id,*),billing(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}`);
+    .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}`);
   return d;
 };
 
@@ -143,13 +153,13 @@ export const getEmployeeSalaryDetailInfo = async (employeeId: string): Promise<a
 
 export const getEmployeeBillingInfo = async (associated_user_id: string): Promise<any> => {
   const d = await axios
-    .get(`${GET_USER_BILLING_URL}?id=eq.${associated_user_id}`);
+    .get(`${GET_USER_CONTRACT_URL}?id=eq.${associated_user_id}`);
   return d;
 };
 
 export const getEmployeeInvoiceInfo = async (associated_user_id: string): Promise<any> => {
   const d = await axios
-    .get(`${GET_EMPLOYEEINVOICE_URL}?invoice_against_user_id=eq.${associated_user_id}`);
+    .get(`${GET_EMPLOYEEINVOICE_URL}?associated_user_id=eq.${associated_user_id}`);
   return d;
 };
 
@@ -161,27 +171,28 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
   return response;
 };
 
-export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<TimesheetRequest> => {
+export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:number;message:string}> => {
   let data = JSON.stringify([
     {
-      "employeeId": t.employeeId,
-      "employeeName": t.employeeName,
-      "employeeClient": t.employeeClient,
-      "timesheetMonthYear": t.timesheetMonthYear,
-      "workingDays": t.workingDays,
-      "workingDates": t.workingDates,
-      "holidayDays": t.holidayDays,
-      "holidayDates": t.holidayDates,
-      "leaveDays": t.leaveDays,
-      "leaveDates": t.leaveDates,
-      "createdBy": t.createdBy
+      contract_id: i.contract_id,
+      client_id: i.client_id,
+      associated_user_id:i.associated_user_id,
+      internal_invoice_no: i.internal_invoice_no,
+      external_invoice_no: i.external_invoice_no,
+      invoice_date: i.invoice_date,
+      invoice_value: i.invoice_value,
+      invoice_paid_status: false,
+      invoice_url: null,
+      invoice_paid_date:null,
+      invoice_paid_amount:null,
+      status:0
     }
   ]);
-
+  console.log("APIData:" + data);
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/employeeTimesheet?select=*',
+    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/invoice',
     headers: {
       'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
       'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
@@ -190,26 +201,69 @@ export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<Time
     data: data
   };
 
-  const response = await axios.request(config)
-    .then((response) => 
-      {
-        if(response.status === 201)
-          {
-            response.data = "Success"
-          }
-          else
-          {
-            response.data = "Failed"
-          }
-        return response
-      })
-    .catch((error) => 
-      {
-        console.log(error);
-        return error
-      });
-      return response;
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    console.error("Error creating Invoice:", error);
+    return { status: 500, message: "Error occurred while creating invoice" }; // Return an object
+  }
+  
 }
+
+
+
+
+export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<{status:number; message:string}> => {
+  const data = JSON.stringify([
+    {
+      employeeId: t.employeeId,
+      employeeName: t.employeeName,
+      employeeClient: t.employeeClient,
+      timesheetMonthYear: t.timesheetMonthYear,
+      workingDays:t.workingDays,
+      holidayDays: t.holidayDays,
+      holidayDates: t.holidayDates,
+      leaveDays: t.leaveDays,
+      leaveDates: t.leaveDates,
+      approved:false,
+      approvedBy:null,
+      approvedDate:null,
+      sentToFinance:false,
+      timesheetFileLocation:null,
+      createdBy: t.createdBy
+    }
+  ]);
+  console.log("APIData:" + data);
+  const config = {
+    method: 'post',
+    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/employeeTimesheet',
+    headers: {
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', // Use environment variable
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', // Use environment variable
+      'Content-Type': 'application/json'
+    },
+    data: data
+  };
+
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    console.error("Error creating timesheet:", error);
+    return { status: 500, message: "Error occurred while creating timesheet" }; // Return an object
+  }
+};
 
 export const getEmployeeTimesheet = async () : Promise<ListOfTimesheet> => {
   let response: ListOfTimesheet = {

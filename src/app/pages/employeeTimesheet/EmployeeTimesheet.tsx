@@ -12,11 +12,7 @@ import {
   TimesheetRequest
 } from "../../modules/apps/user-management/users-list/core/_models";
 
-var salaryDetailsInfo: any = await apiHelper
-  .getEmployeeSalaryDetailInfo("1")
-  .then(async (data) => {
-    return data;
-  });
+
 
 var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
   return data.data;
@@ -35,12 +31,15 @@ const profileDetailsSchema = Yup.object().shape({
   currency: Yup.string().required("Currency is required"),
 });
 
+
 const EmployeeTimesheet: FC = () => {
   const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
+
   const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
+
   const handleUserChange = async (userName: string) => {
     var hasMatch = allUserInfo.find(function (value: User) {
       return value.firstName == userName;
@@ -55,7 +54,7 @@ const EmployeeTimesheet: FC = () => {
   const [loading, setLoading] = useState(false);
   const formik = useFormik<IProfileDetails>({
     initialValues,
-    onSubmit: () => {
+    onSubmit:async () => {
       setLoading(true);
       setTimeout(async () => {
         const payload = {
@@ -63,27 +62,32 @@ const EmployeeTimesheet: FC = () => {
         };
         const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
-        if(data.sEmployee.length < 1 || data.fName.length < 1 || data.client.length < 1 || data.dates.length < 1)
+        if(data.sEmployee.length < 1 || data.fName.length < 1 || data.client.length < 1 || data.workingDays.length < 1)
         {
           alert("Please select all fields")
           setLoading(false)
           return
         }
-        let timeSheetRequest : TimesheetRequest = {
+        const timeSheetRequest : TimesheetRequest = {
           employeeId: data.sEmployee,
           employeeName: data.fName,
           employeeClient: data.client,
           timesheetMonthYear: data.monthyear,
-          workingDays: data.dates,
-          workingDates: data.datesStr,
+          workingDays: data.workingDays,
           holidayDays: data.holidays,
           holidayDates: data.holidaysStr,
           leaveDays: data.leaves,
           leaveDates: data.leavesStr,
           createdBy: "Jaffar",
-          status: 0
+          status: 0,
+          timesheetFileLocation:"",
+          sentToFinance: "",
+          approvedDate: undefined,
+          approvedBy: undefined,
+          approved: undefined,
+        
         };
-        var apiResponse = await createEmployeeTimesheet(timeSheetRequest)
+        const apiResponse = await createEmployeeTimesheet(timeSheetRequest)
         if (apiResponse.status === 201)
           {
             alert("Success");
@@ -125,13 +129,14 @@ const EmployeeTimesheet: FC = () => {
                     id="sEmployee"
                     className="form-select form-select-solid form-select-lg fw-bold"
                     {...formik.getFieldProps("sEmployee")}
-                    defaultValue={"Select a Employee..."}
+                    
                     onChange={async (e) => {
                       await handleUserChange(e.target.value);
-                      formik.setFieldValue("company", updatedUserInfo.client);
+                      formik.setFieldValue("client", updatedUserInfo.client);
                     }}
                     value={initialValues.fName}
-                  >
+                  > 
+                    <option value="">Select Employee</option>
                     {allUserInfo.map((data: any, i: number) => (
                       <option key={i} value={data.firstName}>
                         {data.firstName}
@@ -147,7 +152,7 @@ const EmployeeTimesheet: FC = () => {
               </div>
             </div>
             <div id="kt_account_profile_details" className="collapse show">
-              <form onSubmit={formik.handleSubmit} noValidate className="form">
+              <form onSubmit={formik.handleSubmit}  noValidate className="form">
                 <div className="card-body border-top p-9">
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label required fw-bold fs-6">
@@ -158,9 +163,10 @@ const EmployeeTimesheet: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Company name"
-                        {...formik.getFieldProps("company")}
+                        {...formik.getFieldProps("client")}
                         onChange={(value) => {
                           updateData({ client: value.target.value });
+                          formik.setFieldValue("client",value.target.value)
                         }}
                       />
                       {formik.touched.client && formik.errors.client && (
@@ -174,29 +180,22 @@ const EmployeeTimesheet: FC = () => {
                   </div>
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label required fw-bold fs-6">
-                      Working Dates
+                      Working Days
                     </label>
                     <div className="col-lg-8 fv-row">
-                      <Flatpickr
-                        className="form-control form-control-lg form-control-solid"
-                        options={
-                          {
-                            mode: "multiple",
-                            dateFormat: "d-m-Y"
-                          }
-                      }
-                        onChange={(dateStr) => {
-                          updateData({ dates: dateStr.length.toString() });
-                          updateData({ datesStr: dateStr.toString()});
+                    
+                      <input
+                      type="text"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Total Working Days"
+                      
+                      onChange={(value) => {
+                        updateData({ workingDays: value.target.value });
+                        formik.setFieldValue("WorkingDays",value.target.value)
                         }}
-                      ></Flatpickr>
-                      {formik.touched.dates && formik.errors.dates && (
-                        <div className="fv-plugins-message-container">
-                          <div className="fv-help-block">
-                            {formik.errors.dates}
-                          </div>
-                        </div>
-                      )}
+                      >
+                        
+                      </input>
                     </div>
                   </div>
                   <div className="row mb-6">
@@ -209,17 +208,18 @@ const EmployeeTimesheet: FC = () => {
                         options={{
                           mode: "single",
                           defaultDate: new Date(),
-                          dateFormat: "M-y",
+                          dateFormat: "m-Y",
                         }}
                         onChange={(dateStr) => {
                           updateData({
                             monthyear: new Date(dateStr.toString())
                               .toLocaleDateString("en-IN", {
-                                year: "numeric",
                                 month: "short",
+                                year: "numeric",
                               })
                               .replace(/ /g, "-"),
                           });
+                        
                         }}
                       ></Flatpickr>
                       {formik.touched.monthyear && formik.errors.monthyear && (
@@ -233,7 +233,7 @@ const EmployeeTimesheet: FC = () => {
                   </div>
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label fw-bold fs-6">
-                      <span className="required">Public Holidays</span>
+                      <span className="">Public Holidays</span>
                     </label>
                     <div className="col-lg-8 fv-row">
                       <Flatpickr
@@ -245,6 +245,8 @@ const EmployeeTimesheet: FC = () => {
                         onChange={(dateStr) => {
                           updateData({ holidays: dateStr.length.toString() });
                           updateData({ holidaysStr: dateStr.toString()});
+                          formik.setFieldValue("holidays",dateStr.length.toString());
+                          formik.setFieldValue("holidaysStr",dateStr.toString());
                         }}
                       ></Flatpickr>
                       {formik.touched.holidays && formik.errors.holidays && (
@@ -258,7 +260,7 @@ const EmployeeTimesheet: FC = () => {
                   </div>
 
                   <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
                       Employee Leaves
                     </label>
                     <div className="col-lg-8 fv-row">
@@ -282,57 +284,15 @@ const EmployeeTimesheet: FC = () => {
                       )}
                     </div>
                   </div>
-                  <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label fw-bold fs-6">
-                      Communication
-                    </label>
-
-                    <div className="col-lg-8 fv-row">
-                      <div className="d-flex align-items-center mt-3">
-                        <label className="form-check form-check-inline form-check-solid me-5">
-                          <input
-                            className="form-check-input"
-                            name="communication[]"
-                            type="checkbox"
-                            defaultChecked={data.communications?.email}
-                            onChange={() => {
-                              updateData({
-                                communications: {
-                                  email: !data.communications?.email,
-                                  phone: data.communications?.phone,
-                                },
-                              });
-                            }}
-                          />
-                          <span className="fw-bold ps-2 fs-6">Email</span>
-                        </label>
-
-                        <label className="form-check form-check-inline form-check-solid">
-                          <input
-                            className="form-check-input"
-                            name="communication[]"
-                            type="checkbox"
-                            defaultChecked={data.communications?.phone}
-                            onChange={() => {
-                              updateData({
-                                communications: {
-                                  email: data.communications?.email,
-                                  phone: !data.communications?.phone,
-                                },
-                              });
-                            }}
-                          />
-                          <span className="fw-bold ps-2 fs-6">Phone</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
                 <div className="card-footer d-flex justify-content-end py-6 px-9">
                   <button
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
+                    onClick={this}
+                    
                   >
                     {!loading && "Save Changes"}
                     {loading && (
@@ -355,4 +315,4 @@ const EmployeeTimesheet: FC = () => {
   );
 };
 
-export { EmployeeTimesheet };
+export { EmployeeTimesheet };

@@ -33,7 +33,7 @@ import { apiHelper } from '../../../../apiFactory/apiHelper'
   const getBillingData = async () : Promise<number> => 
     {
       var sum = 0
-      await apiHelper.getBillingTotalValue().then(function (apiData)
+      await apiHelper.getInvoiceTotalValue().then(function (apiData)
       {
         for(var i = 0; i < apiData?.data.length; i++)
           {
