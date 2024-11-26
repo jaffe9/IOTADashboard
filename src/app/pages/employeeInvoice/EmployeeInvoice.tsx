@@ -233,7 +233,7 @@ const EmployeeInvoice: FC = () => {
                         className="form-control form-control-lg form-control-solid"
                         options={{
                           mode: "single",
-                          dateFormat: "Y-m-d",
+                          dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
                           updateData({ invoice_date: dateStr.toLocaleString("en-IN",{
