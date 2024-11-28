@@ -171,7 +171,7 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
   return response;
 };
 
-export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:number;message:string}> => {
+export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
     {
       contract_id: i.contract_id,
@@ -185,7 +185,6 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
       invoice_url: null,
       invoice_paid_date:null,
       invoice_paid_amount:null,
-      status:0
     }
   ]);
   console.log("APIData:" + data);

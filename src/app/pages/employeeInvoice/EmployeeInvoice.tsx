@@ -61,10 +61,7 @@ const EmployeeInvoice: FC = () => {
     initialValues,
     onSubmit: () => {
       setLoading(true);
-      setTimeout(async () => {
-        const payload = {
-          ...updatedUserInfo,
-        };
+      setTimeout( async () => {
         const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
         console.log(updatedData);
