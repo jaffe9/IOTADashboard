@@ -39,11 +39,11 @@ export interface IProfileDetailsInvoice {
   invoice_paid_date:string;
   invoice_paid_status:boolean;
 
-  communications:
-  {
-    email: boolean;
-    phone: boolean;
-  }
+  // communications:
+  // {
+  //   email: boolean;
+  //   phone: boolean;
+  // }
 }
 
 export interface IUpdateEmail {
@@ -144,10 +144,10 @@ export const profileDetailsInitValuesInvoice: IProfileDetailsInvoice = {
   invoice_value: "",
   invoice_url: "",
   invoice_date: "",
-  communications: {
-    email: true,
-    phone: true
-  },
+  // communications: {
+  //   email: true,
+  //   phone: true
+  // },
   invoice_paid_date: "",
   invoice_paid_amount: "",
   associated_user_id: "",

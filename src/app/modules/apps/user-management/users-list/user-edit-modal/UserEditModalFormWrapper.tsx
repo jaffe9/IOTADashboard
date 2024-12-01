@@ -6,7 +6,6 @@ import {getUserById} from '../core/_requests'
 import { apiHelper } from '../../../../../../apiFactory/apiHelper'
 import { useEffect } from 'react'
 import { payslipOptions, Salary } from '../core/_models'
-import { number, string } from 'yup'
 
 const getSalaryDataFromApi = async (id : string) => 
   {
