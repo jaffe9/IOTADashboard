@@ -148,7 +148,7 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
                     <td className='text-danger fw-bold'>
                       {formatExpiryDate(record.billing_end_date)}
                     </td>
-                    <td className='text-end'>
+                    <td className='text-end' style={{maxWidth:'100px'}}>
                     <span
                       className={`text-primary bold`}
                       >
@@ -159,7 +159,6 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
                                 whiteSpace: 'nowrap', 
                                 textOverflow: 'ellipsis', 
                                 overflow: 'hidden', 
-                                minWidth: '69px' 
                               }}>
                               <a
                               href={`${record.contract_file_location}`}

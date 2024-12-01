@@ -3,7 +3,7 @@ import { ID, Response } from '../../../../../../_metronic/helpers'
 export enum payslipOptions { download = "download", email = "email" }
 
 export type User = {
-  contract_id: string
+  contract_id?: string
   id?: number
   username?: string
   email?: string

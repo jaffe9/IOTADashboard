@@ -217,7 +217,7 @@ const EmployeeTimesheet: FC = () => {
                                 month: "short",
                                 year: "numeric",
                               })
-                              .replace(/ /g, "-"),
+                              .replace(/\//g, "-"),
                           });
                         
                         }}

@@ -6,6 +6,7 @@ import {getUserById} from '../core/_requests'
 import { apiHelper } from '../../../../../../apiFactory/apiHelper'
 import { useEffect } from 'react'
 import { payslipOptions, Salary } from '../core/_models'
+import { number, string } from 'yup'
 
 const getSalaryDataFromApi = async (id : string) => 
   {
@@ -69,7 +70,7 @@ useEffect(() =>
   )
   
   if (!itemIdForUpdate) {
-    return <UserEditModalForm isUserLoading={isLoading} user={{ id: undefined }} salary={salary} basic_allowance={basic_allowance} hr_allowance={hr_allowance} travel_allowance={travel_allowance} lop_days={lop_days}
+    return <UserEditModalForm isUserLoading={isLoading} user={{ id: undefined }} salary={salary} basic_allowance={basic_allowance} hr_allowance={hr_allowance} travel_allowance={travel_allowance} lop_days={lop_days} 
     salary_advance={salary_advance}
     employee_request={employee_request}
     holidays={holidays}

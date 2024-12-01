@@ -171,7 +171,7 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
   return response;
 };
 
-export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:number;message:string}> => {
+export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
     {
       contract_id: i.contract_id,
@@ -185,7 +185,6 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
       invoice_url: null,
       invoice_paid_date:null,
       invoice_paid_amount:null,
-      status:0
     }
   ]);
   console.log("APIData:" + data);
@@ -210,8 +209,13 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
      return { status: response.status, message: "Failed" }; // Return an object
     }
   } catch (error) {
-    console.error("Error creating Invoice:", error);
-    return { status: 500, message: "Error occurred while creating invoice" }; // Return an object
+    if (axios.isAxiosError(error)){
+      console.error("error:",error.response?.data  || error.message)
+    }else{
+      console.error("Unexpected error:",error);
+    }
+
+    return { status: 500, message: "Error creating invoice" };
   }
   
 }
