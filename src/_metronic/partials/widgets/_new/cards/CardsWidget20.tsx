@@ -53,6 +53,7 @@ const CardsWidget20 = ({ className, description, color, img }: Props) => (
   useEffect(() => {
     setValues();
     }),
+  <a href={"/apps/user-management/users"} style={{ textDecoration: 'none' }}>
   <div
     className={`card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end ${className}`}
     style={{
@@ -93,6 +94,7 @@ const CardsWidget20 = ({ className, description, color, img }: Props) => (
       </div>
     </div>
   </div>
+  </a>
 )
 
 export { CardsWidget20 };

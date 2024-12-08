@@ -3,11 +3,12 @@ import {MenuComponent} from '../../../../../../../_metronic/assets/ts/components
 import {initialQueryState, KTIcon} from '../../../../../../../_metronic/helpers'
 import {useQueryRequest} from '../../core/QueryRequestProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
+import { setNestedObjectValues } from 'formik'
 
 const UsersListFilter = () => {
   const {updateState} = useQueryRequest()
   const {isLoading} = useQueryResponse()
-  const [role, setRole] = useState<string | undefined>()
+  const [companyName, setCompanyName] = useState<string>('')
   const [lastLogin, setLastLogin] = useState<string | undefined>()
 
   useEffect(() => {
@@ -15,12 +16,14 @@ const UsersListFilter = () => {
   }, [])
 
   const resetData = () => {
-    updateState({filter: undefined, ...initialQueryState})
+    setCompanyName('') // Clear local filter state
+    
+    updateState({filter: undefined, ...initialQueryState});
   }
 
   const filterData = () => {
     updateState({
-      filter: {role, last_login: lastLogin},
+      filter: {companyName},
       ...initialQueryState,
     })
   }
@@ -55,55 +58,35 @@ const UsersListFilter = () => {
         <div className='px-7 py-5' data-kt-user-table-filter='form'>
           {/* begin::Input group */}
           <div className='mb-10'>
-            <label className='form-label fs-6 fw-bold'>Role:</label>
+            <label className='form-label fs-6 fw-bold'>ClientName:</label>
             <select
               className='form-select form-select-solid fw-bolder'
               data-kt-select2='true'
               data-placeholder='Select option'
               data-allow-clear='true'
-              data-kt-user-table-filter='role'
+              data-kt-user-table-filter='companyName'
               data-hide-search='true'
-              onChange={(e) => setRole(e.target.value)}
-              value={role}
+              onChange={(e) => setCompanyName(e.target.value)}
+              value={companyName}
             >
               <option value=''></option>
-              <option value='Administrator'>Administrator</option>
-              <option value='Analyst'>Analyst</option>
-              <option value='Developer'>Developer</option>
-              <option value='Support'>Support</option>
-              <option value='Trial'>Trial</option>
+              <option value='Arab National Bank'>Arab National Bank</option>
+              <option value='Riyad Bank'>Riyad Bank</option>
+              <option value='InnovWayz Technologies'>InnovWayz Technologies</option>
+              <option value='Saudi National Bank'>Saudi National Bank</option>
+              <option value='Saudi Awwal Bank'>Saudi Awwal Bank</option>
+              <option value='Saudi Investment Bank'>Saudi Investment Bank</option>              
             </select>
           </div>
           {/* end::Input group */}
 
-          {/* begin::Input group */}
-          <div className='mb-10'>
-            <label className='form-label fs-6 fw-bold'>Last login:</label>
-            <select
-              className='form-select form-select-solid fw-bolder'
-              data-kt-select2='true'
-              data-placeholder='Select option'
-              data-allow-clear='true'
-              data-kt-user-table-filter='two-step'
-              data-hide-search='true'
-              onChange={(e) => setLastLogin(e.target.value)}
-              value={lastLogin}
-            >
-              <option value=''></option>
-              <option value='Yesterday'>Yesterday</option>
-              <option value='20 mins ago'>20 mins ago</option>
-              <option value='5 hours ago'>5 hours ago</option>
-              <option value='2 days ago'>2 days ago</option>
-            </select>
-          </div>
-          {/* end::Input group */}
 
           {/* begin::Actions */}
           <div className='d-flex justify-content-end'>
             <button
               type='button'
               disabled={isLoading}
-              onClick={filterData}
+              onClick={resetData}
               className='btn btn-light btn-active-light-primary fw-bold me-2 px-6'
               data-kt-menu-dismiss='true'
               data-kt-user-table-filter='reset'
@@ -113,12 +96,14 @@ const UsersListFilter = () => {
             <button
               disabled={isLoading}
               type='button'
-              onClick={resetData}
+              onClick={filterData}
               className='btn btn-primary fw-bold px-6'
               data-kt-menu-dismiss='true'
               data-kt-user-table-filter='filter'
             >
               Apply
+
+
             </button>
           </div>
           {/* end::Actions */}

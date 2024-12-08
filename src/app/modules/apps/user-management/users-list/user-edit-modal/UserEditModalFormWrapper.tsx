@@ -69,7 +69,7 @@ useEffect(() =>
   )
   
   if (!itemIdForUpdate) {
-    return <UserEditModalForm isUserLoading={isLoading} user={{ id: undefined }} salary={salary} basic_allowance={basic_allowance} hr_allowance={hr_allowance} travel_allowance={travel_allowance} lop_days={lop_days}
+    return <UserEditModalForm isUserLoading={isLoading} user={{ id: undefined }} salary={salary} basic_allowance={basic_allowance} hr_allowance={hr_allowance} travel_allowance={travel_allowance} lop_days={lop_days} 
     salary_advance={salary_advance}
     employee_request={employee_request}
     holidays={holidays}
