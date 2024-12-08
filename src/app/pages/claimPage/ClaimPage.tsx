@@ -1,16 +1,31 @@
 import { useState, FC } from "react";
-import { toAbsoluteUrl } from "../../../_metronic/helpers";
 import {
   IProfileDetails,
   profileDetailsInitValues as initialValues,
-} from "../../../app/modules/accounts/components/settings/SettingsModel";
+} from "../../modules/accounts/components/settings/SettingsModel";
 import * as Yup from "yup";
 import { useFormik } from "formik";
-import DatePicker from "react-flatpickr";
-import flatpickr from "flatpickr";
 import Flatpickr from "react-flatpickr";
+import { apiHelper, createClaimPage } from "../../../apiFactory/apiHelper";
+import {
+  User,
+  ClaimRequest,
+  Expenses,
+} from "../../modules/apps/user-management/users-list/core/_models";
 
+
+
+// var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
+//   return data.data;
+// });
+var allUserInfo: any = await Promise.all(
+  [ apiHelper.getAllEmployees(), apiHelper.getExpenses(), apiHelper.getAccountManager() ]
+).then(([employee,expense ,manager]) => {
+  return { employee:employee.data, expense:expense.data , manager:manager.data}
+})
+let updatedUserInfo: IProfileDetails = initialValues;
 const profileDetailsSchema = Yup.object().shape({
+  sEmployee: Yup.string().required("Please select an employee from list"),
   fName: Yup.string().required("First name is required"),
   lName: Yup.string().required("Last name is required"),
   company: Yup.string().required("Company name is required"),
@@ -22,246 +37,268 @@ const profileDetailsSchema = Yup.object().shape({
   currency: Yup.string().required("Currency is required"),
 });
 
+
 const ClaimPage: FC = () => {
-  const [data, setData] = useState<IProfileDetails>(initialValues);
+  const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
+
   const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
-    const updatedData = Object.assign(data, fieldsToUpdate);
+    const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
+  };
+
+  const handleAccountManagerChange = async (accountManagerName : string) => {
+    var hasMatch = allUserInfo.manager.find(function (value : Expenses){
+      return value.expenseBy = accountManagerName;
+    });
+    updateData({
+      expenseBy: accountManagerName,
+    })
+  }
+  const handleChange = async (id : number) => {
+    var hasMatch = allUserInfo.expense.find(function (value : Expenses){
+      return value.expenseType = id;
+    });
+    updateData({
+      expenseType: id,
+    })
+  }
+  const handleUserChange = async (userName: string) => {
+    var hasMatch = allUserInfo.employee.find(function (value: User) {
+      return value.firstName == userName;
+    });
+    updateData({
+      associatedUserId:hasMatch.id,
+      fName: userName,
+    });
   };
 
   const [loading, setLoading] = useState(false);
   const formik = useFormik<IProfileDetails>({
     initialValues,
-    validationSchema: profileDetailsSchema,
-    onSubmit: (values) => {
+    onSubmit:async () => {
       setLoading(true);
-      setTimeout(() => {
-        values.communications.email = data.communications.email;
-        values.communications.phone = data.communications.phone;
-        const updatedData = Object.assign(data, values);
+      setTimeout(async () => {
+        const payload = {
+          ...updatedUserInfo,
+        };
+        const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
-        setLoading(false);
+        if(data.expenseType < 1  )
+        {
+          alert("Please select all fields")
+          setLoading(false)
+          return
+        }
+        const ClaimRequest : ClaimRequest = {
+          expenseType: data.expenseType,
+          expenseDate: data.expenseDate,
+          expenseBy: data.expenseBy,
+          expenseAmount: data.expenseAmount,
+          associatedUserId: data.associatedUserId
+        };
+        const apiResponse = await createClaimPage(ClaimRequest)
+        if (apiResponse.status === 201)
+          {
+            alert("Claim Successful");
+            setLoading(false);
+          }
+          else
+          {
+            alert("An error occurred, please try again later");
+            setLoading(false);
+          }
       }, 1000);
     },
   });
 
   return (
     <div className="card mb-12">
-      <div className="card-body d-flex align-items-left py-12">
-        <div className="card mb-12 mb-xl-12">
-          <div
-            className="card-header border-0 cursor-pointer"
-            role="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#kt_account_profile_details"
-            aria-expanded="true"
-            aria-controls="kt_account_profile_details"
-          >
-            <div className="card-title m-0">
-              <h3 className="fw-bolder m-0">Submit a Claim</h3>
+      <div className="form">
+        <div className="card-body">
+          <div className="card mb-12 mb-xl-12">
+            <div
+              className="card-header border-0 cursor-pointer"
+              role="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#kt_account_profile_details"
+              aria-expanded="true"
+              aria-controls="kt_account_profile_details"
+            >
+              <div className="card-title m-0">
+                <h3 className="fw-bolder m-0">Submit Claim</h3>
+              </div>
             </div>
-          </div>
-
-          <div id="kt_account_profile_details" className="collapse show">
-            <form onSubmit={formik.handleSubmit} noValidate className="form">
-              <div className="card-body border-top p-9">
-                <div className="row mb-6">
-                  <label className="col-lg-4 col-form-label fw-bold fs-6">
-                    Full Name
-                  </label>
-                  <div className="col-lg-8">
-                    <div
-                      className="image-input image-input-outline"
-                      data-kt-image-input="true"
-                      style={{
-                        backgroundImage: `url(${toAbsoluteUrl(
-                          "media/avatars/blank.png"
-                        )})`,
-                      }}
-                    >
-                      <div
-                        className="image-input-wrapper w-125px h-125px"
-                        style={{
-                          backgroundImage: `url(${toAbsoluteUrl(data.fName)})`,
-                        }}
-                      ></div>
+            <div className="card-body border-top p-9">
+              <div className="row mb-6">
+                <label className="col-lg-4 col-form-label fw-bold fs-6">
+                  <span className="required">Select Employee</span>
+                </label>
+                <div className="col-lg-8 fv-row">
+                  <select
+                    id="associatedUserId"
+                    className="form-select form-select-solid form-select-lg fw-bold"
+                    {...formik.getFieldProps("associatedUserId")}
+                    
+                    onChange={async (e) => {
+                      await handleUserChange(e.target.value);
+                      formik.setFieldValue("associatedUserId", updatedUserInfo.associatedUserId);
+                    }}
+                    value={initialValues.fName}
+                  > 
+                    <option value="">Select Employee</option>
+                    {allUserInfo.employee.map((data: any, i: number) => (
+                      <option key={i} value={data.firstName}>
+                        {data.firstName} - {data.id} 
+                      </option>
+                    ))}
+                  </select>
+                  {/* {formik.touched.sEmployee && formik.errors.sEmployee && (
+                    <div className="fv-plugins-message-container">
+                      <div className="fv-help-block">{formik.errors.sEmployee}</div>
                     </div>
-                  </div>
+                  )} */}
                 </div>
-
-                <div className="row mb-6">
-                  <label className="col-lg-4 col-form-label required fw-bold fs-6">
-                    Full Name
-                  </label>
-
-                  <div className="col-lg-8">
-                    <div className="row">
-                      <div className="col-lg-6 fv-row">
-                        <input
-                          type="text"
-                          className="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                          placeholder="First name"
-                          {...formik.getFieldProps("fName")}
-                        />
-                        {formik.touched.fName && formik.errors.fName && (
-                          <div className="fv-plugins-message-container">
-                            <div className="fv-help-block">
-                              {formik.errors.fName}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="col-lg-6 fv-row">
-                        <input
-                          type="text"
-                          className="form-control form-control-lg form-control-solid"
-                          placeholder="Last name"
-                          {...formik.getFieldProps("fName")}
-                        />
-                        {formik.touched.fName && formik.errors.fName && (
-                          <div className="fv-plugins-message-container">
-                            <div className="fv-help-block">
-                              {formik.errors.fName}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="row mb-6">
-                  <label className="col-lg-4 col-form-label required fw-bold fs-6">
-                    Company
-                  </label>
-
-                  <div className="col-lg-8 fv-row">
-                    <input
-                      type="text"
-                      className="form-control form-control-lg form-control-solid"
-                      placeholder="Company name"
-                      {...formik.getFieldProps("company")}
-                    />
-                    {formik.touched.client && formik.errors.client && (
-                      <div className="fv-plugins-message-container">
-                        <div className="fv-help-block">
-                          {formik.errors.client}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="row mb-6">
-                  <label className="col-lg-4 col-form-label required fw-bold fs-6">
-                    Company
-                  </label>
-
-                  <div className="col-lg-8 fv-row">
-                    <Flatpickr className="form-control form-control-lg form-control-solid"
-                      options={{
-                        mode: "multiple",
-                        dateFormat: "d-m-Y",
-                      }}
-                    ></Flatpickr>
-                    {formik.touched.client && formik.errors.client && (
-                      <div className="fv-plugins-message-container">
-                        <div className="fv-help-block">
-                          {formik.errors.client}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="row mb-6">
-                  <label className="col-lg-4 col-form-label fw-bold fs-6">
-                    <span className="required">Contact Phone</span>
-                  </label>
-
-                  <div className="col-lg-8 fv-row">
-                    <input
-                      type="tel"
-                      className="form-control form-control-lg form-control-solid"
-                      placeholder="Phone number"
-                      {...formik.getFieldProps("contactPhone")}
-                    />
-                    {formik.touched.communications?.phone &&
-                      formik.errors.communications?.phone && (
+              </div>
+            </div>
+            <div id="kt_account_profile_details" className="collapse show">
+              <form onSubmit={formik.handleSubmit}  noValidate className="form">
+                <div className="card-body border-top p-9">
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
+                      Expense Type
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <select
+                    id="expenseType"
+                    className="form-select form-select-solid form-select-lg fw-bold"
+                    {...formik.getFieldProps("expenseType")}
+                    
+                    onChange={async (e) => {
+                      await handleChange(parseInt(e.target.value));
+                      formik.setFieldValue("expenseType", updatedUserInfo.expenseType);
+                    }}
+                   // value={initialValues.expenseType}
+                  > 
+                    <option value="">Select Expense Type</option>
+                    {allUserInfo.expense.map((data: any, i: number) => (
+                      <option key={i} value={data.id}>
+                        {data.id} - {data.expenseTypeDesc}
+                      </option>
+                    ))}
+                  </select>
+                      {formik.touched.expenseType && formik.errors.expenseType && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
-                            {formik.errors.communications?.phone}
+                            {formik.errors.expenseType}
                           </div>
                         </div>
                       )}
-                  </div>
-                </div>
-                <div className="row mb-6">
-                  <label className="col-lg-4 col-form-label fw-bold fs-6">
-                    Communication
-                  </label>
-
-                  <div className="col-lg-8 fv-row">
-                    <div className="d-flex align-items-center mt-3">
-                      <label className="form-check form-check-inline form-check-solid me-5">
-                        <input
-                          className="form-check-input"
-                          name="communication[]"
-                          type="checkbox"
-                          defaultChecked={data.communications?.email}
-                          onChange={() => {
-                            updateData({
-                              communications: {
-                                email: !data.communications?.email,
-                                phone: data.communications?.phone,
-                              },
-                            });
-                          }}
-                        />
-                        <span className="fw-bold ps-2 fs-6">Email</span>
-                      </label>
-
-                      <label className="form-check form-check-inline form-check-solid">
-                        <input
-                          className="form-check-input"
-                          name="communication[]"
-                          type="checkbox"
-                          defaultChecked={data.communications?.phone}
-                          onChange={() => {
-                            updateData({
-                              communications: {
-                                email: data.communications?.email,
-                                phone: !data.communications?.phone,
-                              },
-                            });
-                          }}
-                        />
-                        <span className="fw-bold ps-2 fs-6">Phone</span>
-                      </label>
                     </div>
                   </div>
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
+                      Expense Amount
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    
+                      <input
+                      type="text"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Total Amount"
+                      
+                      onChange={(value) => {
+                        updateData({ expenseAmount: value.target.value });
+                        formik.setFieldValue("expenseAmount",value.target.value)
+                        }}
+                      >
+                        
+                      </input>
+                    </div>
+                  </div>
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label fw-bold fs-6">
+                      <span className="required">Expense Date</span>
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <Flatpickr
+                        className="form-control form-control-lg form-control-solid"
+                        options={{
+                          mode: "single",
+                          dateFormat: "d-m-Y",
+                        }}
+                        onChange={(dateStr) => {
+                          updateData({ expenseDate: dateStr.toLocaleString("en-IN",{
+                            year: "numeric",
+                            month: "2-digit",
+                            day : "2-digit"
+                            }).replace(/\//g, "-") });
+                        }}
+                      ></Flatpickr>
+                      {formik.touched.expenseDate && formik.errors.expenseDate && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            {formik.errors.expenseDate}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label fw-bold fs-6 required">
+                      <span className="">Expense By</span>
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <select
+                    id="expenseBy"
+                    className="form-select form-select-solid form-select-lg fw-bold"
+                    {...formik.getFieldProps("expenseBy")}
+                    
+                    onChange={async (e) => {
+                      await handleAccountManagerChange(e.target.value);
+                      formik.setFieldValue("expenseBy", updatedUserInfo.expenseBy);
+                    }}
+                    //value={initialValues.expenseBy}
+                  > 
+                    <option value="">Select Account Manager</option>
+                    {allUserInfo.manager.map((data: any, i: number) => (
+                      <option key={i} value={data.accountManagerName}>
+                        {data.accountManagerName}
+                      </option>
+                    ))}
+                  </select>
+                      {formik.touched.expenseBy && formik.errors.expenseBy && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            {formik.errors.expenseBy}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
                 </div>
-              </div>
-              <div className="card-footer d-flex justify-content-end py-6 px-9">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={loading}
-                >
-                  {!loading && "Save Changes"}
-                  {loading && (
-                    <span
-                      className="indicator-progress"
-                      style={{ display: "block" }}
-                    >
-                      Please wait...{" "}
-                      <span className="spinner-border spinner-border-sm align-middle ms-2"></span>
-                    </span>
-                  )}
-                </button>
-              </div>
-            </form>
+                <div className="card-footer d-flex justify-content-end py-6 px-9">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={loading}
+                    onClick={this}
+                    
+                  >
+                    {!loading && "Save Changes"}
+                    {loading && (
+                      <span
+                        className="indicator-progress"
+                        style={{ display: "block" }}
+                      >
+                        Please wait...{" "}
+                        <span className="spinner-border spinner-border-sm align-middle ms-2"></span>
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -269,4 +306,4 @@ const ClaimPage: FC = () => {
   );
 };
 
-export { ClaimPage };
+export { ClaimPage };

@@ -90,7 +90,7 @@ const EmployeeInvoice: FC = () => {
         var apiResponse = await createEmployeeInvoice(invoiceRequest)
         if (apiResponse.status === 201)
           {
-            alert("Success");
+            alert("Invoice Submitted Successfully");
             setLoading(false);
           }
           else
@@ -155,7 +155,14 @@ const EmployeeInvoice: FC = () => {
               </div>
             </div>
             <div id="kt_account_profile_details" className="collapse show">
-              <form onSubmit={formik.handleSubmit}  noValidate className="form">
+            <form
+                onSubmit={(e) => {
+                  e.preventDefault(); // Prevent default form submission
+                  formik.handleSubmit();
+                }}
+                noValidate
+                className="form"
+              >
                 <div className="card-body border-top p-9">
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label  fw-bold fs-6"> 

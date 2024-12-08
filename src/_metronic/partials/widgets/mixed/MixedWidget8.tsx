@@ -26,7 +26,7 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
     if(records){
       const today = new Date();
       const twoMonthsFromNow = new Date();
-      twoMonthsFromNow.setMonth(today.getMonth() + 2)
+      twoMonthsFromNow.setMonth(today.getMonth() + 3)
       const filteredAndSortedRecords = records
       .filter((record : ContractExpRecord) =>{
         const expiryDate= new Date(record.billing_end_date);

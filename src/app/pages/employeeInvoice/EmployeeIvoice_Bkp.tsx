@@ -52,7 +52,8 @@ const EmployeeInvoice: FC = () => {
       year: "numeric",
       month: "2-digit",
       }).replace(/\//g, "_"),
-      contract_id:contract_id,
+      contract_id:hasMatch.contract_id,
+      associated_user_id:hasMatch.id
     });
   };
 
@@ -61,10 +62,7 @@ const EmployeeInvoice: FC = () => {
     initialValues,
     onSubmit: () => {
       setLoading(true);
-      setTimeout(async () => {
-        const payload = {
-          ...updatedUserInfo,
-        };
+      setTimeout( async () => {
         const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
         console.log(updatedData);
@@ -135,6 +133,8 @@ const EmployeeInvoice: FC = () => {
                     onChange={async (e) => {
                       await handleUserChange(e.target.value);
                       formik.setFieldValue("client_id", updatedUserInfo.client_id);
+                      formik.setFieldValue("contract_id", updatedUserInfo.contract_id);
+                      formik.setFieldValue("associated_user_id", updatedUserInfo.associated_user_id);
                     
                     }}
                     value={initialValues.contract_id}
@@ -173,6 +173,30 @@ const EmployeeInvoice: FC = () => {
                         }}
                       />
                       {formik.touched.client_id && formik.errors.client_id && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      User Id
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg form-control-solid"
+                        placeholder="Associated User Id"
+                        {...formik.getFieldProps("associated_user_id")}
+                        onChange={(value) => {
+                          updateData({ associated_user_id: value.target.value});
+                          formik.setFieldValue("associated_user_id",value.target.value)
+                        }}
+                      />
+                      {formik.touched.associated_user_id && formik.errors.associated_user_id && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
                             
@@ -233,7 +257,7 @@ const EmployeeInvoice: FC = () => {
                         className="form-control form-control-lg form-control-solid"
                         options={{
                           mode: "single",
-                          dateFormat: "Y-m-d",
+                          dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
                           updateData({ invoice_date: dateStr.toLocaleString("en-IN",{

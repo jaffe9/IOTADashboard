@@ -1,4 +1,10 @@
 export interface IProfileDetails {
+  associatedUserId: number;
+  expenseTypeDesc:string
+  expenseType: number;
+  expenseDate: string;
+  expenseBy: string;
+  expenseAmount: string;
   invoice_url:string,
   invoice_date:string,
   internal_invoice_no:string,
@@ -37,13 +43,7 @@ export interface IProfileDetailsInvoice {
   client_id: any;
   contract_id:string;
   invoice_paid_date:string;
-  invoice_paid_status:boolean;
-
-  // communications:
-  // {
-  //   email: boolean;
-  //   phone: boolean;
-  // }
+  invoice_paid_status:boolean,
 }
 
 export interface IUpdateEmail {
@@ -132,7 +132,13 @@ export const profileDetailsInitValues: IProfileDetails = {
   external_invoice_no: "",
   invoice_value: "",
   invoice_url: "",
-  invoice_date: ""
+  invoice_date: "",
+  expenseType: 0,
+  expenseDate: "",
+  expenseBy: "",
+  expenseAmount: "",
+  associatedUserId: 0,
+  expenseTypeDesc: ""
 };
 
 export const profileDetailsInitValuesInvoice: IProfileDetailsInvoice = {

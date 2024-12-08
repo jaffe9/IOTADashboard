@@ -1,6 +1,6 @@
 import axios from "axios";
 import { resourceLimits } from "worker_threads";
-import { EmployeeOnboardingResponse, InvoiceRequest, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { ClaimRequest, EmployeeOnboardingResponse, InvoiceRequest, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 
@@ -18,6 +18,8 @@ axios.defaults.headers.common['apikey'] = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
 //const API_URL = import.meta.env.VITE_APP_THEME_API_URL;
 const API_URL = `https://zhplktaovpyenmypkjql.supabase.co/rest/v1`;
 const GET_USERS_URL = `${API_URL}/user`;
+const GET_EXPENSE = `${API_URL}/expensesType`;
+const GET_ACCOUNT_MANAGER = `${API_URL}/accountManager`;
 const GET_USER_SALARY_URL = `${API_URL}/salary`;
 const GET_USER_SALARY_DETAIL_URL = `${API_URL}/salaryDetails`;
 const GET_USER_CONTRACT_URL = `${API_URL}/contract`;
@@ -78,6 +80,17 @@ export const getNationalIdExp = async () => {
   }
 }
 
+// Fetching the data related to national_id
+export const getLeavesLeft = async () => {
+  try{
+    const response = await axiosInstance.get("leaveEntitlment?select=*,user_id(username,companyName)&order=id");
+    return response.data;
+  }catch (error){
+    console.error('Error fetching Leaves Left for employees:', error);
+    return null
+  }
+}
+
 // Opportunities Data
 export const getAllOpportunities = async () => {
   try {
@@ -123,9 +136,21 @@ export const getSalaryInfoByEmployee = async (employeeId: string) => {
 
 export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
   const d = await axios
-    .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
+    .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associated_account_manager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
   return d;
 };
+
+export const getExpenses = async (): Promise<UsersQueryResponse> => {
+  const d = await axios
+    .get(`${GET_EXPENSE}?select=*&order=id`);
+  return d;
+};
+
+export const getAccountManager = async (): Promise<UsersQueryResponse> => {
+  const d = await axios
+   .get(`${GET_ACCOUNT_MANAGER}?select=*&order=id`)
+  return d;
+}
 
 export const getPeerEmployees = async (clientId: string): Promise<UsersQueryResponse> => {
   const d = await axios
@@ -221,6 +246,57 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
 }
 
 
+export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; message:string}> => {
+  let data = JSON.stringify([
+    {
+      expenseType: c.expenseType,
+      expenseDate: c.expenseDate,
+      expenseBy: c.expenseBy,
+      expenseAmount: c.expenseAmount,
+      expenseApprovalStatus:false,
+      expenseApprovedBy:null,
+      expenseApprovedDate:null,
+      expenseApprovedAmount:null,
+      externalTransactionId:null,
+      originalTransactionDate:null,
+      externalTransactionNarration:null,
+      associatedUserId:c.associatedUserId,
+
+
+    }
+  ]);
+  console.log("APIData:" + data);
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/expenses',
+    headers: {
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Content-Type': 'application/json'
+    },
+    data: data
+  };
+
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("error:",error.response?.data  || error.message)
+    }else{
+      console.error("Unexpected error:",error);
+    }
+
+    return { status: 500, message: "Error Submitting Claim" };
+  }
+  
+}
 
 
 export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<{status:number; message:string}> => {

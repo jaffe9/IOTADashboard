@@ -90,7 +90,7 @@ const EmployeeTimesheet: FC = () => {
         const apiResponse = await createEmployeeTimesheet(timeSheetRequest)
         if (apiResponse.status === 201)
           {
-            alert("Success");
+            alert("TimeSheet Submitted Successfully");
             setLoading(false);
           }
           else

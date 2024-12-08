@@ -1,166 +1,89 @@
 
-import React from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import {KTIcon} from '../../../helpers'
 import {Dropdown1} from '../../content/dropdown/Dropdown1'
+import { getLeavesLeft } from '../../../../apiFactory/apiHelper'
 
 type Props = {
   className: string
 }
 
+type LeaveBalanceRecord = {
+  leave_accrued_current_year: number;
+  leaves_used: number;
+  leave_left_current_year:number;
+  year:string;
+  user_id: { username: string , companyName:string };
+};
+
 const ListsWidget3: React.FC<Props> = ({className}) => {
+  const [expiringRecords, setExpiringRecords] = useState<LeaveBalanceRecord[]>([]);
+
+  const fetchLeaveBalance = async () => {
+    const records = await getLeavesLeft();
+    const sortByYear = records
+    .sort((a: { year: number } , b: { year: number }) => b.year - a.year )
+    setExpiringRecords(sortByYear);
+  }
+
+  useEffect(() => {
+    fetchLeaveBalance();
+  }, []);
   return (
-    <div className={`card ${className}`}>
-      {/* begin::Header */}
-      <div className='card-header border-0'>
-        <h3 className='card-title fw-bold text-gray-900'>Todo</h3>
-        <div className='card-toolbar'>
-          {/* begin::Menu */}
-          <button
-            type='button'
-            className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
-            data-kt-menu-trigger='click'
-            data-kt-menu-placement='bottom-end'
-            data-kt-menu-flip='top-end'
-          >
-            <KTIcon iconName='category' className='fs-2' />
-          </button>
-          <Dropdown1 />
-          {/* end::Menu */}
-        </div>
+    <div className={`card`}>      
+    {/* begin::Header */}
+    <div className='card-header border-0'>
+      <h3 className='card-title fw-bold text-gray-900'>Employee Leave Balance</h3>
+      <div className='card-toolbar'>
+        {/* begin::Menu */}
+        <button
+          type='button'
+          className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
+          data-kt-menu-trigger='click'
+          data-kt-menu-placement='bottom-end'
+          data-kt-menu-flip='top-end'
+        >
+          <KTIcon iconName='category' className='fs-2' />
+        </button>
+        <Dropdown1 />
+        {/* end::Menu */}
       </div>
-      {/* end::Header */}
-      {/* begin::Body */}
-      <div className='card-body pt-2'>
-        {/* begin::Item */}
-        <div className='d-flex align-items-center mb-8'>
-          {/* begin::Bullet */}
-          <span className='bullet bullet-vertical h-40px bg-success'></span>
-          {/* end::Bullet */}
-          {/* begin::Checkbox */}
-          <div className='form-check form-check-custom form-check-solid mx-5'>
-            <input className='form-check-input' type='checkbox' value='' />
-          </div>
-          {/* end::Checkbox */}
-          {/* begin::Description */}
-          <div className='flex-grow-1'>
-            <a href='#' className='text-gray-800 text-hover-primary fw-bold fs-6'>
-              Create FireStone Logo
-            </a>
-            <span className='text-muted fw-semibold d-block'>Due in 2 Days</span>
-          </div>
-          {/* end::Description */}
-          <span className='badge badge-light-success fs-8 fw-bold'>New</span>
-        </div>
-        {/* end:Item */}
-        {/* begin::Item */}
-        <div className='d-flex align-items-center mb-8'>
-          {/* begin::Bullet */}
-          <span className='bullet bullet-vertical h-40px bg-primary'></span>
-          {/* end::Bullet */}
-          {/* begin::Checkbox */}
-          <div className='form-check form-check-custom form-check-solid mx-5'>
-            <input className='form-check-input' type='checkbox' value='' />
-          </div>
-          {/* end::Checkbox */}
-          {/* begin::Description */}
-          <div className='flex-grow-1'>
-            <a href='#' className='text-gray-800 text-hover-primary fw-bold fs-6'>
-              Stakeholder Meeting
-            </a>
-            <span className='text-muted fw-semibold d-block'>Due in 3 Days</span>
-          </div>
-          {/* end::Description */}
-          <span className='badge badge-light-primary fs-8 fw-bold'>New</span>
-        </div>
-        {/* end:Item */}
-        {/* begin::Item */}
-        <div className='d-flex align-items-center mb-8'>
-          {/* begin::Bullet */}
-          <span className='bullet bullet-vertical h-40px bg-warning'></span>
-          {/* end::Bullet */}
-          {/* begin::Checkbox */}
-          <div className='form-check form-check-custom form-check-solid mx-5'>
-            <input className='form-check-input' type='checkbox' value='' />
-          </div>
-          {/* end::Checkbox */}
-          {/* begin::Description */}
-          <div className='flex-grow-1'>
-            <a href='#' className='text-gray-800 text-hover-primary fw-bold fs-6'>
-              Scoping &amp; Estimations
-            </a>
-            <span className='text-muted fw-semibold d-block'>Due in 5 Days</span>
-          </div>
-          {/* end::Description */}
-          <span className='badge badge-light-warning fs-8 fw-bold'>New</span>
-        </div>
-        {/* end:Item */}
-        {/* begin::Item */}
-        <div className='d-flex align-items-center mb-8'>
-          {/* begin::Bullet */}
-          <span className='bullet bullet-vertical h-40px bg-primary'></span>
-          {/* end::Bullet */}
-          {/* begin::Checkbox */}
-          <div className='form-check form-check-custom form-check-solid mx-5'>
-            <input className='form-check-input' type='checkbox' value='' />
-          </div>
-          {/* end::Checkbox */}
-          {/* begin::Description */}
-          <div className='flex-grow-1'>
-            <a href='#' className='text-gray-800 text-hover-primary fw-bold fs-6'>
-              KPI App Showcase
-            </a>
-            <span className='text-muted fw-semibold d-block'>Due in 2 Days</span>
-          </div>
-          {/* end::Description */}
-          <span className='badge badge-light-primary fs-8 fw-bold'>New</span>
-        </div>
-        {/* end:Item */}
-        {/* begin::Item */}
-        <div className='d-flex align-items-center mb-8'>
-          {/* begin::Bullet */}
-          <span className='bullet bullet-vertical h-40px bg-danger'></span>
-          {/* end::Bullet */}
-          {/* begin::Checkbox */}
-          <div className='form-check form-check-custom form-check-solid mx-5'>
-            <input className='form-check-input' type='checkbox' value='' />
-          </div>
-          {/* end::Checkbox */}
-          {/* begin::Description */}
-          <div className='flex-grow-1'>
-            <a href='#' className='text-gray-800 text-hover-primary fw-bold fs-6'>
-              Project Meeting
-            </a>
-            <span className='text-muted fw-semibold d-block'>Due in 12 Days</span>
-          </div>
-          {/* end::Description */}
-          <span className='badge badge-light-danger fs-8 fw-bold'>New</span>
-        </div>
-        {/* end:Item */}
-        {/* begin::Item */}
-        <div className='d-flex align-items-center'>
-          {/* begin::Bullet */}
-          <span className='bullet bullet-vertical h-40px bg-success'></span>
-          {/* end::Bullet */}
-          {/* begin::Checkbox */}
-          <div className='form-check form-check-custom form-check-solid mx-5'>
-            <input className='form-check-input' type='checkbox' value='' />
-          </div>
-          {/* end::Checkbox */}
-          {/* begin::Description */}
-          <div className='flex-grow-1'>
-            <a href='#' className='text-gray-800 text-hover-primary fw-bold fs-6'>
-              Customers Update
-            </a>
-            <span className='text-muted fw-semibold d-block'>Due in 1 week</span>
-          </div>
-          {/* end::Description */}
-          <span className='badge badge-light-success fs-8 fw-bold'>New</span>
-        </div>
-        {/* end:Item */}
-      </div>
-      {/* end::Body */}
     </div>
-  )
-}
+    {/* end::Header */}
+
+    {/* begin::Body */}
+    <div className='card-body pt-2'>
+      <div className='table-responsive'>
+        <table className='table table table-hover color-yellow'>
+          {/* Table Header */}
+          <thead>
+            <tr className='text-gray-900 fw-bold  mb-1 fs-6'>
+              <th>Username</th>
+              <th>Total Leaves</th>
+              <th>Leaves Used</th>
+              <th>Leave Left</th>
+              <th>Year</th>
+            </tr>
+          </thead>
+
+          {/* Table Body */}
+          <tbody>
+            {expiringRecords.map((record, index) => (
+              <tr key={`user-id-${index}`} className='text-gray-900 fw-bold text-hover-primary mb-1 fs-6'>
+                <td>{record.user_id?.username?.toUpperCase()}</td>
+                <td>{record.leave_accrued_current_year}</td>
+                <td>{record.leaves_used}</td>
+                <td className='text-900 fw-bold text-hover-danger mb-1 fs-6'>{record.leave_left_current_year}</td>
+                <td>{record.year}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {/* end::Body */}
+  </div>
+);
+};
 
 export {ListsWidget3}

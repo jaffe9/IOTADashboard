@@ -16,6 +16,12 @@ export type User = {
   employeeId?: string
   pic?: string
 }
+export type Expenses = {
+  id?: number
+  expenseTypeDesc?: string
+  expenseBy?: string
+  expenseType?: number
+}
 
 export type ResourceOnboardingStatus = {
   id: number;
@@ -91,6 +97,14 @@ export type InvoiceRequest = {
    "invoice_paid_date":string,
    "invoice_paid_amount":string,
 }
+
+export type ClaimRequest = {
+  associatedUserId: number
+  "expenseType": number,
+  "expenseDate": string,
+  "expenseAmount": string,
+  "expenseBy": string
+}
 export type ListOfTimesheet = {
   length: number,
   status: number,
@@ -117,5 +131,5 @@ export const initialUser: User = {
   occupation: 'Art Director',
   firstName: 'Jaffar',
   email: '',
-  contract_id: ''
+  contract_id: '',
 }
