@@ -1,29 +1,23 @@
 import { useState, FC } from "react";
 import {
-  IProfileDetails,
-  profileDetailsInitValues as initialValues,
+  IProfileDetailsInvoice,
+  profileDetailsInitValuesInvoice as initialValues,
 } from "../../modules/accounts/components/settings/SettingsModel";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createClaimPage } from "../../../apiFactory/apiHelper";
+import { apiHelper, createEmployeeInvoice } from "../../../apiFactory/apiHelper";
 import {
   User,
-  ClaimRequest,
-  Expenses,
+  InvoiceRequest
 } from "../../modules/apps/user-management/users-list/core/_models";
 
 
 
-// var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
-//   return data.data;
-// });
-var allUserInfo: any = await Promise.all(
-  [ apiHelper.getAllEmployees(), apiHelper.getExpenses(), apiHelper.getAccountManager() ]
-).then(([employee,expense ,manager]) => {
-  return { employee:employee.data, expense:expense.data , manager:manager.data}
-})
-let updatedUserInfo: IProfileDetails = initialValues;
+var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
+  return data.data;
+});
+let updatedUserInfo: IProfileDetailsInvoice = initialValues;
 const profileDetailsSchema = Yup.object().shape({
   sEmployee: Yup.string().required("Please select an employee from list"),
   fName: Yup.string().required("First name is required"),
@@ -37,71 +31,66 @@ const profileDetailsSchema = Yup.object().shape({
   currency: Yup.string().required("Currency is required"),
 });
 
-
-const ClaimPage: FC = () => {
-  const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
-
-  const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
+const EmployeeInvoice: FC = () => {
+  const [data, setData] = useState<IProfileDetailsInvoice>(updatedUserInfo);
+  const updateData = (fieldsToUpdate: Partial<IProfileDetailsInvoice>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
-
-  const handleAccountManagerChange = async (accountManagerName : string) => {
-    var hasMatch = allUserInfo.manager.find(function (value : Expenses){
-      return value.expenseBy = accountManagerName;
+  const handleUserChange = async (contract_id: string) => {
+    var hasMatch = allUserInfo.find(function (value: User) {
+      return value.contract_id == contract_id;
     });
+    const today = new Date();
+    const previousMonth = new Date();
+    previousMonth.setMonth(today.getMonth() - 1);
     updateData({
-      expenseBy: accountManagerName,
-    })
-  }
-  const handleChange = async (id : number) => {
-    var hasMatch = allUserInfo.expense.find(function (value : Expenses){
-      return value.expenseType = id;
-    });
-    updateData({
-      expenseType: id,
-      expenseTypeDesc:hasMatch.expenseTypeDesc,
-    })
-  }
-  const handleUserChange = async (userName: string) => {
-    var hasMatch = allUserInfo.employee.find(function (value: User) {
-      return value.firstName == userName;
-    });
-    updateData({
-      associatedUserId:hasMatch.id,
-      fName: userName,
+      client_id: hasMatch.clientId,
+     // fName: userName,
+      internal_invoice_no: hasMatch.employeeId+"_"+previousMonth
+      .toLocaleDateString("en-IN",{
+      year: "numeric",
+      month: "2-digit",
+      }).replace(/\//g, "_"),
+      contract_id:hasMatch.contract_id,
+      associated_user_id:hasMatch.id
     });
   };
 
   const [loading, setLoading] = useState(false);
-  const formik = useFormik<IProfileDetails>({
+  const formik = useFormik<IProfileDetailsInvoice>({
     initialValues,
-    onSubmit:async () => {
+    onSubmit: () => {
       setLoading(true);
-      setTimeout(async () => {
-        const payload = {
-          ...updatedUserInfo,
-        };
+      setTimeout( async () => {
         const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
-        if(data.expenseType < 1  )
+        console.log(updatedData);
+        if(   data.client_id.length < 1 || data.invoice_date.length < 1)
         {
+
           alert("Please select all fields")
           setLoading(false)
           return
         }
-        const ClaimRequest : ClaimRequest = {
-          expenseType: data.expenseType,
-          expenseDate: data.expenseDate,
-          expenseBy: data.expenseBy,
-          expenseAmount: data.expenseAmount,
-          associatedUserId: data.associatedUserId,
-          expenseTypeDesc: data.expenseTypeDesc,
+        let invoiceRequest : InvoiceRequest = {
+          contract_id: data.contract_id,
+          client_id: data.client_id,
+          internal_invoice_no: data.internal_invoice_no,
+          external_invoice_no: data.external_invoice_no,
+          invoice_date: data.invoice_date,
+          invoice_value: data.invoice_value,
+          invoice_paid_status: data.invoice_paid_status,
+          invoice_url: data.invoice_url,
+          invoice_paid_date: data.invoice_paid_date,
+          invoice_paid_amount: data.invoice_paid_amount,
+          status: 0,
+          associated_user_id:data.associated_user_id,
         };
-        const apiResponse = await createClaimPage(ClaimRequest)
+        var apiResponse = await createEmployeeInvoice(invoiceRequest)
         if (apiResponse.status === 201)
           {
-            alert("Claim Successful");
+            alert("Success");
             setLoading(false);
           }
           else
@@ -127,30 +116,33 @@ const ClaimPage: FC = () => {
               aria-controls="kt_account_profile_details"
             >
               <div className="card-title m-0">
-                <h3 className="fw-bolder m-0">Submit Claim</h3>
+                <h3 className="fw-bolder m-0">Submit Invoice</h3>
               </div>
             </div>
             <div className="card-body border-top p-9">
               <div className="row mb-6">
                 <label className="col-lg-4 col-form-label fw-bold fs-6">
-                  <span className="required">Select Employee</span>
+                  <span className="required">Contract Id</span>
                 </label>
                 <div className="col-lg-8 fv-row">
                   <select
-                    id="associatedUserId"
+                    id="contract_id"
                     className="form-select form-select-solid form-select-lg fw-bold"
-                    {...formik.getFieldProps("associatedUserId")}
+                    {...formik.getFieldProps("contract_id")}
                     
                     onChange={async (e) => {
                       await handleUserChange(e.target.value);
-                      formik.setFieldValue("associatedUserId", updatedUserInfo.associatedUserId);
+                      formik.setFieldValue("client_id", updatedUserInfo.client_id);
+                      formik.setFieldValue("contract_id", updatedUserInfo.contract_id);
+                      formik.setFieldValue("associated_user_id", updatedUserInfo.associated_user_id);
+                    
                     }}
-                    value={initialValues.fName}
+                    value={initialValues.contract_id}
                   > 
-                    <option value="">Select Employee</option>
-                    {allUserInfo.employee.map((data: any, i: number) => (
-                      <option key={i} value={data.firstName}>
-                        {data.firstName} - {data.id} 
+                    <option value="">Select ID</option>
+                    {allUserInfo.map((data: any, i: number) => (
+                      <option key={i} value={data.contract_id}>
+                        {data.firstName} {data.contract_id}
                       </option>
                     ))}
                   </select>
@@ -166,55 +158,21 @@ const ClaimPage: FC = () => {
               <form onSubmit={formik.handleSubmit}  noValidate className="form">
                 <div className="card-body border-top p-9">
                   <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
-                      Expense Type
-                    </label>
-                    <div className="col-lg-8 fv-row">
-                    <select
-                    id="expenseType"
-                    className="form-select form-select-solid form-select-lg fw-bold"
-                    {...formik.getFieldProps("expenseType")}
-                    
-                    onChange={async (e) => {
-                      await handleChange(parseInt(e.target.value));
-                      formik.setFieldValue("expenseType", updatedUserInfo.expenseType);
-                      formik.setFieldValue("expenseTypeDEsc",updatedUserInfo.expenseTypeDesc);
-                    }}
-                   // value={initialValues.expenseType}
-                  > 
-                    <option value="">Select Expense Type</option>
-                    {allUserInfo.expense.map((data: any, i: number) => (
-                      <option key={i} value={data.id}>
-                        {data.id} - {data.expenseTypeDesc}
-                      </option>
-                    ))}
-                  </select>
-                      {formik.touched.expenseType && formik.errors.expenseType && (
-                        <div className="fv-plugins-message-container">
-                          <div className="fv-help-block">
-                            {formik.errors.expenseType}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label  fw-bold fs-6 required"> 
-                      Expense Type Desc
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6"> 
+                      Client Id
                     </label>
                     <div className="col-lg-8 fv-row">
                       <input
                         type="text"
                         className="form-control form-control-lg form-control-solid"
-                        placeholder="Expense Type Description"
-                       // {...formik.getFieldProps("expenseTypeDesc")}
+                        placeholder="Client Id"
+                        {...formik.getFieldProps("client_id")}
                         onChange={(value) => {
-                          updateData({ expenseTypeDesc: value.target.value });
-                          formik.setFieldValue("expenseTypeDesc",value.target.value)
+                          updateData({ client_id: value.target.value });
+                          formik.setFieldValue("client_id",value.target.value)
                         }}
                       />
-                      {formik.touched.expenseTypeDesc && formik.errors.expenseTypeDesc && (
+                      {formik.touched.client_id && formik.errors.client_id && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
                             
@@ -223,30 +181,76 @@ const ClaimPage: FC = () => {
                       )}
                     </div>
                   </div>
-
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      User Id
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg form-control-solid"
+                        placeholder="Associated User Id"
+                        {...formik.getFieldProps("associated_user_id")}
+                        onChange={(value) => {
+                          updateData({ associated_user_id: value.target.value});
+                          formik.setFieldValue("associated_user_id",value.target.value)
+                        }}
+                      />
+                      {formik.touched.associated_user_id && formik.errors.associated_user_id && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      InternalInvoiceNo
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg form-control-solid"
+                        placeholder="Internal Invoice Number"
+                        {...formik.getFieldProps("internal_invoice_no")}
+                        onChange={(value) => {
+                          updateData({ internal_invoice_no: value.target.value});
+                          formik.setFieldValue("internal_invoice_no",value.target.value)
+                        }}
+                      />
+                      {formik.touched.internal_invoice_no && formik.errors.internal_invoice_no && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label required fw-bold fs-6">
-                      Expense Amount
+                      ExternalInvoiceNo
                     </label>
                     <div className="col-lg-8 fv-row">
                     
                       <input
                       type="text"
                       className="form-control form-control-lg form-control-solid"
-                      placeholder="Enter Total Amount"
+                      placeholder="Enter Invoice Number Starting From ITC.."
                       
                       onChange={(value) => {
-                        updateData({ expenseAmount: value.target.value });
-                        formik.setFieldValue("expenseAmount",value.target.value)
+                        updateData({ external_invoice_no: value.target.value });
+                        formik.setFieldValue("external_invoice_no",value.target.value)
                         }}
-                      >
-                        
+                      > 
                       </input>
                     </div>
                   </div>
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label fw-bold fs-6">
-                      <span className="required">Expense Date</span>
+                      <span className="required">Invoice Date</span>
                     </label>
                     <div className="col-lg-8 fv-row">
                     <Flatpickr
@@ -256,55 +260,41 @@ const ClaimPage: FC = () => {
                           dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
-                          updateData({ expenseDate: dateStr.toLocaleString("en-IN",{
+                          updateData({ invoice_date: dateStr.toLocaleString("en-IN",{
                             year: "numeric",
                             month: "2-digit",
                             day : "2-digit"
                             }).replace(/\//g, "-") });
                         }}
                       ></Flatpickr>
-                      {formik.touched.expenseDate && formik.errors.expenseDate && (
+                      {formik.touched.invoice_date && formik.errors.invoice_date && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
-                            {formik.errors.expenseDate}
+                            {formik.errors.invoice_date}
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
                   <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label fw-bold fs-6 required">
-                      <span className="">Expense By</span>
+                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
+                      InvoiceValue
                     </label>
                     <div className="col-lg-8 fv-row">
-                    <select
-                    id="expenseBy"
-                    className="form-select form-select-solid form-select-lg fw-bold"
-                    {...formik.getFieldProps("expenseBy")}
                     
-                    onChange={async (e) => {
-                      await handleAccountManagerChange(e.target.value);
-                      formik.setFieldValue("expenseBy", updatedUserInfo.expenseBy);
-                    }}
-                    //value={initialValues.expenseBy}
-                  > 
-                    <option value="">Select Account Manager</option>
-                    {allUserInfo.manager.map((data: any, i: number) => (
-                      <option key={i} value={data.accountManagerName}>
-                        {data.accountManagerName}
-                      </option>
-                    ))}
-                  </select>
-                      {formik.touched.expenseBy && formik.errors.expenseBy && (
-                        <div className="fv-plugins-message-container">
-                          <div className="fv-help-block">
-                            {formik.errors.expenseBy}
-                          </div>
-                        </div>
-                      )}
+                      <input
+                      type="text"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Invoice Value"
+                      
+                      onChange={(value) => {
+                        updateData({ invoice_value: value.target.value });
+                        formik.setFieldValue("invoice_value",value.target.value)
+                        }}
+                      >
+                      </input>
                     </div>
-                  </div>
-                  
+                  </div>                  
                 </div>
                 <div className="card-footer d-flex justify-content-end py-6 px-9">
                   <button
@@ -312,7 +302,6 @@ const ClaimPage: FC = () => {
                     className="btn btn-primary"
                     disabled={loading}
                     onClick={this}
-                    
                   >
                     {!loading && "Save Changes"}
                     {loading && (
@@ -335,4 +324,4 @@ const ClaimPage: FC = () => {
   );
 };
 
-export { ClaimPage };
+export { EmployeeInvoice };

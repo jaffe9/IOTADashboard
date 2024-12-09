@@ -8,8 +8,8 @@ type Props = {
 
 type NationalIdRecord = {
   national_id: string;
-  expiry_date: string; // Ensure date handling
-  associated_user_id: { username: string }; // Add nested structure for user
+  expiry_date: string;
+  associated_user_id: { username: string };
 };
 
 const ListsWidget26 = ({ className }: Props) => {
@@ -19,16 +19,18 @@ const ListsWidget26 = ({ className }: Props) => {
     const records = await getNationalIdExp();
 
     if (records) {
-      const filteredRecords = records.filter((record: NationalIdRecord) => {
-        const today = new Date();
-        const twoMonthsFromNow = new Date();
-        twoMonthsFromNow.setMonth(today.getMonth() + 2);
+      const today = new Date();
+      const twoMonthsFromNow = new Date();
+      twoMonthsFromNow.setMonth(today.getMonth() + 2);
 
-        const expiryDate = new Date(record.expiry_date);
-        return expiryDate <= twoMonthsFromNow && expiryDate > today;
-      });
+      const filteredAndSortedRecords = records
+        .filter((record: NationalIdRecord) => {
+          const expiryDate = new Date(record.expiry_date);
+          return expiryDate <= twoMonthsFromNow && expiryDate > today;
+        })
+        .sort((a: { expiry_date: string | number | Date; }, b: { expiry_date: string | number | Date; }) => new Date(a.expiry_date).getTime() - new Date(b.expiry_date).getTime());
 
-      setExpiringRecords(filteredRecords);
+      setExpiringRecords(filteredAndSortedRecords);
     }
   };
 
@@ -57,7 +59,7 @@ const ListsWidget26 = ({ className }: Props) => {
             <Fragment key={`national-id-${index}`}>
               <div className="d-flex flex-stack">
                 <a href="#" className="text-primary fw-bold fs-6 me-2">
-                {record.associated_user_id?.username || 'No username'} - {record.national_id} 
+                  {record.associated_user_id?.username?.toUpperCase() || 'NO USERNAME'} - {record.national_id}
                 </a>
                 <span className="text-danger">
                   Expiry Date: {formatExpiryDate(record.expiry_date)}

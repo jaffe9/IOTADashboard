@@ -3,6 +3,7 @@ import { ID, Response } from '../../../../../../_metronic/helpers'
 export enum payslipOptions { download = "download", email = "email" }
 
 export type User = {
+  contract_id?: string
   id?: number
   username?: string
   email?: string
@@ -14,6 +15,12 @@ export type User = {
   employeeJoiningDate?: string
   employeeId?: string
   pic?: string
+}
+export type Expenses = {
+  id?: number
+  expenseTypeDesc?: string
+  expenseBy?: string
+  expenseType?: number
 }
 
 export type ResourceOnboardingStatus = {
@@ -58,20 +65,47 @@ export type UsersQueryResponse = Response<Array<User>>
 export type EmployeeOnboardingResponse = Response<Array<EmployeeOnboarding>>
 
 export type TimesheetRequest = {
-  status: number
+  timesheetFileLocation: any
+  sentToFinance: any
+  approvedDate: any
+  approvedBy: any
+  approved: any
+  "workingDays": string,
   "employeeId": string,
   "employeeName": string,
   "employeeClient": string,
   "timesheetMonthYear": string,
-  "workingDays": string,
-  "workingDates": string,
   "holidayDays": string,
   "holidayDates": string,
   "leaveDays": string,
   "leaveDates": string,
-  "createdBy": string
+  "createdBy": string,
+  "status": number
 }
 
+export type InvoiceRequest = {
+   associated_user_id: any
+   status: number
+   "contract_id":string,
+   "client_id":string,
+   "internal_invoice_no":string,
+   "external_invoice_no":string,
+   "invoice_date":string,
+   "invoice_value":string,
+   "invoice_paid_status":boolean,
+   "invoice_url":string,
+   "invoice_paid_date":string,
+   "invoice_paid_amount":string,
+}
+
+export type ClaimRequest = {
+  expenseTypeDesc: string
+  associatedUserId: number
+  "expenseType": number,
+  "expenseDate": string,
+  "expenseAmount": string,
+  "expenseBy": string
+}
 export type ListOfTimesheet = {
   length: number,
   status: number,
@@ -98,4 +132,5 @@ export const initialUser: User = {
   occupation: 'Art Director',
   firstName: 'Jaffar',
   email: '',
+  contract_id: '',
 }

@@ -42,10 +42,11 @@ const UserCustomHeader: FC<Props> = ({className, title, tableProps}) => {
       updateState({sort: undefined, order: undefined, ...initialQueryState})
     }
   }
-
+  const {key , ...CustomHeaderProps} = tableProps.column.getHeaderProps()
   return (
     <th
-      {...tableProps.column.getHeaderProps()}
+     // {...tableProps.column.getHeaderProps()}
+      { ...CustomHeaderProps}
       className={clsx(
         className,
         isSelectedForSorting && order !== undefined && `table-sort-${order}`

@@ -42,11 +42,11 @@ const CardsWidget17: FC<Props> = ({
         <div className='card-title d-flex flex-column'>
           <div className='d-flex align-items-center'>
             <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>$</span>
-            <span id = "billingTotalValueTag" className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'></span>
+            <span id = 'unpaidTotalValueTag' className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'></span>
             <span className='badge badge-light-success fs-base'>
               <KTIcon iconName='arrow-up' className='fs-5 text-success ms-n1' />2.2%</span>
           </div>
-          <span className='text-gray-500 pt-1 fw-semibold fs-6'>Projects Earnings in April</span>
+          <span className='text-gray-500 pt-1 fw-semibold fs-6'>Pendinng Invoices</span>
         </div>
       </div>
 
@@ -64,23 +64,23 @@ const CardsWidget17: FC<Props> = ({
         <div className='d-flex flex-column content-justify-center flex-row-fluid'>
           <div className='d-flex fw-semibold align-items-center'>
             <div className='bullet w-8px h-3px rounded-2 bg-success me-3'></div>
-            <div id = 'clientName1' className='text-gray-500 flex-grow-1 me-4'></div>
+            <div id = 'clientName1' className='text-gray-500 flex-grow-1 me-4'>ANB</div>
             <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>$</span>
-            <div id = 'client1Value' className='fw-bolder text-gray-700 text-xxl-end'>$7,660</div>
+            <div id = 'unpaidClient1Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
           <div className='d-flex fw-semibold align-items-center my-3'>
             <div className='bullet w-8px h-3px rounded-2 bg-primary me-3'></div>
-            <div id = 'clientName2' className='text-gray-500 flex-grow-1 me-4'></div>
+            <div id = 'clientName2' className='text-gray-500 flex-grow-1 me-4'>RB</div>
             <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>$</span>
-            <div id = 'client2Value' className='fw-bolder text-gray-700 text-xxl-end'>$2,820</div>
+            <div id = 'unpaidClient2Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
           <div className='d-flex fw-semibold align-items-center'>
             <div
               className='bullet w-8px h-3px rounded-2 me-3'
-              style={{backgroundColor: '#E4E6EF'}}
+              style={{backgroundColor: '#E4E6EF', visibility:"hidden"}}  // hide the visibility
             ></div>
-            <div className='text-gray-500 flex-grow-1 me-4'>Others</div>
-            <div className=' fw-bolder text-gray-700 text-xxl-end'>$45,257</div>
+            <div className='text-gray-500 flex-grow-1 me-4'></div>
+            <div className=' fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
         </div>
       </div>
@@ -158,7 +158,7 @@ const initChart = function (
 export {CardsWidget17}
 function setValues()
   {
-  let billingTotalValue = document.getElementById('billingTotalValueTag')
+  let invoiceTotalValue = document.getElementById('invoiceTotalValueTag')
   let clientNameValue1 = document.getElementById('clientName1')
   
   let clientNameValue2 = document.getElementById('clientName2')
@@ -166,39 +166,54 @@ function setValues()
   let client1ValueTag = document.getElementById('client1Value')
   
   let client2ValueTag = document.getElementById('client2Value')
+
+  let unpaidTotalValueTag = document.getElementById('unpaidTotalValueTag'); // New element for unpaid total
+  let unpaidClient1ValueTag = document.getElementById('unpaidClient1Value'); // New element for unpaid client1
+  let unpaidClient2ValueTag = document.getElementById('unpaidClient2Value');
   
-  let billingTotal = apiHelper.getBillingTotalValue().then((response:any) => 
-    {
-      var txtSum = null;
-      if(!billingTotalValue){ return }
-      var sum = 0.0;
-      var client1Value = 0.0;
-      var client2Value = 0.0;
-      for(let i = 0; i < response.data.length; i++)
-        {
-          if(response.data[i].client_id == 1)
-            {
-              sum = sum + response.data[i].billing_value / 11
-              client1Value = client1Value + response.data[i].billing_value / 11
-            }
-          else
-          {
-            sum = sum + response.data[i].billing_value / 12
-            client2Value = client2Value + response.data[i].billing_value / 11
-          }
-          txtSum = sum.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
-        }
-      billingTotalValue.innerHTML = String(txtSum);
-      if(!clientNameValue1){ return }
-      clientNameValue1.innerHTML = "ANB";
-      if(!clientNameValue2){ return }
-      clientNameValue2.innerHTML = "RB";
-      if(!client1ValueTag){ return }
-      client1ValueTag.innerHTML = String(client1Value.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}));
-      if(!client2ValueTag){ return }
-      client2ValueTag.innerHTML = String(client2Value.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}));
+  apiHelper.getInvoiceTotalValue().then((response: any) => {
+    let totalInvoiceValue = 0.0;
+    let client1TotalValue = 0.0;
+    let client2TotalValue = 0.0;
 
-      var topClient = null
+    let unpaidTotalValue = 0.0;
+    let unpaidClient1Value = 0.0;
+    let unpaidClient2Value = 0.0;
 
+    // Loop through response data
+    response.data.forEach((item: any) => {
+      const billingValue = parseFloat(item.invoice_value) || 0;
+      const isPaid = item.invoice_paid_status;
+
+      // Calculate total values
+      totalInvoiceValue += billingValue;
+      if (item.client_id === 1) {
+        client1TotalValue += billingValue;
+        if (!isPaid) unpaidClient1Value += billingValue;
+      } else if (item.client_id === 2) {
+        client2TotalValue += billingValue;
+        if (!isPaid) unpaidClient2Value += billingValue;
+      }
+
+      if (!isPaid) unpaidTotalValue += billingValue;
     });
+
+    // Format values to 2 decimal places
+    const formatValue = (value: number) =>
+      value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Update DOinvoicents
+    if (invoiceTotalValue) invoiceTotalValue.innerHTML = formatValue(totalInvoiceValue);
+    if (clientNameValue1) clientNameValue1.innerHTML = "ANB";
+    if (client1ValueTag) client1ValueTag.innerHTML = formatValue(client1TotalValue);
+    if (clientNameValue2) clientNameValue2.innerHTML = "RB";
+    if (client2ValueTag) client2ValueTag.innerHTML = formatValue(client2TotalValue);
+
+    // Update unpaid invoice values
+    if (unpaidTotalValueTag) unpaidTotalValueTag.innerHTML = formatValue(unpaidTotalValue);
+    if (clientNameValue1) clientNameValue1.innerHTML = "ANB";
+    if (unpaidClient1ValueTag) unpaidClient1ValueTag.innerHTML = formatValue(unpaidClient1Value);
+    if (clientNameValue2) clientNameValue2.innerHTML = "RB";
+    if (unpaidClient2ValueTag) unpaidClient2ValueTag.innerHTML = formatValue(unpaidClient2Value);
+  });
   }
