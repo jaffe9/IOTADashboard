@@ -99,6 +99,7 @@ export type InvoiceRequest = {
 }
 
 export type ClaimRequest = {
+  expenseTypeDesc: string
   associatedUserId: number
   "expenseType": number,
   "expenseDate": string,

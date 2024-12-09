@@ -60,6 +60,7 @@ const ClaimPage: FC = () => {
     });
     updateData({
       expenseType: id,
+      expenseTypeDesc:hasMatch.expenseTypeDesc,
     })
   }
   const handleUserChange = async (userName: string) => {
@@ -94,7 +95,8 @@ const ClaimPage: FC = () => {
           expenseDate: data.expenseDate,
           expenseBy: data.expenseBy,
           expenseAmount: data.expenseAmount,
-          associatedUserId: data.associatedUserId
+          associatedUserId: data.associatedUserId,
+          expenseTypeDesc: data.expenseTypeDesc,
         };
         const apiResponse = await createClaimPage(ClaimRequest)
         if (apiResponse.status === 201)
@@ -176,6 +178,7 @@ const ClaimPage: FC = () => {
                     onChange={async (e) => {
                       await handleChange(parseInt(e.target.value));
                       formik.setFieldValue("expenseType", updatedUserInfo.expenseType);
+                      formik.setFieldValue("expenseTypeDEsc",updatedUserInfo.expenseTypeDesc);
                     }}
                    // value={initialValues.expenseType}
                   > 
@@ -195,6 +198,32 @@ const ClaimPage: FC = () => {
                       )}
                     </div>
                   </div>
+
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6 required"> 
+                      Expense Type Desc
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg form-control-solid"
+                        placeholder="Expense Type Description"
+                       // {...formik.getFieldProps("expenseTypeDesc")}
+                        onChange={(value) => {
+                          updateData({ expenseTypeDesc: value.target.value });
+                          formik.setFieldValue("expenseTypeDesc",value.target.value)
+                        }}
+                      />
+                      {formik.touched.expenseTypeDesc && formik.errors.expenseTypeDesc && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label required fw-bold fs-6">
                       Expense Amount

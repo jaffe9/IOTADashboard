@@ -259,7 +259,7 @@ export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; 
       expenseApprovedAmount:null,
       externalTransactionId:null,
       originalTransactionDate:null,
-      externalTransactionNarration:null,
+      externalTransactionNarration:c.expenseTypeDesc,
       associatedUserId:c.associatedUserId,
 
 
