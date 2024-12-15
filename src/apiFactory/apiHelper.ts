@@ -5,6 +5,8 @@ import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 
 import { create } from "domain";
+import { file } from "@form-validation/bundle/popular";
+import { url } from "inspector";
 
 class getUserDataParams {
   baseUrl: string | undefined
@@ -245,6 +247,35 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
   
 }
 
+export const uploadInvoiceToSupabase = async (file:File) => {
+  const Iconfig = {
+    method : "POST",
+    maxBodyLength : Infinity,
+    url :  `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_invoice_file/Dec_2024/${file.name}`,
+    headers : {
+      "Authorization" :  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      "Content-Type"  : file.type
+    },
+    data : file
+  };
+
+  try{
+    const response = await axios(Iconfig);
+    console.log('Iconfig response :',response)
+
+    if (response.status === 200){
+      //Extract the file path 
+      const fileKey = response.data.file;
+      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_invoice_file/Dec_2024/${fileKey}`;
+      return publicUrl;
+    }else{
+      throw new Error('File Upload Failed')
+    }
+   }catch (error) {
+    console.error('Error in Tconfig',error)
+  }
+}
+
 
 export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
@@ -296,6 +327,65 @@ export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; 
     return { status: 500, message: "Error Submitting Claim" };
   }
   
+}
+
+export const uploadClaimsToSupabase = async (file:File) => {
+  const Cconfig = {
+    method : "POST",
+    maxBodyLength : Infinity,
+    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/${file.name}` ,
+    headers : {
+      'Authorization' : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Content-Type' : file.type
+    },
+    data : file,
+  };
+  try{
+    const response = await axios(Cconfig);
+    console.log('uploade response',response)
+
+    if (response.status === 200){
+      //Extract the file path 
+      const fileKey = response.data.file;
+      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/${fileKey}`;
+      return publicUrl;
+    }else{
+      throw new Error('Claim Upload Failed')
+    }
+   }catch (error) {
+    console.error('Error in Cconfig',error)
+  }
+    
+}
+
+
+export const uploadFileToSupabase = async (file:File) => {
+     const Tconfig = {
+      method : "POST",
+      maxBodyLength : Infinity,
+      url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/${file.name}`,
+      headers : {
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+        'Content-Type': file.type,
+      },
+      data : file,
+     };
+
+     try{
+      const response = await axios(Tconfig);
+      console.log('uploade response',response)
+
+      if (response.status === 200){
+        //Extract the file path 
+        const fileKey = response.data.file;
+        const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/${fileKey}`;
+        return publicUrl;
+      }else{
+        throw new Error('Timesheet Upload Failed')
+      }
+     }catch (error) {
+      console.error('Error in Tconfig',error)
+    }
 }
 
 

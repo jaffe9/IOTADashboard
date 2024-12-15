@@ -6,7 +6,7 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createEmployeeInvoice } from "../../../apiFactory/apiHelper";
+import { apiHelper, createEmployeeInvoice, uploadInvoiceToSupabase } from "../../../apiFactory/apiHelper";
 import {
   User,
   InvoiceRequest
@@ -33,10 +33,28 @@ const profileDetailsSchema = Yup.object().shape({
 
 const EmployeeInvoice: FC = () => {
   const [data, setData] = useState<IProfileDetailsInvoice>(updatedUserInfo);
+  const [file,setFile] = useState(null)
   const updateData = (fieldsToUpdate: Partial<IProfileDetailsInvoice>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
+
+  const handleFileChange = (event:any ) =>{
+    setFile(event.target.files[0])
+  }
+  const handleInvoiceUpload = async() =>{
+    if(!file){
+      alert("Please Select Invoice")
+      return ;
+    }
+    try{
+     await uploadInvoiceToSupabase(file)
+     alert('Invoice Uploaded')
+    }catch(error){
+     console.error("Error Uploading Invoice:",error)
+    }
+  }
+
   const handleUserChange = async (contract_id: string) => {
     var hasMatch = allUserInfo.find(function (value: User) {
       return value.contract_id == contract_id;
@@ -301,7 +319,29 @@ const EmployeeInvoice: FC = () => {
                       >
                       </input>
                     </div>
-                  </div>                  
+                  </div>   
+
+                   <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      File Upload
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <div className="input-group"> 
+                      <input
+                      type="file"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Upload TimeSheet"
+                      onChange={handleFileChange}
+                      />
+                      <span className="input-group-badge badge badge-success cursor-pointer"
+                      onClick={handleInvoiceUpload}>
+                        Click To Upload
+                        </span>
+                        </div>
+                     
+                    </div>
+                    </div>
+
                 </div>
                 <div className="card-footer d-flex justify-content-end py-6 px-9">
                   <button

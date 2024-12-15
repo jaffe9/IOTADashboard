@@ -6,11 +6,12 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createEmployeeTimesheet } from "../../../apiFactory/apiHelper";
+import { apiHelper, createEmployeeTimesheet, uploadFileToSupabase } from "../../../apiFactory/apiHelper";
 import {
   User,
-  TimesheetRequest
+  TimesheetRequest, 
 } from "../../modules/apps/user-management/users-list/core/_models";
+import axios from "axios";
 
 
 
@@ -34,11 +35,33 @@ const profileDetailsSchema = Yup.object().shape({
 
 const EmployeeTimesheet: FC = () => {
   const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
-
+  const [ file , setFile ] = useState(null);
+  const [ uploadstatus , setUploadstatus ] = useState("") ;
   const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
+
+  const handleFileChange = (event : any) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleFileUpload = async () =>{
+    if(!file){
+      alert('Please Upload TimeSheet');
+      return ;
+    }
+    try{
+     setUploadstatus('...uploading');
+      await uploadFileToSupabase(file);
+     alert('Timesheet File Uploaded',)
+    }catch(error){
+     alert('File Upload Failed ')
+     console.error(error)
+    }
+
+  }
+
 
   const handleUserChange = async (userName: string) => {
     var hasMatch = allUserInfo.find(function (value: User) {
@@ -285,6 +308,27 @@ const EmployeeTimesheet: FC = () => {
                     </div>
                   </div>
                   
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      File Upload
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <div className="input-group"> 
+                      <input
+                      type="file"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Upload TimeSheet"
+                      onChange={handleFileChange}
+                      />
+                      <span className="input-group-badge badge badge-success cursor-pointer"
+                      onClick={handleFileUpload}>
+                        Click To Upload
+                        </span>
+                        </div>
+                     
+                    </div>
+                  </div>
+
                 </div>
                 <div className="card-footer d-flex justify-content-end py-6 px-9">
                   <button
@@ -316,3 +360,5 @@ const EmployeeTimesheet: FC = () => {
 };
 
 export { EmployeeTimesheet };
+
+

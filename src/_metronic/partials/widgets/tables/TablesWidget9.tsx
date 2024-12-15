@@ -28,7 +28,7 @@ const TablesWidget9: React.FC<Props> = ({ className }) => {
             Pending Timesheets
           </span>
           <span className="text-muted mt-1 fw-semibold fs-7">
-            Pending {timeSheet.length} more Timesheet
+            Pending {timeSheet} more Timesheet
           </span>
         </h3>
         <div

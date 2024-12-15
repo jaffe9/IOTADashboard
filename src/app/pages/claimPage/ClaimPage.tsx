@@ -6,7 +6,7 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createClaimPage } from "../../../apiFactory/apiHelper";
+import { apiHelper, createClaimPage, uploadClaimsToSupabase } from "../../../apiFactory/apiHelper";
 import {
   User,
   ClaimRequest,
@@ -40,11 +40,27 @@ const profileDetailsSchema = Yup.object().shape({
 
 const ClaimPage: FC = () => {
   const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
-
+  const [ file , setFile ] = useState(null);
   const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
+
+const handelFileChange = (event : any) => {
+  setFile(event.target.files[0])
+}
+const handleClaimupload = async () => {
+  if(!file){
+    alert('Select Claim To Upload')
+    return ;
+  }
+  try{
+   await uploadClaimsToSupabase(file)
+   alert('Claim Uploaded')
+  }catch(error){
+   console.error('Error in Claim Upload:',error)
+  }
+}
 
   const handleAccountManagerChange = async (accountManagerName : string) => {
     var hasMatch = allUserInfo.manager.find(function (value : Expenses){
@@ -272,6 +288,28 @@ const ClaimPage: FC = () => {
                       )}
                     </div>
                   </div>
+
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      File Upload
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <div className="input-group"> 
+                      <input
+                      type="file"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Upload TimeSheet"
+                      onChange={handelFileChange}
+                      />
+                      <span className="input-group-badge badge badge-success cursor-pointer"
+                        onClick={handleClaimupload}>
+                        Click To Upload
+                        </span>
+                        </div>
+                     
+                    </div>
+                    </div>
+
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label fw-bold fs-6 required">
                       <span className="">Expense By</span>
@@ -303,9 +341,9 @@ const ClaimPage: FC = () => {
                         </div>
                       )}
                     </div>
-                  </div>
-                  
+                  </div>                  
                 </div>
+                
                 <div className="card-footer d-flex justify-content-end py-6 px-9">
                   <button
                     type="submit"
