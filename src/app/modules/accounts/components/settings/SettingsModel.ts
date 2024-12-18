@@ -46,6 +46,20 @@ export interface IProfileDetailsInvoice {
   invoice_paid_status:boolean,
 }
 
+export interface IProfileDetailsContract {
+  associated_user_id: any;
+  contract_no : string,
+  billing_value: string,
+  billing_start_date : string,
+  billing_end_date : string,
+  billing_months : number,
+  associatedAccountManager : number,
+  status:null,
+  contract_file_location:null,
+  client_id: any;
+
+}
+
 export interface IUpdateEmail {
   newEmail: string;
   confirmPassword: string;
@@ -140,6 +154,19 @@ export const profileDetailsInitValues: IProfileDetails = {
   associatedUserId: 0,
   expenseTypeDesc: ""
 };
+
+export const profileDetailsInitValuesContract: IProfileDetailsContract = {
+  associated_user_id: 0,
+  contract_no : "",
+  billing_value: "",
+  billing_start_date : "",
+  billing_end_date : "",
+  billing_months : 0,
+  associatedAccountManager : 0,
+  status:null,
+  contract_file_location:null,
+  client_id: 0,
+}
 
 export const profileDetailsInitValuesInvoice: IProfileDetailsInvoice = {
   invoice_paid_status: false,

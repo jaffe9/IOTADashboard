@@ -26,6 +26,9 @@ const SidebarMenuMain = () => {
       <SidebarMenuItem to='/employeeinvoice' icon='switch' title='Employee Invoice' fontIcon='bi-layers' />
       <div className='menu-item'>
       </div>
+      <SidebarMenuItem to='/contract' icon='switch' title='Employee Contract' fontIcon='bi-layers' />
+      <div className='menu-item'>
+      </div>
       <SidebarMenuItem to='/claim' icon='switch' title='Claims' fontIcon='bi-layers' />
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { resourceLimits } from "worker_threads";
-import { ClaimRequest, EmployeeOnboardingResponse, InvoiceRequest, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 
@@ -198,6 +198,8 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
   return response;
 };
 
+
+// Start of Invoice
 export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
     {
@@ -276,6 +278,93 @@ export const uploadInvoiceToSupabase = async (file:File) => {
   }
 }
 
+// End of Invoice
+
+// Start of Contract
+
+export const createContractPage = async (c: ContractRequest): Promise<{status:number; message:string}> => {
+  let data = JSON.stringify([
+    {
+      client_id: c.client_id,
+      contract_no : c.contract_no,
+      billing_value: c.billing_value,
+      billing_start_date : c.billing_start_date,
+      billing_end_date : c.billing_end_date,
+      billing_months : c.billing_months,
+      associatedAccountManager : c.associatedAccountManager,
+      status:null,
+      contract_file_location:null,
+      associated_user_id:c.associated_user_id
+
+
+    }
+  ]);
+  console.log("APIData:" + data);
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/contract',
+    headers: {
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Content-Type': 'application/json'
+    },
+    data: data
+  };
+
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("error:",error.response?.data  || error.message)
+    }else{
+      console.error("Unexpected error:",error);
+    }
+
+    return { status: 500, message: "Error Submitting Contract" };
+  }
+  
+}
+
+export const uploadContractToSupabase = async (file:File) => {
+  const Cconfig = {
+    method : "POST",
+    maxBodyLength : Infinity,
+    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_contracts/${file.name}` ,
+    headers : {
+      'Authorization' : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Content-Type' : file.type
+    },
+    data : file,
+  };
+  try{
+    const response = await axios(Cconfig);
+    console.log('uploade response',response)
+
+    if (response.status === 200){
+      //Extract the file path 
+      const fileKey = response.data.file;
+      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_contracts/${fileKey}`;
+      return publicUrl;
+    }else{
+      throw new Error('Contract Upload Failed')
+    }
+   }catch (error) {
+    console.error('Error in Contractconfig',error)
+  }
+    
+}
+// End of Contract
+
+
+
+// for Claim
 
 export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
@@ -357,8 +446,9 @@ export const uploadClaimsToSupabase = async (file:File) => {
   }
     
 }
+/// End of claim
 
-
+//  Start of Timesheet
 export const uploadFileToSupabase = async (file:File) => {
      const Tconfig = {
       method : "POST",
@@ -461,5 +551,5 @@ export const getEmployeeTimesheet = async () : Promise<ListOfTimesheet> => {
   response = d.data;
   return response;
 }
-
+// end of timesheet
 export * as apiHelper from './apiHelper.ts';

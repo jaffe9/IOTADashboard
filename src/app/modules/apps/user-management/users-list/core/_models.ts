@@ -3,6 +3,7 @@ import { ID, Response } from '../../../../../../_metronic/helpers'
 export enum payslipOptions { download = "download", email = "email" }
 
 export type User = {
+  associated_user_id?: number
   contract_id?: string
   id?: number
   username?: string
@@ -21,6 +22,11 @@ export type Expenses = {
   expenseTypeDesc?: string
   expenseBy?: string
   expenseType?: number
+}
+
+export type Contract = {
+associatedAccountManager?:number
+id?:number
 }
 
 export type ResourceOnboardingStatus = {
@@ -98,6 +104,18 @@ export type InvoiceRequest = {
    "invoice_paid_amount":string,
 }
 
+export type ContractRequest = {
+  "client_id" : string, 
+  "contract_no": string,
+  "associated_user_id" : number,
+  "billing_value" : string,
+  "billing_start_date" : string,
+   "billing_end_date" : string,
+   "billing_months" : number,
+   "associatedAccountManager" : number,
+
+}
+
 export type ClaimRequest = {
   expenseTypeDesc: string
   associatedUserId: number
@@ -133,4 +151,5 @@ export const initialUser: User = {
   firstName: 'Jaffar',
   email: '',
   contract_id: '',
+  associated_user_id: 0
 }
