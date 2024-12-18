@@ -1,4 +1,4 @@
-import { LOG_LEVEL } from "../logger/environment";
+import { LOG_LEVEL } from "./environment";
 
 /** Signature of a logging function */
 export interface LogFn {
