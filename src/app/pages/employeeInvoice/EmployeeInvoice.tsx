@@ -160,7 +160,7 @@ const EmployeeInvoice: FC = () => {
                     <option value="">Select ID</option>
                     {allUserInfo.map((data: any, i: number) => (
                       <option key={i} value={data.contract_id}>
-                        {data.firstName} {data.contract_id}
+                        {data.firstName} 
                       </option>
                     ))}
                   </select>
@@ -189,6 +189,7 @@ const EmployeeInvoice: FC = () => {
                     <div className="col-lg-8 fv-row">
                       <input
                         type="text"
+                        readOnly
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Client Id"
                         {...formik.getFieldProps("client_id")}
@@ -213,6 +214,7 @@ const EmployeeInvoice: FC = () => {
                     <div className="col-lg-8 fv-row">
                       <input
                         type="text"
+                        readOnly
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Associated User Id"
                         {...formik.getFieldProps("associated_user_id")}
@@ -236,6 +238,7 @@ const EmployeeInvoice: FC = () => {
                     </label>
                     <div className="col-lg-8 fv-row">
                       <input
+                        readOnly
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Internal Invoice Number"

@@ -1,5 +1,6 @@
 export interface IProfileDetails {
   associatedUserId: number;
+  password : string ;
   expenseTypeDesc:string
   expenseType: number;
   expenseDate: string;
@@ -15,6 +16,16 @@ export interface IProfileDetails {
   contract_id:string;
   sEmployee: string;
   fName: string;
+  uName:string;
+  lName : string ;
+  fullName : string ;
+  occupation : string ;
+  companyName : string ;
+  phone : string ;
+  language : string ;
+  timeZone : string ;
+  accountManager : number ;
+  address : string ;
   client: string;
   monthyear: string;
   dates: string;
@@ -24,6 +35,7 @@ export interface IProfileDetails {
   holidays: string;
   holidaysStr: string;
   invoice_paid_status:boolean;
+  email : string ;
   communications:
   {
     email: boolean;
@@ -57,6 +69,7 @@ export interface IProfileDetailsContract {
   status:null,
   contract_file_location:null,
   client_id: any;
+  username : string
 
 }
 
@@ -152,11 +165,24 @@ export const profileDetailsInitValues: IProfileDetails = {
   expenseBy: "",
   expenseAmount: "",
   associatedUserId: 0,
-  expenseTypeDesc: ""
+  expenseTypeDesc: "",
+  password: "",
+  uName: "",
+  lName: "",
+  fullName: "",
+  occupation: "",
+  companyName: "",
+  phone: "",
+  language: "",
+  timeZone: "",
+  accountManager: 0,
+  address: "",
+  email: ""
 };
 
 export const profileDetailsInitValuesContract: IProfileDetailsContract = {
   associated_user_id: 0,
+  username : "",
   contract_no : "",
   billing_value: "",
   billing_start_date : "",

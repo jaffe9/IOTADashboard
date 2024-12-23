@@ -10,15 +10,16 @@ import { apiHelper,  createContractPage,  uploadContractToSupabase } from "../..
 import {
   User,
   ContractRequest,
-  Contract
+  Contract,
+  TempUser
 } from "../../modules/apps/user-management/users-list/core/_models";
 
 
 
 var allUserInfo: any = await Promise.all(
-  [ apiHelper.getAllEmployees(), apiHelper.getAccountManager() ]
-).then(([employee ,manager]) => {
-  return { employee:employee.data , manager:manager.data}
+  [ apiHelper.getTempUserDetails(), apiHelper.getAccountManager() ]
+).then(([employee ,manager ]) => {
+  return { employee:employee.data , manager:manager.data }
 })
 let updatedUserInfo: IProfileDetailsContract = initialValues;
 const profileDetailsSchema = Yup.object().shape({
@@ -62,31 +63,20 @@ const ContractPage: FC = () => {
     }
   }
 
-  const handleAccountManagerChange = async ( id : number) => {
-    var hasMatch = allUserInfo.manager.find(function(value: Contract){
-      return value.associatedAccountManager = id;
-    });
-      updateData({
-        associatedAccountManager : hasMatch.id
-      })
+  const handleAccountManagerChange = async (accountManagerid : number) => {
+    updateData({
+      associatedAccountManager: accountManagerid,
+    })
   }
 
-  const handleUserChange = async (contract_id: string) => {
-    var hasMatch = allUserInfo.employee.find(function (value: User) {
-      return value.contract_id == contract_id;
+  const handleUserChange = async ( username : string) => {
+    var hasMatch = allUserInfo.employee.find(function (value: TempUser) {
+      return value.username == username;
     });
-    const today = new Date();
-    const currentMonth = new Date();
-    //previousMonth.setMonth(today.getMonth() - 1);
+    
     updateData({
       client_id: hasMatch.clientId,
-     // fName: userName,
-      contract_no : hasMatch.employeeId+"_"+currentMonth
-      .toLocaleDateString("en-IN",{
-      year: "numeric",
-      month: "2-digit",
-      }).replace(/\//g, "_"),
-      associated_user_id:hasMatch.id
+      username : username,
     });
   };
 
@@ -106,8 +96,8 @@ const ContractPage: FC = () => {
           setLoading(false)
           return
         }
-        let invoiceRequest : ContractRequest = {
-          client_id: data.client_id,
+        let ContractRequest : ContractRequest = {
+         client_id: data.client_id,
           contract_no : data.contract_no,
           billing_value: data.billing_value,
           billing_start_date : data.billing_start_date,
@@ -118,10 +108,10 @@ const ContractPage: FC = () => {
 
 
         };
-        var apiResponse = await createContractPage(invoiceRequest)
+        var apiResponse = await createContractPage(ContractRequest)
         if (apiResponse.status === 201)
           {
-            alert("Invoice Submitted Successfully");
+            alert("Contract Submitted Successfully");
             setLoading(false);
           }
           else
@@ -157,22 +147,22 @@ const ContractPage: FC = () => {
                 </label>
                 <div className="col-lg-8 fv-row">
                   <select
-                    id="associated_user_id"
+                    id="username"
                     className="form-select form-select-solid form-select-lg fw-bold"
-                    {...formik.getFieldProps("associated_user_id")}
+                    {...formik.getFieldProps("username")}
                     
                     onChange={async (e) => {
-                      await handleUserChange(e.target.value);
+                      await handleUserChange((e.target.value));
                       formik.setFieldValue("client_id", updatedUserInfo.client_id);
-                      formik.setFieldValue("associated_user_id", updatedUserInfo.associated_user_id);
+                    
                     
                     }}
-                    value={initialValues.associated_user_id}
+                  
                   > 
                     <option value="">Select ID</option>
                     {allUserInfo.employee.map((data: any, i: number) => (
-                      <option key={i} value={data.contract_id}>
-                        {data.firstName} 
+                      <option key={i} value={data.username}>
+                        {data.username} 
                       </option>
                     ))}
                   </select>
@@ -201,11 +191,12 @@ const ContractPage: FC = () => {
                     <div className="col-lg-8 fv-row">
                       <input
                         type="text"
+                        readOnly
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Client Id"
                         {...formik.getFieldProps("client_id")}
                         onChange={(value) => {
-                          updateData({ client_id: value.target.value });
+                          updateData({client_id: value.target.value });
                           formik.setFieldValue("client_id",value.target.value)
                         }}
                       />
@@ -218,7 +209,7 @@ const ContractPage: FC = () => {
                       )}
                     </div>
                   </div>
-                  <div className="row mb-6">
+                  {/* <div className="row mb-6">
                     <label className="col-lg-4 col-form-label  fw-bold fs-6">
                       Employee Id
                     </label>
@@ -226,9 +217,11 @@ const ContractPage: FC = () => {
                       <input
                         type="text"
                         className="form-control form-control-lg form-control-solid"
-                        placeholder="Associated User Id"
-                        {...formik.getFieldProps("associated_user_id")}
-                        
+                        placeholder="Enter Employee Id"
+                        onChange={(value) => {
+                          updateData({ contract_no: value.target.value});
+                          formik.setFieldValue("contract_no",value.target.value)
+                        }}
                       />
                       {formik.touched.associated_user_id && formik.errors.associated_user_id && (
                         <div className="fv-plugins-message-container">
@@ -238,17 +231,17 @@ const ContractPage: FC = () => {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
                   <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
                       Contract No
                     </label>
                     <div className="col-lg-8 fv-row">
                       <input
                         type="text"
                         className="form-control form-control-lg form-control-solid"
-                        placeholder="Internal Invoice Number"
-                        {...formik.getFieldProps("contract_no")}
+                        placeholder="Enter Contract Number"
+                      
                         onChange={(value) => {
                           updateData({ contract_no: value.target.value});
                           formik.setFieldValue("contract_no",value.target.value)
@@ -287,20 +280,20 @@ const ContractPage: FC = () => {
                       <span className="required">Billing Start Date</span>
                     </label>
                     <div className="col-lg-8 fv-row">
-                    <Flatpickr
-                        className="form-control form-control-lg form-control-solid"
-                        options={{
-                          mode: "single",
-                          dateFormat: "d-m-Y",
+                     <Flatpickr
+                       className="form-control form-control-lg form-control-solid"
+                       options={{
+                       mode: "single",
+                       dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
-                          updateData({ billing_start_date: dateStr.toLocaleString("en-IN",{
-                            year: "numeric",
-                            month: "2-digit",
-                            day : "2-digit"
-                            }).replace(/\//g, "-") });
-                        }}
-                      ></Flatpickr>
+                         updateData({ billing_start_date: dateStr.toLocaleString("en",{
+                          year: "numeric",
+                          month: "2-digit",
+                          day : "2-digit"
+                          }).replace(/\//g, "-") });
+                           }}
+                         ></Flatpickr>
                       {formik.touched.billing_start_date && formik.errors.billing_start_date && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
@@ -316,19 +309,19 @@ const ContractPage: FC = () => {
                     </label>
                     <div className="col-lg-8 fv-row">
                     <Flatpickr
-                        className="form-control form-control-lg form-control-solid"
-                        options={{
-                          mode: "single",
-                          dateFormat: "d-m-Y",
+                       className="form-control form-control-lg form-control-solid"
+                       options={{
+                       mode: "single",
+                       dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
-                          updateData({ billing_end_date: dateStr.toLocaleString("en-IN",{
-                            year: "numeric",
-                            month: "2-digit",
-                            day : "2-digit"
-                            }).replace(/\//g, "-") });
-                        }}
-                      ></Flatpickr>
+                         updateData({ billing_end_date: dateStr.toLocaleString("en",{
+                          year: "numeric",
+                          month: "2-digit",
+                          day : "2-digit"
+                          }).replace(/\//g, "-") });
+                           }}
+                         ></Flatpickr>
                       {formik.touched.billing_end_date && formik.errors.billing_end_date && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">

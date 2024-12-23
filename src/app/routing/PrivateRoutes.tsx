@@ -12,6 +12,8 @@ import ClaimPageWrapper from '../pages/claimPage/ClaimPageWrapper'
 import EmployeeTimesheetWrapper from '../pages/employeeTimesheet/EmployeeTimesheetWrapper'
 import EmployeeInvoiceWrapper from '../pages/employeeInvoice/EmployeeInvoiceWrapper'
 import ContractPageWrapper from '../pages/contractPage/ContractPageWrapper'
+import { CreateEmployee } from '../pages/createEmployee/CreateEmployee'
+import CreateEmployeeWrapper from '../pages/createEmployee/CreateEmployeeWrapper'
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
@@ -34,6 +36,7 @@ const PrivateRoutes = () => {
         <Route path='employeetimesheet' element={<EmployeeTimesheetWrapper/>}/>
         <Route path='employeeinvoice' element={<EmployeeInvoiceWrapper/>}/>
         <Route path='contract' element={<ContractPageWrapper/>}/>
+        <Route path='createTempEmp' element={<CreateEmployeeWrapper/>}/>
         {/* Lazy Modules */}
         <Route
           path='crafted/pages/profile/*'

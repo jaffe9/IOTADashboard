@@ -1,3 +1,4 @@
+import { string } from 'yup'
 import { ID, Response } from '../../../../../../_metronic/helpers'
 
 export enum payslipOptions { download = "download", email = "email" }
@@ -17,6 +18,28 @@ export type User = {
   employeeId?: string
   pic?: string
 }
+
+export type TempUser = {
+  associated_user_id?: number
+  client_id?: number
+  id?: number
+  username?: string
+  email?: string
+  firstName?: string
+  lastName?: string
+  occupation?: string
+  companyName?: string
+  phone?: string
+  employeeJoiningDate?: string
+  employeeId?: string
+  pic?: string
+}
+
+export type clients = {
+  id? : number,
+  client_name? : string,
+}
+
 export type Expenses = {
   id?: number
   expenseTypeDesc?: string
@@ -124,6 +147,24 @@ export type ClaimRequest = {
   "expenseAmount": string,
   "expenseBy": string
 }
+
+export type temEmp = {
+"username" : string,
+"password" : string,
+"email" : string,
+"firstName" : string,
+"lastName" : string,
+"fullName" : string,
+"occupation" : string,
+"companyName" : string,
+"phone" : string,
+"language" : string,
+"timeZone" : string,
+"address" : string,
+"clientId" : number,
+"associated_account_manager" : number,
+}
+
 export type ListOfTimesheet = {
   length: number,
   status: number,

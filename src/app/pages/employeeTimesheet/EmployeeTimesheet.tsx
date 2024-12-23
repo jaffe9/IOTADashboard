@@ -178,11 +178,12 @@ const EmployeeTimesheet: FC = () => {
               <form onSubmit={formik.handleSubmit}  noValidate className="form">
                 <div className="card-body border-top p-9">
                   <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
+                    <label className="col-lg-4 col-form-label fw-bold fs-6">
                       Client
                     </label>
                     <div className="col-lg-8 fv-row">
                       <input
+                        readOnly
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Company name"

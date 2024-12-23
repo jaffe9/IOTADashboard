@@ -166,7 +166,7 @@ const handleClaimupload = async () => {
                     <option value="">Select Employee</option>
                     {allUserInfo.employee.map((data: any, i: number) => (
                       <option key={i} value={data.firstName}>
-                        {data.firstName} - {data.id} 
+                        {data.firstName} 
                       </option>
                     ))}
                   </select>
@@ -272,7 +272,7 @@ const handleClaimupload = async () => {
                           dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
-                          updateData({ expenseDate: dateStr.toLocaleString("en-IN",{
+                          updateData({ expenseDate: dateStr.toLocaleString("en",{
                             year: "numeric",
                             month: "2-digit",
                             day : "2-digit"

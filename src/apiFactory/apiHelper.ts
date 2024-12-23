@@ -1,6 +1,6 @@
 import axios from "axios";
 import { resourceLimits } from "worker_threads";
-import { ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, Salary, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 
@@ -20,9 +20,11 @@ axios.defaults.headers.common['apikey'] = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
 //const API_URL = import.meta.env.VITE_APP_THEME_API_URL;
 const API_URL = `https://zhplktaovpyenmypkjql.supabase.co/rest/v1`;
 const GET_USERS_URL = `${API_URL}/user`;
+const GET_TEMP_USERS_URL = `${API_URL}/tempUser`;
 const GET_EXPENSE = `${API_URL}/expensesType`;
 const GET_ACCOUNT_MANAGER = `${API_URL}/accountManager`;
 const GET_USER_SALARY_URL = `${API_URL}/salary`;
+const GET_CLIENT_DETAILS_URL = `${API_URL}/clients`
 const GET_USER_SALARY_DETAIL_URL = `${API_URL}/salaryDetails`;
 const GET_USER_CONTRACT_URL = `${API_URL}/contract`;
 const GET_EMPLOYEEONBOARDING_URL = `${API_URL}/employeeOnboarding`;
@@ -198,6 +200,87 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
   return response;
 };
 
+export const getClientDetails = async () : Promise<any> => {
+  const d =  await axios
+    .get(`${GET_CLIENT_DETAILS_URL}?select=*&order=id`);
+  return d;
+};
+
+export const getTempUserDetails = async () : Promise<any> => {
+  const d =  await axios
+    .get(`${GET_TEMP_USERS_URL}?select=*&order=id`);
+  return d;
+};
+
+// Table For temparary user 
+export const createTempEmployee = async (t: temEmp): Promise<{status:number; message:string}> => {
+  let data = JSON.stringify([
+    {
+      username : t.username,
+      password : "Innovwayz@123",
+      email : t.email,
+      firstName : t.firstName,
+      lastName : t.lastName,
+      fullName : t.fullName,
+      occupation : t.occupation,
+      companyName : t.companyName,
+      phone : t.phone,
+      roles : null,
+      pic : null,
+      language : t.language,
+      timeZone : t.timeZone,
+      website : null,
+      emailSettings : null,
+      auth : null,
+      communication : null,
+      address : t.address,
+      socialNetworks : null,
+      employeeJoiningDate : null,
+      loginId : null,
+      employeeId : null,
+      employeeBand : null,
+      isClientFacing : false,
+      clientId : t.clientId,
+      isActive : false,
+      contract_id : null,
+      associated_account_manager : t.associated_account_manager,
+
+    }
+  ]);
+  console.log("APIData:" + data);
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/tempUser',
+    headers: {
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Content-Type': 'application/json'
+    },
+    data: data
+  };
+
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("error in tempEmp:",error.response?.data  || error.message)
+    }else{
+      console.error("Unexpected error:",error);
+    }
+
+    return { status: 500, message: "Error creating Temperary Employee" };
+  }
+  
+}
+
+// table end for temp user
 
 // Start of Invoice
 export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:number; message:string}> => {
@@ -294,7 +377,7 @@ export const createContractPage = async (c: ContractRequest): Promise<{status:nu
       associatedAccountManager : c.associatedAccountManager,
       status:null,
       contract_file_location:null,
-      associated_user_id:c.associated_user_id
+      associated_user_id:null,
 
 
     }
