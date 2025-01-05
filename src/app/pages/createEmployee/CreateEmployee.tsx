@@ -28,7 +28,6 @@ let updatedUserInfo: IProfileDetails = initialValues;
 
 const CreateEmployee: FC = () => {
   const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
-  const [ file , setFile ] = useState(null);
   const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
@@ -37,8 +36,8 @@ const CreateEmployee: FC = () => {
 
   const handleAccountManagerChange = async (accountManagerid : number) => {
     updateData({
-      accountManager: accountManagerid,
-    })
+      associated_account_manager: accountManagerid,
+    })    
   }
   const handleChange = async (client_name : string) => {
     var hasMatch = allUserInfo.clients.find(function (value : clients){
@@ -67,7 +66,7 @@ const CreateEmployee: FC = () => {
       setTimeout(async () => {
         const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
-        if(data.client_id < 1 || data.accountManager == null || data.uName == null || data.fullName == null  )
+        if(data.client_id < 1 || data.associated_account_manager == null || data.uName == null || data.fullName == null  )
         {
           alert("Please select all fields")
           setLoading(false)
@@ -87,7 +86,7 @@ const CreateEmployee: FC = () => {
           timeZone : data.timeZone,
           address : data.address,
           clientId : data.client_id,
-          associated_account_manager : data.accountManager,
+          associated_account_manager : data.associated_account_manager,
         };
         const apiResponse = await createTempEmployee(tempEmp)
         if (apiResponse.status === 201)
@@ -560,13 +559,13 @@ const CreateEmployee: FC = () => {
                     </label>
                     <div className="col-lg-8 fv-row">
                     <select
-                    id="expenseBy"
+                    id="accountManger"
                     className="form-select form-select-solid form-select-lg fw-bold"
-                    {...formik.getFieldProps("accountManager")}
+                    {...formik.getFieldProps("associated_account_manager")}
                     
                     onChange={async (e) => {
                       await handleAccountManagerChange(parseInt(e.target.value));
-                      formik.setFieldValue("accountManger", updatedUserInfo.accountManager);
+                      formik.setFieldValue("associated_account_maager", updatedUserInfo.associated_account_manager);
                     }}
                     
                   > 
@@ -577,10 +576,10 @@ const CreateEmployee: FC = () => {
                       </option>
                     ))}
                   </select>
-                      {formik.touched.expenseBy && formik.errors.expenseBy && (
+                      {formik.touched.associated_account_manager&& formik.errors.associated_account_manager&& (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
-                            {formik.errors.expenseBy}
+                            {formik.errors.associated_account_manager}
                           </div>
                         </div>
                       )}

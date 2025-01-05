@@ -24,7 +24,7 @@ export interface IProfileDetails {
   phone : string ;
   language : string ;
   timeZone : string ;
-  accountManager : number ;
+  associated_account_manager : number ;
   address : string ;
   client: string;
   monthyear: string;
@@ -59,6 +59,8 @@ export interface IProfileDetailsInvoice {
 }
 
 export interface IProfileDetailsContract {
+  contract_end_date: string;
+  contract_date: string;
   associated_user_id: any;
   contract_no : string,
   billing_value: string,
@@ -175,7 +177,7 @@ export const profileDetailsInitValues: IProfileDetails = {
   phone: "",
   language: "",
   timeZone: "",
-  accountManager: 0,
+  associated_account_manager: 0,
   address: "",
   email: ""
 };
@@ -190,6 +192,8 @@ export const profileDetailsInitValuesContract: IProfileDetailsContract = {
   billing_months : 0,
   associatedAccountManager : 0,
   status:null,
+  contract_date :"",
+  contract_end_date : "",
   contract_file_location:null,
   client_id: 0,
 }

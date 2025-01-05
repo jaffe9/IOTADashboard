@@ -89,6 +89,12 @@ export type Salary = {
   payslilpOptionSelected?: payslipOptions
 }
 
+export type National_id = {
+  id?:number
+  national_id?: string
+  expiry_date?: string
+}
+
 export type UsersQueryResponse = Response<Array<User>>
 
 export type EmployeeOnboardingResponse = Response<Array<EmployeeOnboarding>>
@@ -134,6 +140,8 @@ export type ContractRequest = {
   "billing_value" : string,
   "billing_start_date" : string,
    "billing_end_date" : string,
+   "contract_date" : string,
+   "contract_end_date" : string;
    "billing_months" : number,
    "associatedAccountManager" : number,
 

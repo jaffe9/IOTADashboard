@@ -231,7 +231,7 @@ const EmployeeTimesheet: FC = () => {
                         className="form-control form-control-lg form-control-solid"
                         options={{
                           mode: "single",
-                          defaultDate: new Date(),
+                         // defaultDate: new Date(),
                           dateFormat: "m-Y",
                         }}
                         onChange={(dateStr) => {

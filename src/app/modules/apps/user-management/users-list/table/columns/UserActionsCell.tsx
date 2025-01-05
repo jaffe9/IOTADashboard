@@ -24,6 +24,10 @@ const UserActionsCell: FC<Props> = ({ id }) => {
     setItemIdForUpdate(id);
   };
 
+  const openIqamaEditModel = () => {
+    setItemIdForUpdate(id)
+  }
+
   const deleteItem = useMutation(() => deleteUser(id), {
     // 💡 response of the mutation is passed to onSuccess
     onSuccess: () => {
@@ -57,6 +61,22 @@ const UserActionsCell: FC<Props> = ({ id }) => {
         <div className="menu-item px-3">
           <a className="menu-link px-3" onClick={openEditModal}>
             Payslip
+          </a>
+        </div>
+        {/* end::Menu item */}
+
+         {/* begin::Menu item */}
+         <div className="menu-item px-3"> 
+          <a className="menu-link px-3" onClick={openIqamaEditModel} >
+            Iqama Exp
+          </a>
+        </div>
+        {/* end::Menu item */}
+
+         {/* begin::Menu item */}
+         <div className="menu-item px-3">
+          <a className="menu-link px-3" >
+           Contract Exp
           </a>
         </div>
         {/* end::Menu item */}

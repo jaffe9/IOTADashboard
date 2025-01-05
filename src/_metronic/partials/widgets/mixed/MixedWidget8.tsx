@@ -14,7 +14,8 @@ type Props = {
 
 type ContractExpRecord = {
   associated_user_id : { username:string , companyName:string};
-  billing_end_date : string;
+  billing_start_date : string;
+  contract_end_date : string;
   contract_file_location : string;
 }
 
@@ -26,13 +27,13 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
     if(records){
       const today = new Date();
       const twoMonthsFromNow = new Date();
-      twoMonthsFromNow.setMonth(today.getMonth() + 3)
+      twoMonthsFromNow.setMonth(today.getMonth() + 2)
       const filteredAndSortedRecords = records
       .filter((record : ContractExpRecord) =>{
-        const expiryDate= new Date(record.billing_end_date);
+        const expiryDate= new Date(record.contract_end_date);
         return expiryDate <= twoMonthsFromNow && expiryDate > today;
       })
-      .sort((a:{billing_end_date:string | number | Date; },b:{billing_end_date:string | number | Date;}) => new Date(a.billing_end_date).getTime() -  new Date(b.billing_end_date).getTime());
+      .sort((a:{contract_end_date:string | number | Date; },b:{contract_end_date:string | number | Date;}) => new Date(a.contract_end_date).getTime() -  new Date(b.contract_end_date).getTime());
       setExpiringRecords(filteredAndSortedRecords);
     }
   };
@@ -145,8 +146,11 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
                       {record.associated_user_id.companyName.toUpperCase()}
                       </span>
                     </td>
+                    <td className='text-success fw-bold'>
+                      {formatExpiryDate(record.billing_start_date)}
+                    </td>
                     <td className='text-danger fw-bold'>
-                      {formatExpiryDate(record.billing_end_date)}
+                      {formatExpiryDate(record.contract_end_date)}
                     </td>
                     <td className='text-end' style={{maxWidth:'100px'}}>
                     <span

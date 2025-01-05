@@ -75,6 +75,12 @@ const CardsWidget17: FC<Props> = ({
             <div id = 'unpaidClient2Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
           <div className='d-flex fw-semibold align-items-center'>
+            <div className='bullet w-8px h-3px rounded-2 bg-white me-3'></div>
+            <div id = 'clientName4' className='text-gray-500 flex-grow-1 me-4'>ARB</div>
+            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>$</span>
+            <div id = 'unpaidClient4Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+          </div>
+          <div className='d-flex fw-semibold align-items-center'>
             <div
               className='bullet w-8px h-3px rounded-2 me-3'
               style={{backgroundColor: '#E4E6EF', visibility:"hidden"}}  // hide the visibility
@@ -179,6 +185,7 @@ function setValues()
     let unpaidTotalValue = 0.0;
     let unpaidClient1Value = 0.0;
     let unpaidClient2Value = 0.0;
+    let unpaidClient4Value = 0.0;
 
     // Loop through response data
     response.data.forEach((item: any) => {

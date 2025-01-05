@@ -68,6 +68,7 @@ let [userForEdit] = useState<User & Salary>({
     pic: user.pic || initialUser.pic,
     occupation: user.occupation || initialUser.occupation,
     firstName: user.firstName || initialUser.firstName,
+    lastName: user.lastName || initialUser.lastName,
     email: user.email || initialUser.email,
     basic_allowance: basic_allowance.toString(),
     hr_allowance: hr_allowance.toString(),

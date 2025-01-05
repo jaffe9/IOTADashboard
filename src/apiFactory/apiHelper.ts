@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { resourceLimits } from "worker_threads";
 import { ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
@@ -7,6 +7,7 @@ import { TimesheetRequest } from "../app/modules/apps/user-management/users-list
 import { create } from "domain";
 import { file } from "@form-validation/bundle/popular";
 import { url } from "inspector";
+import { error } from "console";
 
 class getUserDataParams {
   baseUrl: string | undefined
@@ -20,6 +21,7 @@ axios.defaults.headers.common['apikey'] = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
 //const API_URL = import.meta.env.VITE_APP_THEME_API_URL;
 const API_URL = `https://zhplktaovpyenmypkjql.supabase.co/rest/v1`;
 const GET_USERS_URL = `${API_URL}/user`;
+const GET_OCCUPATION_URL = `${API_URL}/employeeBand`;
 const GET_TEMP_USERS_URL = `${API_URL}/tempUser`;
 const GET_EXPENSE = `${API_URL}/expensesType`;
 const GET_ACCOUNT_MANAGER = `${API_URL}/accountManager`;
@@ -200,6 +202,11 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
   return response;
 };
 
+export const getEmpOccupation = async () => {
+  const d = await axios
+     .get(`${GET_OCCUPATION_URL}?select=*`)
+}
+
 export const getClientDetails = async () : Promise<any> => {
   const d =  await axios
     .get(`${GET_CLIENT_DETAILS_URL}?select=*&order=id`);
@@ -208,11 +215,66 @@ export const getClientDetails = async () : Promise<any> => {
 
 export const getTempUserDetails = async () : Promise<any> => {
   const d =  await axios
-    .get(`${GET_TEMP_USERS_URL}?select=*&order=id`);
+    .get(`${GET_TEMP_USERS_URL}?select=*&order=id&userId=eq.false`);
   return d;
 };
 
-// Table For temparary user 
+export const updateUserId =  async (userId : any ) => {
+  const config = {
+    method : "PATCH",
+    maxBodyLength : Infinity ,
+    url : 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/tempUser?select=*&where&userId=eq.false',
+    headers :  {
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Content-Type': 'application/json'
+    },
+    data : userId
+  };
+  try {
+  const res = await axios.request(config);
+  console.log( `UserId updated to True: ${JSON.stringify(res.data)}`)
+  return res.data
+  }catch(e){
+   if (axios.isAxiosError(e)){
+    console.error("Axios Error in update userId : ", e.response?.data || e.message)
+   }else{
+    console.error("Error in updating userId to false " , e)
+   }
+  }
+} 
+
+// API to move a temp user to the user table
+export const movetempUserToUser = async (userdata : any ) => {
+const config = {
+  method : "POST" ,
+  maxBodyLength : Infinity,
+  url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/user',
+    headers: {
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Content-Type': 'application/json'
+    },
+  data : userdata //user data to be moved
+};
+
+try {
+  const response = await axios.request(config);
+  console.log(`User moved successfully : ${JSON.stringify(response.data)}`)
+  return response.data
+
+}catch(e){
+  if (axios.isAxiosError(e)) {
+  console.error("Axios Error :", e.response?.data || e.message)
+  }else{
+    console.error("Error in Moving tempuser to uer", e)
+  }
+
+}
+}
+
+
+// Table creation For temparary user 
 export const createTempEmployee = async (t: temEmp): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
     {
@@ -371,9 +433,11 @@ export const createContractPage = async (c: ContractRequest): Promise<{status:nu
       client_id: c.client_id,
       contract_no : c.contract_no,
       billing_value: c.billing_value,
-      billing_start_date : c.billing_start_date,
-      billing_end_date : c.billing_end_date,
+      billing_start_date : null,
+      billing_end_date : null,
       billing_months : c.billing_months,
+      contract_date : c.contract_date,
+      contract_end_date : c.contract_end_date,
       associatedAccountManager : c.associatedAccountManager,
       status:null,
       contract_file_location:null,
@@ -505,7 +569,7 @@ export const uploadClaimsToSupabase = async (file:File) => {
   const Cconfig = {
     method : "POST",
     maxBodyLength : Infinity,
-    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/${file.name}` ,
+    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/Jan_2025/${file.name}` ,
     headers : {
       'Authorization' : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
       'Content-Type' : file.type
@@ -519,7 +583,7 @@ export const uploadClaimsToSupabase = async (file:File) => {
     if (response.status === 200){
       //Extract the file path 
       const fileKey = response.data.file;
-      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/${fileKey}`;
+      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/Jan_2025/${fileKey}`;
       return publicUrl;
     }else{
       throw new Error('Claim Upload Failed')
@@ -536,7 +600,7 @@ export const uploadFileToSupabase = async (file:File) => {
      const Tconfig = {
       method : "POST",
       maxBodyLength : Infinity,
-      url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/${file.name}`,
+      url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/Dec_2024/${file.name}`,
       headers : {
         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
         'Content-Type': file.type,
@@ -551,7 +615,7 @@ export const uploadFileToSupabase = async (file:File) => {
       if (response.status === 200){
         //Extract the file path 
         const fileKey = response.data.file;
-        const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/${fileKey}`;
+        const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/Dec_2024/${fileKey}`; // hase a folder
         return publicUrl;
       }else{
         throw new Error('Timesheet Upload Failed')

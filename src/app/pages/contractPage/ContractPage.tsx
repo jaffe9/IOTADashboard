@@ -46,18 +46,19 @@ const ContractPage: FC = () => {
   const handleFileChange = (event:any ) =>{
     setFile(event.target.files[0])
   }
-  const handleContractUpload = async() =>{
+  const handleContractUpload = async() =>{  
     if(!file){
       alert("Please Select .pdf fomrat Contract")
       return ;
     }
      // Check if the uploaded file is in .pdf format
-  if (file !== "application/pdf") {
-    alert("Only .pdf files are allowed. Please select a valid .pdf file.");
+  if (!file) {
+      alert("Only .pdf files are allowed. Please select a valid .pdf file.");
     return;
   }
     try{
      await uploadContractToSupabase(file)
+     alert("Contract uploaded Successfully !")
     }catch(error){
      console.error("Error Uploading Contract:",error)
     }
@@ -103,6 +104,8 @@ const ContractPage: FC = () => {
           billing_start_date : data.billing_start_date,
           billing_end_date : data.billing_end_date,
           billing_months : data.billing_months,
+          contract_date : data.contract_date,
+          contract_end_date : data.contract_end_date,
           associatedAccountManager : data.associatedAccountManager,
           associated_user_id:data.associated_user_id
 
@@ -159,7 +162,7 @@ const ContractPage: FC = () => {
                     }}
                   
                   > 
-                    <option value="">Select ID</option>
+                    <option value="" disabled>Select employee</option>
                     {allUserInfo.employee.map((data: any, i: number) => (
                       <option key={i} value={data.username}>
                         {data.username} 
@@ -277,7 +280,7 @@ const ContractPage: FC = () => {
                   </div>
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label fw-bold fs-6">
-                      <span className="required">Billing Start Date</span>
+                      <span className="required">Contract Start Date</span>
                     </label>
                     <div className="col-lg-8 fv-row">
                      <Flatpickr
@@ -287,17 +290,17 @@ const ContractPage: FC = () => {
                        dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
-                         updateData({ billing_start_date: dateStr.toLocaleString("en",{
+                         updateData({ contract_date: dateStr.toLocaleString("en",{
                           year: "numeric",
                           month: "2-digit",
                           day : "2-digit"
                           }).replace(/\//g, "-") });
                            }}
                          ></Flatpickr>
-                      {formik.touched.billing_start_date && formik.errors.billing_start_date && (
+                      {formik.touched.contract_date && formik.errors.contract_date && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
-                            {formik.errors.billing_start_date}
+                            {formik.errors.contract_date}
                           </div>
                         </div>
                       )}
@@ -305,7 +308,7 @@ const ContractPage: FC = () => {
                   </div>
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label fw-bold fs-6">
-                      <span className="required">Billing End Date</span>
+                      <span className="required">Contract End Date</span>
                     </label>
                     <div className="col-lg-8 fv-row">
                     <Flatpickr
@@ -315,41 +318,50 @@ const ContractPage: FC = () => {
                        dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
-                         updateData({ billing_end_date: dateStr.toLocaleString("en",{
+                         updateData({ contract_end_date: dateStr.toLocaleString("en",{
                           year: "numeric",
                           month: "2-digit",
                           day : "2-digit"
                           }).replace(/\//g, "-") });
                            }}
                          ></Flatpickr>
-                      {formik.touched.billing_end_date && formik.errors.billing_end_date && (
+                      {formik.touched.contract_end_date && formik.errors.contract_end_date && (
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
-                            {formik.errors.billing_end_date}
+                            {formik.errors.contract_end_date}
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
-                  <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
-                      Billing Months
+
+
+                 <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label fw-bold fs-6">
+                      <span className="required">Billing Months </span>
                     </label>
                     <div className="col-lg-8 fv-row">
-                    
-                      <input
-                      type="text"
-                      className="form-control form-control-lg form-control-solid"
-                      placeholder="Enter Total Number Of Months "
-                      
-                      onChange={(value) => {
-                        updateData({ billing_months: parseInt(value.target.value) });
-                        formik.setFieldValue("billing_months",value.target.value)
-                        }}
+                    <select
+                        className='form-select form-select-lg form-select-solid'
+                        data-control='select2'
+                        data-placeholder='Select Total Months...'
+      
+                        onChange={(e) => updateData({billing_months: parseInt(e.target.value)})}
                       >
-                      </input>
+                        <option hidden>Select billing_months</option>
+                        <option value='11'>11 Months</option>
+                        <option value='12'>12 Months</option>
+                      </select>
+            
+                      {formik.touched.billing_months && formik.errors.billing_months && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            {formik.errors.billing_months}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>   
+                  </div>
 
                    <div className="row mb-6">
                     <label className="col-lg-4 col-form-label  fw-bold fs-6">
