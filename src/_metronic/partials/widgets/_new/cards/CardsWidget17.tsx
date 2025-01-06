@@ -37,7 +37,8 @@ const CardsWidget17: FC<Props> = ({
     }, 10)
   }
   return (
-    <div className={`card card-flush ${className}`}>
+   <a href='/getInvoiceDetails'
+   > <div className={`card card-flush ${className}`}>
       <div className='card-header pt-5'>
         <div className='card-title d-flex flex-column'>
           <div className='d-flex align-items-center'>
@@ -91,6 +92,7 @@ const CardsWidget17: FC<Props> = ({
         </div>
       </div>
     </div>
+  </a>
   )
 }
 

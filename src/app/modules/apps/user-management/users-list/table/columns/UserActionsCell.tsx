@@ -25,7 +25,7 @@ const UserActionsCell: FC<Props> = ({ id }) => {
   };
 
   const openIqamaEditModel = () => {
-    setItemIdForUpdate(id)
+    
   }
 
   const deleteItem = useMutation(() => deleteUser(id), {

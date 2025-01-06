@@ -165,6 +165,7 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
                                 overflow: 'hidden', 
                               }}>
                               <a
+                              target='_blank'
                               href={`${record.contract_file_location}`}
                               >{record.contract_file_location}</a>
                             </style>  </strong>   

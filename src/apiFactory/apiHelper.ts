@@ -85,7 +85,16 @@ export const getNationalIdExp = async () => {
     return null
   }
 }
-
+//Fetch the data related to Invoices
+export const getInvoiceDetails = async () => {
+  try{
+  const response = await axiosInstance.get("invoice?select=*,associated_user_id(username,companyName)&invoice_paid_status=eq.false&order=id")
+  return response.data;
+  }catch(error){
+  console.error("Error fetching Invoices Details",error);
+   return null
+  }
+}
 // Fetching the data related to national_id
 export const getLeavesLeft = async () => {
   try{
@@ -219,17 +228,18 @@ export const getTempUserDetails = async () : Promise<any> => {
   return d;
 };
 
-export const updateUserId =  async (userId : any ) => {
+// Update IqamaEspiry of the user
+export const updateUserIqamaExp =  async (id : any ,national_id: any ,expiry_date : any ) => {
   const config = {
     method : "PATCH",
     maxBodyLength : Infinity ,
-    url : 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/tempUser?select=*&where&userId=eq.false',
+    url : 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/nationalIdInfo?select=*,associated_user_id(username,companyName)',
     headers :  {
       'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
       'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
       'Content-Type': 'application/json'
     },
-    data : userId
+    data : [id,national_id,expiry_date]
   };
   try {
   const res = await axios.request(config);
@@ -244,7 +254,33 @@ export const updateUserId =  async (userId : any ) => {
   }
 } 
 
-// API to move a temp user to the user table
+// Api update tempUser Status to false 
+export const updateUserId =  async (id : any ) => {
+  const config = {
+    method : "PATCH",
+    maxBodyLength : Infinity ,
+    url : `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/tempUser?select=*&id=eq.${id}`,
+    headers :  {
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Content-Type': 'application/json'
+    },
+    data : { userId:true }
+  };
+  try {
+  const res = await axios.request(config);
+  console.log( `UserId updated to True: ${JSON.stringify(res.data)}`)
+  return res.data
+  }catch(e){
+   if (axios.isAxiosError(e)){
+    console.error("Axios Error in update userId : ", e.response?.data || e.message)
+   }else{
+    console.error("Error in updating userId to false " , e)
+   }
+  }
+} 
+
+// API to move a temp-user to the user table
 export const movetempUserToUser = async (userdata : any ) => {
 const config = {
   method : "POST" ,

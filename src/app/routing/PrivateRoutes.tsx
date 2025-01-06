@@ -14,6 +14,7 @@ import EmployeeInvoiceWrapper from '../pages/employeeInvoice/EmployeeInvoiceWrap
 import ContractPageWrapper from '../pages/contractPage/ContractPageWrapper'
 import { CreateEmployee } from '../pages/createEmployee/CreateEmployee'
 import CreateEmployeeWrapper from '../pages/createEmployee/CreateEmployeeWrapper'
+import { GetInvoiceDetails } from '../pages/invoiceInfo/invoiceDetails'
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
@@ -37,6 +38,7 @@ const PrivateRoutes = () => {
         <Route path='employeeinvoice' element={<EmployeeInvoiceWrapper/>}/>
         <Route path='contract' element={<ContractPageWrapper/>}/>
         <Route path='createTempEmp' element={<CreateEmployeeWrapper/>}/>
+        <Route path='getInvoiceDetails' element={<GetInvoiceDetails className={''}/>}/>
         {/* Lazy Modules */}
         <Route
           path='crafted/pages/profile/*'

@@ -32,14 +32,13 @@ const ListsWidget26 = ({ className }: Props) => {
     const { id , userId , ...tempDatas } = user
     // remove userId as it is extra field
      try{
-      const resuult = await movetempUserToUser(tempDatas);
-      console.log("User moved successfully :" , resuult )
+        const resuult = await movetempUserToUser(tempDatas);
+        console.log("User moved successfully :" , resuult )
       // To filter the data once the id is moved
       setTempUsers((prev) => prev.filter((u) => u.id !== user.id))
          try{
-          const dataToUpdate = {userId : true}
-          const updateData = await updateUserId(dataToUpdate)
-          console.log(`updated userId ${userId}` , updateData)
+          const updateData = await updateUserId(user.id)
+          console.log(`updated userId ${user.id}` , updateData)
          }catch(error){
             if (axios.isAxiosError(error)){
               console.error("Error in updating userId in listwidget26 ; " , error.response?.data)

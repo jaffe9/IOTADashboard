@@ -1,9 +1,7 @@
 import {useEffect} from 'react'
-import {UserEditModalHeader} from './UserEditModalHeader'
-import {UserEditModalFormWrapper} from './UserEditModalFormWrapper'
-import { UserEditModalHeaderIqama } from './UserEditModalHeaderIqama'
-import { UserEditModalFormWrapperIqama } from './UserEditModalFormWrapperIqama'
-
+import { UserEditModalHeaderIqama } from './IqamaEditModalHeader'
+import { UserEditModalFormWrapperIqama } from './IqamaEditModalFormWrapper'
+//
 const UserEditModal = () => {
   useEffect(() => {
     document.body.classList.add('modal-open')
