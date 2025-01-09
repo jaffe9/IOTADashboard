@@ -20,7 +20,7 @@ const ListsWidget26 = ({ className }: Props) => {
   // Function to fetch the temp users' details
   const tempUserRecords = async () => {
     const records = await getTempUserDetails();  // Use the correct function from the API
-    console.log("Records info from list26", records.data)
+  
     if (records && records.data) {
       setTempUsers(records.data); // Assuming the API returns data under 'data' property
     }

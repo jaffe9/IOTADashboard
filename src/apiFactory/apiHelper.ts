@@ -88,7 +88,7 @@ export const getNationalIdExp = async () => {
 //Fetch the data related to Invoices
 export const getInvoiceDetails = async () => {
   try{
-  const response = await axiosInstance.get("invoice?select=*,associated_user_id(username,companyName)&invoice_paid_status=eq.false&order=id")
+  const response = await axiosInstance.get("invoice?select=*,associated_user_id(username,companyName,clientId(client_short_name))&invoice_paid_status=eq.false&order=id")
   return response.data;
   }catch(error){
   console.error("Error fetching Invoices Details",error);
@@ -152,6 +152,12 @@ export const getSalaryInfoByEmployee = async (employeeId: string) => {
 export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
   const d = await axios
     .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associated_account_manager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
+  return d;
+};
+
+export const getAllClaimEmployees = async (): Promise<UsersQueryResponse> => {
+  const d = await axios
+    .get(`${GET_USERS_URL}?select=*&isActive=eq.true&order=id`);
   return d;
 };
 

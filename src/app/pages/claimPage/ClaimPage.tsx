@@ -19,7 +19,7 @@ import {
 //   return data.data;
 // });
 var allUserInfo: any = await Promise.all(
-  [ apiHelper.getAllEmployees(), apiHelper.getExpenses(), apiHelper.getAccountManager() ]
+  [ apiHelper.getAllClaimEmployees(), apiHelper.getExpenses(), apiHelper.getAccountManager() ]
 ).then(([employee,expense ,manager]) => {
   return { employee:employee.data, expense:expense.data , manager:manager.data}
 })

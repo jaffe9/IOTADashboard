@@ -7,19 +7,28 @@ type Props = {
   row: Row<User>
 }
 
-const CustomRow: FC<Props> = ({row}) => (
-  <tr {...row.getRowProps()}>
-    {row.cells.map((cell) => {
-      return (
-        <td
-          {...cell.getCellProps()}
-          className={clsx({'text-end min-w-100px': cell.column.id === 'actions'})}
-        >
-          {cell.render('Cell')}
-        </td>
-      )
-    })}
-  </tr>
-)
+const CustomRow: FC<Props> = ({ row }) => {
+  // Extract the key and other row props
+  const { key, ...rowProps } = row.getRowProps();
+
+  return (
+    <tr {...rowProps}>
+      {row.cells.map((cell) => {
+        // Extract the key and other cell props
+        const { key: cellKey, ...cellProps } = cell.getCellProps();
+
+        return (
+          <td
+            {...cellProps}
+            key={cellKey} // Pass key explicitly to React
+            className={clsx({ 'text-end min-w-100px': cell.column.id === 'actions' })}
+          >
+            {cell.render('Cell')}
+          </td>
+        );
+      })}
+    </tr>
+  );
+};
 
 export {CustomRow}

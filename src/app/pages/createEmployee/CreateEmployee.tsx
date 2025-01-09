@@ -12,6 +12,7 @@ import {
   clients,
   temEmp,
 } from "../../modules/apps/user-management/users-list/core/_models";
+import ChipsDemo from "./multiSelectDropDown";
 
 
 
@@ -354,62 +355,7 @@ const CreateEmployee: FC = () => {
                       <span className="required">Language </span>
                     </label>
                     <div className="col-lg-8 fv-row">
-                    <select
-                        className='form-select form-select-lg form-select-solid'
-                        data-control='select2'
-                        data-placeholder='Select Language...'
-      
-                        onChange={(e) => updateData({language: e.target.value})}
-                      >
-                        <option hidden>Select Language</option>
-                        <option value='Indonesian'>Bahasa Indonesia - Indonesian</option>
-                        <option value='Bahasa Melayu - Malay'>Bahasa Melayu - Malay</option>
-                        <option value='Català - Catalan'>Català - Catalan</option>
-                        <option value='Čeština - Czech'>Čeština - Czech</option>
-                        <option value='Dansk - Danish'>Dansk - Danish</option>
-                        <option value='Deutsch - German'>Deutsch - German</option>
-                        <option value='English'>English</option>
-                        <option value='English UK - British English'>English UK - British English</option>
-                        <option value='Español - Spanish'>Español - Spanish</option>
-                        <option value='Euskara - Basque (beta)'>Euskara - Basque (beta)</option>
-                        <option value='Filipino'>Filipino</option>
-                        <option value='Français - French'>Français - French</option>
-                        <option value='Gaeilge - Irish (beta)'>Gaeilge - Irish (beta)</option>
-                        <option value='Galego - Galician (beta)'>Galego - Galician (beta)</option>
-                        <option value='Hrvatski - Croatian'>Hrvatski - Croatian</option>
-                        <option value='Italiano - Italian'>Italiano - Italian</option>
-                        <option value='Magyar - Hungarian'>Magyar - Hungarian</option>
-                        <option value='Nederlands - Dutch'>Nederlands - Dutch</option>
-                        <option value='Norsk - Norwegian'>Norsk - Norwegian</option>
-                        <option value='Polski - Polish'>Polski - Polish</option>
-                        <option value='Português - Portuguese'>Português - Portuguese</option>
-                        <option value='Română - Romanian'>Română - Romanian</option>
-                        <option value='Slovenčina - Slovak'>Slovenčina - Slovak</option>
-                        <option value='Suomi - Finnish'>Suomi - Finnish</option>
-                        <option value='Svenska - Swedish'>Svenska - Swedish</option>
-                        <option value='Tiếng Việt - Vietnamese'>Tiếng Việt - Vietnamese</option>
-                        <option value='Türkçe - Turkish'>Türkçe - Turkish</option>
-                        <option value='Ελληνικά - Greek'>Ελληνικά - Greek</option>
-                        <option value='Български език - Bulgarian'>Български език - Bulgarian</option>
-                        <option value='Русский - Russian'>Русский - Russian</option>
-                        <option value='Српски - Serbian'>Српски - Serbian</option>
-                        <option value='Українська мова - Ukrainian'>Українська мова - Ukrainian</option>
-                        <option value='Hebrew'>עִבְרִית - Hebrew</option>
-                        <option value='Urdu (beta)'>اردو - Urdu (beta)</option>
-                        <option value='Arabic'>العربية - Arabic</option>
-                        <option value='Persian'>فارسی - Persian</option>
-                        <option value='Marathi'>मराठी - Marathi</option>
-                        <option value='Hindi'>हिन्दी - Hindi</option>
-                        <option value='Bangla'>বাংলা - Bangla</option>
-                        <option value='Gujarati'>ગુજરાતી - Gujarati</option>
-                        <option value='Tamil'>தமிழ் - Tamil</option>
-                        <option value='Kannada'>ಕನ್ನಡ - Kannada</option>
-                        <option value='Thai'>ภาษาไทย - Thai</option>
-                        <option value=' Korean'>한국어 - Korean</option>
-                        <option value='Japanese'>日本語 - Japanese</option>
-                        <option value='Simplified Chinese'>简体中文 - Simplified Chinese</option>
-                        <option value='Traditional Chinese'>繁體中文 - Traditional Chinese</option>
-                      </select>
+                    <ChipsDemo/>
             
                       {formik.touched.language && formik.errors.language && (
                         <div className="fv-plugins-message-container">
