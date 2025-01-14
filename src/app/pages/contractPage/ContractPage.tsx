@@ -351,6 +351,7 @@ const ContractPage: FC = () => {
                         <option hidden>Select billing_months</option>
                         <option value='11'>11 Months</option>
                         <option value='12'>12 Months</option>
+                        <option value='6'>6 Months</option>
                       </select>
             
                       {formik.touched.billing_months && formik.errors.billing_months && (

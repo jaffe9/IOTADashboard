@@ -22,7 +22,7 @@ export interface IProfileDetails {
   occupation : string ;
   companyName : string ;
   phone : string ;
-  language : string ;
+  language : string[] ;
   timeZone : string ;
   associated_account_manager : number ;
   address : string ;
@@ -175,7 +175,7 @@ export const profileDetailsInitValues: IProfileDetails = {
   occupation: "",
   companyName: "",
   phone: "",
-  language: "",
+  language: [],
   timeZone: "",
   associated_account_manager: 0,
   address: "",

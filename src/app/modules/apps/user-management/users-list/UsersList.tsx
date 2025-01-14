@@ -4,12 +4,16 @@ import {QueryResponseProvider} from './core/QueryResponseProvider'
 import {UsersListHeader} from './components/header/UsersListHeader'
 import {UsersTable} from './table/UsersTable'
 import {UserEditModal} from './user-edit-modal/UserEditModal'
+import {IqamaEditModal} from './Iqama-edit-modal/IqamaEditModal'
 import {KTCard} from '../../../../../_metronic/helpers'
 import { ToolbarWrapper } from '../../../../../_metronic/layout/components/toolbar'
 import { Content } from '../../../../../_metronic/layout/components/content'
+import { IqamaListViewProvider, useIqamaListView } from './core/IqamaListViewProvider'
+
 
 const UsersList = () => {
   const {itemIdForUpdate} = useListView()
+  const {itemIqamaForUpdate} = useIqamaListView()
   return (
     <>
       <KTCard>
@@ -17,6 +21,7 @@ const UsersList = () => {
         <UsersTable />
       </KTCard>
       {itemIdForUpdate !== undefined && <UserEditModal />}
+      {itemIqamaForUpdate !== undefined && <IqamaEditModal />}
     </>
   )
 }
@@ -24,12 +29,12 @@ const UsersList = () => {
 const UsersListWrapper = () => (
   <QueryRequestProvider>
     <QueryResponseProvider>
-      <ListViewProvider>
+      <ListViewProvider> || <IqamaListViewProvider>
         <ToolbarWrapper />
         <Content>
           <UsersList />
         </Content>
-      </ListViewProvider>
+      </IqamaListViewProvider> || </ListViewProvider>
     </QueryResponseProvider>
   </QueryRequestProvider>
 )

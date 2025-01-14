@@ -2,6 +2,8 @@ import {Dispatch, SetStateAction} from 'react'
 
 export type ID = undefined | null | number
 
+export type Iqama = undefined | number
+
 export type employee_id = string
 
 export type PaginationState = {
@@ -80,6 +82,30 @@ export const initialListView: ListViewContextProps = {
   onSelectAll: () => {},
   clearSelected: () => {},
   setItemIdForUpdate: () => {},
+  isAllSelected: false,
+  disabled: false,
+}
+
+export type IqamaListViewContextProps = {
+  selected: Array<Iqama>
+  onSelect: (selectedIqama: Iqama) => void
+  onSelectAll: () => void
+  clearSelected: () => void
+  // NULL => (CREATION MODE) | MODAL IS OPENED
+  // NUMBER => (EDIT MODE) | MODAL IS OPENED
+  // UNDEFINED => MODAL IS CLOSED
+  itemIqamaForUpdate?: Iqama
+  setItemIqamaForUpdate: Dispatch<SetStateAction<Iqama>>
+  isAllSelected: boolean
+  disabled: boolean
+}
+
+export const iqamaInitialListView: IqamaListViewContextProps = {
+  selected: [],
+  onSelect: () => {},
+  onSelectAll: () => {},
+  clearSelected: () => {},
+  setItemIqamaForUpdate: () => {},
   isAllSelected: false,
   disabled: false,
 }

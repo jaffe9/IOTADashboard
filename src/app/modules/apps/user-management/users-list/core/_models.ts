@@ -166,7 +166,7 @@ export type temEmp = {
 "occupation" : string,
 "companyName" : string,
 "phone" : string,
-"language" : string,
+"language" : string[],
 "timeZone" : string,
 "address" : string,
 "clientId" : number,

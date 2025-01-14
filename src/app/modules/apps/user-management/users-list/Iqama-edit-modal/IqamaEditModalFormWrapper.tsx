@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {useQuery} from 'react-query'
 import {UserEditModalFormIqama} from './IqamaEditModalForm'
 import {isNotEmpty, QUERIES} from '../../../../../../_metronic/helpers'
@@ -11,13 +12,14 @@ const getIqamaDataFromApi = async (id : string) =>
   {
     return await apiHelper.getNationalIdExp().then(function(result){return result})
   }
-var national_id = ""
-var expiry_date = ""
-var iqama:National_id= {}
+let national_id = ""
+let expiry_date = ""
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let iqama:National_id= {}
 const UserEditModalFormWrapperIqama = () => {
 useEffect(() => 
     {
-      var selected_User_id : any = "";
+      let selected_User_id : any = "";
       selected_User_id = itemIdForUpdate?.toString()
       const iqamaInfo = getIqamaDataFromApi(selected_User_id)
 

@@ -3,6 +3,7 @@ import React, { Fragment, useEffect, useState } from 'react'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import {Dropdown1} from '../../content/dropdown/Dropdown1'
 import { getLeavesLeft } from '../../../../apiFactory/apiHelper'
+import { numeric } from '@form-validation/bundle/popular'
 
 type Props = {
   className: string
@@ -13,7 +14,7 @@ type LeaveBalanceRecord = {
   leaves_used: number;
   leave_left_current_year:number;
   year:number;
-  user_id: { username: string , companyName:string };
+  user_id: { username: string , companyName:string , employeeJoiningDate:string };
 };
 
 const ListsWidget3: React.FC<Props> = ({ className }) => {
@@ -83,7 +84,7 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
               <a
                 className={`nav-link btn btn-sm btn-color-muted btn-active btn-active-light-primary fw-bold px-4`}
               >
-                Tab 3
+                2026
               </a>
             </li>
           </ul>
@@ -116,18 +117,18 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
 const renderTable = (records: LeaveBalanceRecord[]) => {
   return (
     <div className="table-responsive">
-      <table className="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-4">
-        <thead className="text-gray-900 fw-bold mb-1 fs-4">
+      <table className="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-4 border border-grey border-2">
+        <thead className="text-gray-900 fw-bold mb-1 fs-4 border border-grey border-2">
           <tr>
             <th className="p-0 w-50px"></th>
-            <th className="p-0 min-w-150px">Username</th>
-            <th className="p-0 min-w-140px">Total Leaves</th>
-            <th className="p-0 min-w-110px">Leaves Used</th>
-            <th className="p-0 min-w-50px">Leave Left</th>
-            <th className="p-0 min-w-50px">Year</th>
+            <th className="px-px min-w-100px">Name</th>
+            <th className="px-px min-w-100px">Total Leaves</th>
+            <th className="px-px min-w-100px">Leaves Used</th>
+            <th className="px-px min-w-50px">Leave Left</th>
+            <th className="px-px min-w-50px">Joining Date</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className='border border-grey border-2 hover-success'>
           {records.map((record, index) => (
             <tr key={index}>
               <td>
@@ -154,7 +155,7 @@ const renderTable = (records: LeaveBalanceRecord[]) => {
               <td className="text-primary fw-bold">{record.leave_accrued_current_year}</td>
               <td className="text-warning fw-bold">{record.leaves_used}</td>
               <td className="text-danger fw-bold">{record.leave_left_current_year}</td>
-              <td className="text-primary fw-bold">{record.year}</td>
+              <td className="text-primary fw-bold">{record.user_id?.employeeJoiningDate}</td>
             </tr>
           ))}
         </tbody>

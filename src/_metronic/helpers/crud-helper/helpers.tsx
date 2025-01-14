@@ -1,6 +1,6 @@
 import {createContext, Dispatch, SetStateAction, useEffect, useState} from 'react'
 import qs from 'qs'
-import {ID, QueryResponseContextProps, QueryState} from './models'
+import {ID,Iqama, QueryResponseContextProps, QueryState} from './models'
 
 function createResponseContext<T>(initialState: QueryResponseContextProps<T>) {
   return createContext(initialState)
@@ -72,6 +72,24 @@ function groupingOnSelect(
   }
 }
 
+function groupingIqamaOnSelect(
+  id: Iqama,
+  selected: Array<Iqama>,
+  setSelected: Dispatch<SetStateAction<Array<Iqama>>>
+) {
+  if (!id) {
+    return
+  }
+
+  if (selected.includes(id)) {
+    setSelected(selected.filter((itemId) => itemId !== id))
+  } else {
+    const updatedSelected = [...selected]
+    updatedSelected.push(id)
+    setSelected(updatedSelected)
+  }
+}
+
 function groupingOnSelectAll<T>(
   isAllSelected: boolean,
   setSelected: Dispatch<SetStateAction<Array<ID>>>,
@@ -88,6 +106,24 @@ function groupingOnSelectAll<T>(
 
   setSelected(data.filter((item) => item.id).map((item) => item.id))
 }
+
+function groupingIqamaOnSelectAll<T>(
+  isAllSelected: boolean,
+  setSelected: Dispatch<SetStateAction<Array<Iqama>>>,
+  data?: Array<T & {id?: Iqama}>
+) {
+  if (isAllSelected) {
+    setSelected([])
+    return
+  }
+
+  if (!data || !data.length) {
+    return
+  }
+
+  setSelected(data.filter((item) => item.id).map((item) => item.id))
+}
+
 
 // Hook
 function useDebounce(value: string | undefined, delay: number) {
@@ -121,4 +157,6 @@ export {
   groupingOnSelectAll,
   useDebounce,
   isNotEmpty,
+  groupingIqamaOnSelect,
+  groupingIqamaOnSelectAll
 }

@@ -118,11 +118,11 @@ const renderTable = (records: invoiceDetails[]) => {
         <thead className="text-gray-900 fw-bold mb-1 fs-4">
           <tr className='border border-grey border-2'>
             <th className="p-0 w-50px"></th>
-            <th className="text text-grey font-mono">Name</th>
-            <th className="text text-grey font-mono">Invoice Number</th>
-            <th className="text text-grey font-mono">Internal Invoice Number</th>
-            <th className="text text-grey font-mono">Value</th>
-            <th className="text text-grey font-mono"> Invoice Url</th>
+            <th className="px-px min-w-100px">Name</th>
+            <th className="px-px min-w-100px">Invoice Number</th>
+            <th className="px-px min-w-100px">Internal Number</th>
+            <th className="px-px min-w-100px">Value</th>
+            <th className="px-px min-w-100px"> Url</th>
           </tr>
         </thead>
         <tbody className='border border-grey border-2'>

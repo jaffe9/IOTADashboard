@@ -98,7 +98,7 @@ export const getInvoiceDetails = async () => {
 // Fetching the data related to national_id
 export const getLeavesLeft = async () => {
   try{
-    const response = await axiosInstance.get("leaveEntitlment?select=*,user_id(username,companyName)&order=id");
+    const response = await axiosInstance.get("leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate)&order=id");
     return response.data;
   }catch (error){
     console.error('Error fetching Leaves Left for employees:', error);

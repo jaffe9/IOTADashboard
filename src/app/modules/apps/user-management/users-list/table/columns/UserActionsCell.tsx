@@ -1,18 +1,21 @@
 import { FC, useEffect } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { MenuComponent } from "../../../../../../../_metronic/assets/ts/components";
-import { ID, KTIcon, QUERIES } from "../../../../../../../_metronic/helpers";
+import { ID, Iqama, KTIcon, QUERIES } from "../../../../../../../_metronic/helpers";
 import { useListView } from "../../core/ListViewProvider";
+import { useIqamaListView } from "../../core/IqamaListViewProvider";
 import { useQueryResponse } from "../../core/QueryResponseProvider";
 import { deleteUser } from "../../core/_requests";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   id: ID;
+  iqama: Iqama;
 };
 
-const UserActionsCell: FC<Props> = ({ id }) => {
+const UserActionsCell: FC<Props> = ({ id, iqama }) => {
   const { setItemIdForUpdate } = useListView();
+  const { setItemIqamaForUpdate } = useIqamaListView();
   const { query } = useQueryResponse();
   const queryClient = useQueryClient();
 
@@ -21,11 +24,12 @@ const UserActionsCell: FC<Props> = ({ id }) => {
   }, []);
 
   const openEditModal = () => {
+    console.log("ID")
     setItemIdForUpdate(id);
   };
 
   const openIqamaEditModel = () => {
-    
+    setItemIqamaForUpdate(iqama);
   }
 
   const deleteItem = useMutation(() => deleteUser(id), {
@@ -68,7 +72,7 @@ const UserActionsCell: FC<Props> = ({ id }) => {
          {/* begin::Menu item */}
          <div className="menu-item px-3"> 
           <a className="menu-link px-3" onClick={openIqamaEditModel} >
-            Iqama Exp
+            Iqama Expiry
           </a>
         </div>
         {/* end::Menu item */}
