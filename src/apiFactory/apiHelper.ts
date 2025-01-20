@@ -70,7 +70,7 @@ export const getContractExpiries = async () => {
   try {
     const response = await axiosInstance.get('contract?select=*,associated_user_id(username,companyName)');
     return response.data;
-    } catch (error) {
+    } catch (error) {                                 
       console.error('Error fetching data:', error);
       return null
       }
@@ -132,6 +132,28 @@ export const getAllSalaries = async () => {
 export const getAllBilling = async () => {
   try {
     const response = await axiosInstance.get('salary?contract=*, user(id,*), client(id,*)', { timeout: 1500 });
+    return response;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return null
+  }
+};
+
+// API for pending Invoices
+export const getPendingInvoices = async () => {
+  try {
+    const response = await axiosInstance.get('invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.false&order=id', );
+    return response;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return null
+  }
+};
+
+// Api for paid invoices
+export const getPaidInvoices = async () => {
+  try {
+    const response = await axiosInstance.get('invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.true&order=id', );
     return response;
   } catch (error) {
     console.error('Error fetching data:', error);

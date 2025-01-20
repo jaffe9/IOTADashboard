@@ -50,6 +50,9 @@ export type Expenses = {
 export type Contract = {
 associatedAccountManager?:number
 id?:number
+contract_no?:string
+contract_date?:string
+contract_end_date?:string
 }
 
 export type ResourceOnboardingStatus = {
@@ -94,6 +97,7 @@ export type National_id = {
   national_id?: string
   expiry_date?: string
 }
+
 
 export type UsersQueryResponse = Response<Array<User>>
 

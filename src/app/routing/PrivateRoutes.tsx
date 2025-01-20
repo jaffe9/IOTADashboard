@@ -12,9 +12,9 @@ import ClaimPageWrapper from '../pages/claimPage/ClaimPageWrapper'
 import EmployeeTimesheetWrapper from '../pages/employeeTimesheet/EmployeeTimesheetWrapper'
 import EmployeeInvoiceWrapper from '../pages/employeeInvoice/EmployeeInvoiceWrapper'
 import ContractPageWrapper from '../pages/contractPage/ContractPageWrapper'
-import { CreateEmployee } from '../pages/createEmployee/CreateEmployee'
 import CreateEmployeeWrapper from '../pages/createEmployee/CreateEmployeeWrapper'
 import { GetInvoiceDetails } from '../pages/invoiceInfo/invoiceDetails'
+import { TRUE } from 'sass'
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))

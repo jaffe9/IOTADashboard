@@ -1,21 +1,25 @@
 import { FC, useEffect } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { MenuComponent } from "../../../../../../../_metronic/assets/ts/components";
-import { ID, Iqama, KTIcon, QUERIES } from "../../../../../../../_metronic/helpers";
+import { Contract, ID, Iqama, KTIcon, QUERIES } from "../../../../../../../_metronic/helpers";
 import { useListView } from "../../core/ListViewProvider";
 import { useIqamaListView } from "../../core/IqamaListViewProvider";
+import { useContractListView } from "../../core/ContractListViewProvider";
 import { useQueryResponse } from "../../core/QueryResponseProvider";
 import { deleteUser } from "../../core/_requests";
 import { useNavigate } from "react-router-dom";
 
+
 type Props = {
   id: ID;
   iqama: Iqama;
+  contract : Contract;
 };
 
-const UserActionsCell: FC<Props> = ({ id, iqama }) => {
+const UserActionsCell: FC<Props> = ({ id, iqama , contract}) => {
   const { setItemIdForUpdate } = useListView();
   const { setItemIqamaForUpdate } = useIqamaListView();
+  const { setItemContractForUpdate } = useContractListView();
   const { query } = useQueryResponse();
   const queryClient = useQueryClient();
 
@@ -30,6 +34,10 @@ const UserActionsCell: FC<Props> = ({ id, iqama }) => {
 
   const openIqamaEditModel = () => {
     setItemIqamaForUpdate(iqama);
+  }
+
+  const openContractEditModel = () => {
+    setItemContractForUpdate(contract);
   }
 
   const deleteItem = useMutation(() => deleteUser(id), {
@@ -79,7 +87,7 @@ const UserActionsCell: FC<Props> = ({ id, iqama }) => {
 
          {/* begin::Menu item */}
          <div className="menu-item px-3">
-          <a className="menu-link px-3" >
+          <a className="menu-link px-3"   onClick={openContractEditModel}>
            Contract Exp
           </a>
         </div>
@@ -87,15 +95,15 @@ const UserActionsCell: FC<Props> = ({ id, iqama }) => {
 
         {/* begin::Menu item */}
         {
-          <div className="menu-item px-3">
-            <a
-              className="menu-link px-3"
-              data-kt-users-table-filter="delete_row"
-              onClick={(event) => (window.location.href = "IOTADashboard/crafted/pages/profile/campaigns")}
-            >
-              Details
-            </a>
-          </div>
+          // <div className="menu-item px-3">
+          //   <a
+          //     className="menu-link px-3"
+          //     data-kt-users-table-filter="delete_row"
+          //     onClick={(event) => (window.location.href = "IOTADashboard/crafted/pages/profile/campaigns")}
+          //   >
+          //     Details
+          //   </a>
+          // </div>
         }
         {/* end::Menu item */}
       </div>
@@ -105,3 +113,7 @@ const UserActionsCell: FC<Props> = ({ id, iqama }) => {
 };
 
 export { UserActionsCell };
+  function useContractLisView(): any {
+    throw new Error("Function not implemented.");
+  }
+

@@ -614,7 +614,7 @@ let [userForEdit] = useState<User & Salary>({
                   {...formik.getFieldProps('payslipOptions')}
                   name='download'
                   type='radio'
-                  defaultChecked={false}
+                //  defaultChecked={false}
                   value='Download'
                   id='kt_modal_update_role_option_0'
                   onClick={() =>setPayslipOption(payslipOptions.download)}
@@ -647,7 +647,7 @@ let [userForEdit] = useState<User & Salary>({
                   {...formik.getFieldProps('payslipOptions')}
                   name='role'
                   type='radio'
-                  defaultChecked={false}
+                 // defaultChecked={false}
                   value='eMail'
                   id='kt_modal_update_role_option_1'
                   onClick={() =>setPayslipOption(payslipOptions.email)}

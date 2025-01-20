@@ -7,7 +7,7 @@ const PageTitleWrapper = () => {
     return null
   }
 
-  return <PageTitle />
+  // return <PageTitle />
 }
 
 export {PageTitleWrapper}

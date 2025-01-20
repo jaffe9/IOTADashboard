@@ -5,15 +5,19 @@ import {UsersListHeader} from './components/header/UsersListHeader'
 import {UsersTable} from './table/UsersTable'
 import {UserEditModal} from './user-edit-modal/UserEditModal'
 import {IqamaEditModal} from './Iqama-edit-modal/IqamaEditModal'
+import {ContractEditModal} from './Contract-edit-modal/ContractEditModal'
 import {KTCard} from '../../../../../_metronic/helpers'
 import { ToolbarWrapper } from '../../../../../_metronic/layout/components/toolbar'
 import { Content } from '../../../../../_metronic/layout/components/content'
-import { IqamaListViewProvider, useIqamaListView } from './core/IqamaListViewProvider'
+import { IqamaListViewProvider, useIqamaListView  } from './core/IqamaListViewProvider'
+import { ContractListViewProvider, useContractListView } from './core/ContractListViewProvider'
 
 
 const UsersList = () => {
   const {itemIdForUpdate} = useListView()
   const {itemIqamaForUpdate} = useIqamaListView()
+  const { itemContractForUpdate } = useContractListView()
+  
   return (
     <>
       <KTCard>
@@ -22,6 +26,7 @@ const UsersList = () => {
       </KTCard>
       {itemIdForUpdate !== undefined && <UserEditModal />}
       {itemIqamaForUpdate !== undefined && <IqamaEditModal />}
+      { itemContractForUpdate !== undefined && <ContractEditModal/>}
     </>
   )
 }
@@ -29,12 +34,12 @@ const UsersList = () => {
 const UsersListWrapper = () => (
   <QueryRequestProvider>
     <QueryResponseProvider>
-      <ListViewProvider> || <IqamaListViewProvider>
+      <ListViewProvider> || <IqamaListViewProvider> || <ContractListViewProvider>
         <ToolbarWrapper />
         <Content>
           <UsersList />
         </Content>
-      </IqamaListViewProvider> || </ListViewProvider>
+        </ContractListViewProvider> || </IqamaListViewProvider> || </ListViewProvider> 
     </QueryResponseProvider>
   </QueryRequestProvider>
 )

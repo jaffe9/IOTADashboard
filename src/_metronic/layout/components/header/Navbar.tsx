@@ -14,12 +14,12 @@ const Navbar = () => {
   return (
     <div className='app-navbar flex-shrink-0'>
       <div className={clsx('app-navbar-item align-items-stretch', itemClass)}>
-        <Search />
+        {/* <Search /> */}
       </div>
 
       <div className={clsx('app-navbar-item', itemClass)}>
         <div id='kt_activities_toggle' className={btnClass}>
-          <KTIcon iconName='chart-simple' className={btnIconClass} />
+          {/* <KTIcon iconName='chart-simple' className={btnIconClass} /> */}
         </div>
       </div>
 

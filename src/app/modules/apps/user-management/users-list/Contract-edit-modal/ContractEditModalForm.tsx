@@ -2,13 +2,13 @@ import {FC, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import {isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
-import {initialUser, National_id, payslipOptions, Salary, User} from '../core/_models'
+import {Contract, initialUser, National_id, payslipOptions, Salary, User} from '../core/_models'
 import clsx from 'clsx'
 import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
 import {createUser, updateUser} from '../core/_requests'
 import {useQueryResponse} from '../core/QueryResponseProvider'
-
+//co
 const date = new Date();
 const payslipDate = date.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}).replace(/ /g, '-');
 const payslipMonth = date.toLocaleDateString('en-GB', {month: 'short', year: 'numeric'}).replace(/ /g, '-');
@@ -17,8 +17,9 @@ type Props = {
   isUserLoading: boolean
   payslipOption: payslipOptions
   user: User
-  national_id: string
-  expiry_date: string
+  contract_no: string
+  contract_date: string
+  contract_end_date: string
  
   payslipOptions:payslipOptions
 }
@@ -50,10 +51,10 @@ const editUserSchema = Yup.object().shape({
 
 
 
-const UserEditModalFormIqama: FC<Props> = ({user, national_id, isUserLoading,expiry_date}) => {
+const UserEditModalFormContract: FC<Props> = ({user, contract_no, isUserLoading,contract_date,contract_end_date}) => {
 const {setItemIdForUpdate} = useListView()
 const {refetch} = useQueryResponse()
-let [userForEdit] = useState<User & National_id>({
+let [userForEdit] = useState<User & Contract> ({
     ...user,
     id: user.id || initialUser.id,
     pic: user.pic || initialUser.pic,
@@ -61,8 +62,9 @@ let [userForEdit] = useState<User & National_id>({
     firstName: user.firstName || initialUser.firstName,
     lastName: user.lastName || initialUser.lastName,
     email: user.email || initialUser.email,
-    national_id:  national_id,
-    expiry_date: expiry_date,
+    contract_no: contract_no,
+    contract_date: contract_date,
+    contract_end_date: contract_end_date
   })
   const selectedUser = userForEdit
   const cancel = (withRefresh?: boolean) => 
@@ -184,7 +186,7 @@ let [userForEdit] = useState<User & National_id>({
           {/* begin::Input group */}
           <div className='fv-row mb-7'>
             {/* begin::Label */}
-            <label className='disabled fw-bold fs-6 mb-2'>Iqama Number</label>
+            <label className='disabled fw-bold fs-6 mb-2'>Contract Number</label>
             {/* end::Label */}
 
             {/* begin::Input */}
@@ -193,21 +195,21 @@ let [userForEdit] = useState<User & National_id>({
               {...formik.getFieldProps('number')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
-                {'is-invalid': formik.touched.national_id && formik.errors.national_id},
+                {'is-invalid': formik.touched.contract_no && formik.errors.contract_no},
                 {
-                  'is-valid': formik.touched.national_id && !formik.errors.national_id,
+                  'is-valid': formik.touched.contract_no && !formik.errors.contract_no,
                 }
               )}
               type='string'
               name='Basic Allowance'
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
-              value={national_id}
+              value={contract_no}
             />
             {/* end::Input */}
-            {formik.touched.national_id && formik.errors.national_id && (
+            {formik.touched.contract_no && formik.errors.contract_no && (
               <div className='fv-plugins-message-container'>
-                <span role='alert'>{formik.errors.national_id}</span>
+                <span role='alert'>{formik.errors.contract_no}</span>
               </div>
             )}
           </div>
@@ -220,7 +222,7 @@ let [userForEdit] = useState<User & National_id>({
           {/* begin::Input group */}
           <div className='fv-row mb-7'>
             {/* begin::Label */}
-            <label className='disabled fw-bold fs-6 mb-2'>Expiry Date</label>
+            <label className='disabled fw-bold fs-6 mb-2'>Contract Date</label>
             {/* end::Label */}
 
             {/* begin::Input */}
@@ -229,21 +231,55 @@ let [userForEdit] = useState<User & National_id>({
               {...formik.getFieldProps('number')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
-                {'is-invalid': formik.touched.expiry_date && formik.errors.expiry_date},
+                {'is-invalid': formik.touched.contract_date && formik.errors.contract_date},
                 {
-                  'is-valid': formik.touched.expiry_date && !formik.errors.expiry_date,
+                  'is-valid': formik.touched.contract_date && !formik.errors.contract_date,
                 }
               )}
               type='string'
               name='HRA'
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
-              value={expiry_date}
+              value={contract_date}
             />
             {/* end::Input */}
-            {formik.touched.expiry_date && formik.errors.expiry_date && (
+            {formik.touched.contract_date && formik.errors.contract_date && (
               <div className='fv-plugins-message-container'>
-                <span role='alert'>{formik.errors.expiry_date}</span>
+                <span role='alert'>{formik.errors.contract_date}</span>
+              </div>
+            )}
+          </div>
+          {/* end::Input group */}
+
+          {/* End of Expiry Date Information*/}
+
+           {/* begin::Input group */}
+           <div className='fv-row mb-7'>
+            {/* begin::Label */}
+            <label className='disabled fw-bold fs-6 mb-2'>Contract End Date</label>
+            {/* end::Label */}
+
+            {/* begin::Input */}
+            <input
+              placeholder='Expiry Date'
+              {...formik.getFieldProps('number')}
+              className={clsx(
+                'form-control form-control-solid mb-3 mb-lg-0',
+                {'is-invalid': formik.touched.contract_end_date && formik.errors.contract_end_date},
+                {
+                  'is-valid': formik.touched.contract_end_date && !formik.errors.contract_end_date,
+                }
+              )}
+              type='string'
+              name='HRA'
+              autoComplete='off'
+              disabled={formik.isSubmitting || isUserLoading}
+              value={contract_end_date}
+            />
+            {/* end::Input */}
+            {formik.touched.contract_end_date && formik.errors.contract_end_date && (
+              <div className='fv-plugins-message-container'>
+                <span role='alert'>{formik.errors.contract_end_date}</span>
               </div>
             )}
           </div>
@@ -365,4 +401,4 @@ let [userForEdit] = useState<User & National_id>({
   )
 }
 
-export {UserEditModalFormIqama}
+export {UserEditModalFormContract}

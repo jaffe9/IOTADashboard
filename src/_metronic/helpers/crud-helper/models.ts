@@ -4,6 +4,8 @@ export type ID = undefined | null | number
 
 export type Iqama = undefined | number
 
+export type Contract = undefined | number
+
 export type employee_id = string
 
 export type PaginationState = {
@@ -106,6 +108,30 @@ export const iqamaInitialListView: IqamaListViewContextProps = {
   onSelectAll: () => {},
   clearSelected: () => {},
   setItemIqamaForUpdate: () => {},
+  isAllSelected: false,
+  disabled: false,
+}
+
+export type ContractListViewContextProps = {
+  selected: Array<Contract>
+  onSelect: (selectedContract: Contract) => void
+  onSelectAll: () => void
+  clearSelected: () => void
+  // NULL => (CREATION MODE) | MODAL IS OPENED
+  // NUMBER => (EDIT MODE) | MODAL IS OPENED
+  // UNDEFINED => MODAL IS CLOSED
+  itemContractForUpdate?: Contract
+  setItemContractForUpdate: Dispatch<SetStateAction<Contract>>
+  isAllSelected: boolean
+  disabled: boolean
+}
+
+export const contractInitialListView: ContractListViewContextProps = {
+  selected: [],
+  onSelect: () => {},
+  onSelectAll: () => {},
+  clearSelected: () => {},
+  setItemContractForUpdate: () => {},
   isAllSelected: false,
   disabled: false,
 }

@@ -48,7 +48,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
       <UserCustomHeader tableProps={props} title='Actions' className='text-end min-w-100px' />
     ),
     id: 'actions',
-    Cell: ({...props}) => <UserActionsCell id={props.data[props.row.index].id} iqama={props.data[props.row.index].id} />,
+    Cell: ({...props}) => <UserActionsCell id={props.data[props.row.index].id} iqama={props.data[props.row.index].id} contract={props.data[props.row.index].id}  />,
   },
 ]
 
