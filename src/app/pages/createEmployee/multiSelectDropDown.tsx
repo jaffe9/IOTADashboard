@@ -9,7 +9,7 @@ interface ChipSelectorProps {
 }
 
 const ChipSelector: React.FC<ChipSelectorProps> = ({ value, onChange }) => {
-  const options = ['English', 'French', 'Spanish', 'German', 'Arabic', 'Mandarin'];
+  const options = ['English','Arabic', 'Urdu' , 'Tamil' , 'Hindi' , 'Telugu' , 'Bengali'];
 
   return (
     <Autocomplete

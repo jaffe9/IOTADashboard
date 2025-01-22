@@ -161,9 +161,20 @@ export const getPaidInvoices = async () => {
   }
 };
 
-export const getSalaryInfoByEmployee = async (employeeId: string) => {
+export const getSalaryInfoByEmployee = async (id: string) => {
   try {
-    const { data } = await axiosInstance.get(`salary?user_id=eq.${employeeId}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays`);
+    const { data } = await axiosInstance.get(`salary?user_id=eq.${id}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)`);
+    return await data[0];
+  }
+  catch (error) {
+    console.error("Error fetching data: ", error);
+  }
+};
+
+// For iqama in Action cell 
+export const getIqamaForAction = async (id: string) => {
+  try {
+    const { data } = await axiosInstance.get(`nationalIdInfo?associated_user_id=eq.${id}&select=id,national_id,expiry_date,associated_user_id(username,email)`);
     return await data[0];
   }
   catch (error) {
@@ -354,7 +365,7 @@ export const createTempEmployee = async (t: temEmp): Promise<{status:number; mes
       roles : null,
       pic : null,
       language : t.language,
-      timeZone : t.timeZone,
+      timeZone : 'AST',
       website : null,
       emailSettings : null,
       auth : null,

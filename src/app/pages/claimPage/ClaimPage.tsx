@@ -200,7 +200,7 @@ const handleClaimupload = async () => {
                   > 
                     <option value="">Select Expense Type</option>
                     {allUserInfo.expense.map((data: any, i: number) => (
-                      <option key={i} value={data.id}>
+                      <option key={i} value={data.id} hidden={data.isEmployeeRelated == false}>
                         {data.id} - {data.expenseTypeDesc}
                       </option>
                     ))}
@@ -328,7 +328,7 @@ const handleClaimupload = async () => {
                   > 
                     <option value="">Select Account Manager</option>
                     {allUserInfo.manager.map((data: any, i: number) => (
-                      <option key={i} value={data.accountManagerName}>
+                      <option key={i} value={data.accountManagerName} disabled={data.isDisabled == true}>
                         {data.accountManagerName}
                       </option>
                     ))}

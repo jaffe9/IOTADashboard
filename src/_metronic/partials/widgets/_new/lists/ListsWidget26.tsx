@@ -20,7 +20,7 @@ type tempUserRecord = {
 
 const ListsWidget26 = ({ className }: Props) => {
   const [tempUsers, setTempUsers] = useState<tempUserRecord[]>([]);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false); //Showing the pop up card 
   const [selectedUser, setSelectedUser] = useState<tempUserRecord | null>(null);
 
   // Function to fetch the temp users' details

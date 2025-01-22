@@ -4,7 +4,7 @@ import { ID, Response } from '../../../../../../_metronic/helpers'
 export enum payslipOptions { download = "download", email = "email" }
 
 export type User = {
-  associated_user_id?: number
+  associated_user_id?: any
   contract_id?: string
   id?: number
   username?: string
@@ -90,12 +90,17 @@ export type Salary = {
   holidays?: string
   deductions_total?: string
   payslilpOptionSelected?: payslipOptions
+  user_id?:{username:string,email:string}
 }
 
 export type National_id = {
   id?:number
   national_id?: string
   expiry_date?: string
+  associated_user_id?:{
+    username : string
+    email : string
+  }
 }
 
 
@@ -201,8 +206,9 @@ export type ListOfTimesheet = {
 export const initialUser: User = {
   employeeId: 'avatars/300-6.jpg',
   occupation: 'Art Director',
-  firstName: 'Jaffar',
+  firstName: '',
+  lastName:'',
   email: '',
   contract_id: '',
-  associated_user_id: 0
+  associated_user_id: {username:'' , email : ''}
 }

@@ -6,6 +6,7 @@ import {getUserById} from '../core/_requests'
 import { apiHelper } from '../../../../../../apiFactory/apiHelper'
 import { useEffect } from 'react'
 import { payslipOptions, Salary } from '../core/_models'
+import { useRadioGroup } from '@mui/material'
 
 const getSalaryDataFromApi = async (id : string) => 
   {
@@ -22,6 +23,7 @@ var earnings_total = 0
 var deductions_total = 0
 var total_net_salary = 0
 var holidays = 0
+var user_id = { username: "" , email : ""}
 var salary:Salary = {}
 const UserEditModalFormWrapper = () => {
 useEffect(() => 
@@ -29,7 +31,6 @@ useEffect(() =>
       var selected_User_id : any = "";
       selected_User_id = itemIdForUpdate?.toString()
       const salaryInfo = getSalaryDataFromApi(selected_User_id)
-
       salaryInfo.then(function(result : any)
       {
         salary = result
@@ -44,8 +45,11 @@ useEffect(() =>
         earnings_total = result.earnings_total
         deductions_total = result.deductions_total
         total_net_salary = result.total_net_salary
+        user_id.username = result.user_id.username
+        user_id.email = result.user_id.email
       })
     },[]
+    
   )
   const {itemIdForUpdate, setItemIdForUpdate} = useListView()
   const enabledQuery: boolean = isNotEmpty(itemIdForUpdate)
@@ -71,6 +75,7 @@ useEffect(() =>
   if (!itemIdForUpdate) {
     return <UserEditModalForm isUserLoading={isLoading} user={{ id: undefined }} salary={salary} basic_allowance={basic_allowance} hr_allowance={hr_allowance} travel_allowance={travel_allowance} lop_days={lop_days} 
     salary_advance={salary_advance}
+    user_id={user_id}
     employee_request={employee_request}
     holidays={holidays}
     lop_salary_total={lop_salary_total}
@@ -83,6 +88,7 @@ useEffect(() =>
 
   if (!isLoading && !error && user) {
     return <UserEditModalForm isUserLoading={isLoading} user={user} salary={salary} basic_allowance={basic_allowance} hr_allowance={hr_allowance} travel_allowance={travel_allowance} lop_days={lop_days} salary_advance={salary_advance}
+    user_id={user_id}
     employee_request={employee_request}
     holidays={holidays}
     lop_salary_total={lop_salary_total}

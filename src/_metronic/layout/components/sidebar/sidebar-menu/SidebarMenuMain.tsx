@@ -20,19 +20,19 @@ const SidebarMenuMain = () => {
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Account Manager Section</span>
         </div>
       </div>
-      <SidebarMenuItem to='/createTempEmp' icon='switch' title='Create New Employee' fontIcon='bi-layers' />
+      <SidebarMenuItem to='/createTempEmp' icon='profile-user' title='Create New Employee' fontIcon='bi-layers' />
       <div className='menu-item'></div>
-      <SidebarMenuItem to='/employeetimesheet' icon='switch' title='Employee Timesheet' fontIcon='bi-layers' />
+      <SidebarMenuItem to='/employeetimesheet' icon='calendar-add' title='Employee Timesheet' fontIcon='bi-layers' />
       <div className='menu-item'>
       </div>
-      <SidebarMenuItem to='/employeeinvoice' icon='switch' title='Employee Invoice' fontIcon='bi-layers' />
+      <SidebarMenuItem to='/employeeinvoice' icon='questionnaire-tablet' title='Employee Invoice' fontIcon='bi-layers' />
       <div className='menu-item'>
       </div>
-      <SidebarMenuItem to='/contract' icon='switch' title='Employee Contract' fontIcon='bi-layers' />
+      <SidebarMenuItem to='/contract' icon='badge' title='Employee Contract' fontIcon='bi-layers' />
       <div className='menu-item'>
       </div>
-      <SidebarMenuItem to='/claim' icon='switch' title='Claims' fontIcon='bi-layers' />
-      <SidebarMenuItem to='/getInvoiceDetails' icon='switch' title='Invoice Details' fontIcon='bi-layers' />
+      <SidebarMenuItem to='/claim' icon='dollar' title='Claims' fontIcon='bi-layers' />
+      <SidebarMenuItem to='/getInvoiceDetails' icon='note-2' title='Invoice Details' fontIcon='bi-layers' />
       <div className='menu-item'>
       </div>
       <div className='menu-item'>
@@ -95,8 +95,8 @@ const SidebarMenuMain = () => {
       <SidebarMenuItemWithSub
         to='/crafted/widgets'
         title='Sales Pipeline'
-        icon='element-7'
-        fontIcon='bi-layers'
+        icon='graph-up'
+        fontIcon='multi-layers'
       >
         {/* <SidebarMenuItem to='/crafted/widgets/lists' title='Lists' hasBullet={true} />
         <SidebarMenuItem to='/crafted/widgets/statistics' title='Statistics' hasBullet={true} />
@@ -109,7 +109,7 @@ const SidebarMenuMain = () => {
 
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
-          <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Apps</span>
+          <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Team</span>
         </div>
       </div>
 
@@ -125,7 +125,7 @@ const SidebarMenuMain = () => {
       </SidebarMenuItemWithSub> */}
       <SidebarMenuItem
         to='/apps/user-management/users'
-        icon='abstract-28'
+        icon='user'
         title='User management'
         fontIcon='bi-layers'
       />

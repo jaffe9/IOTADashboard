@@ -372,7 +372,7 @@ const CreateEmployee: FC = () => {
                         )}
                       </div>
                     </div>
-                  <div className="row mb-6">
+                  {/* <div className="row mb-6">
                     <label className="col-lg-4 col-form-label fw-bold fs-6">
                       <span className="required">TimeZone </span>
                     </label>
@@ -396,7 +396,7 @@ const CreateEmployee: FC = () => {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label fw-bold fs-6">
@@ -441,7 +441,7 @@ const CreateEmployee: FC = () => {
                   > 
                     <option value="">Select Account Manager</option>
                     {allUserInfo.manager.map((data: any, i: number) => (
-                      <option key={i} value={data.id}>
+                      <option key={i} value={data.id} disabled={data.isDisabled == true}>
                         {data.accountManagerName}
                       </option>
                     ))}
@@ -454,7 +454,8 @@ const CreateEmployee: FC = () => {
                         </div>
                       )}
                     </div>
-                  </div>                  
+                  </div>       
+
                 </div>
                 
                 <div className="card-footer d-flex justify-content-end py-6 px-9">

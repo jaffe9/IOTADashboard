@@ -2,12 +2,12 @@ import {FC, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import {isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
-import {initialUser, National_id, payslipOptions, Salary, User} from '../core/_models'
+import {initialUser, National_id, payslipOptions, User} from '../core/_models'
 import clsx from 'clsx'
-import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
 import {createUser, updateUser} from '../core/_requests'
 import {useQueryResponse} from '../core/QueryResponseProvider'
+import { useIqamaListView } from '../core/IqamaListViewProvider'
 
 const date = new Date();
 const payslipDate = date.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}).replace(/ /g, '-');
@@ -17,9 +17,10 @@ type Props = {
   isUserLoading: boolean
   payslipOption: payslipOptions
   user: User
-  national_id: string
-  expiry_date: string
- 
+  iqama:National_id
+  national_id : number
+  expiry_date : string
+  associated_user_id:{username:string,email:string}
   payslipOptions:payslipOptions
 }
 const payslipOption = payslipOptions
@@ -50,19 +51,22 @@ const editUserSchema = Yup.object().shape({
 
 
 
-const UserEditModalFormIqama: FC<Props> = ({user, national_id, isUserLoading,expiry_date}) => {
-const {setItemIdForUpdate} = useListView()
+const UserEditModalFormIqama: FC<Props> = ({user, iqama , isUserLoading, associated_user_id,national_id,expiry_date  }) => {
+const {setItemIqamaForUpdate} = useIqamaListView()
 const {refetch} = useQueryResponse()
 let [userForEdit] = useState<User & National_id>({
-    ...user,
+    ...user,...iqama ,
     id: user.id || initialUser.id,
     pic: user.pic || initialUser.pic,
     occupation: user.occupation || initialUser.occupation,
     firstName: user.firstName || initialUser.firstName,
     lastName: user.lastName || initialUser.lastName,
     email: user.email || initialUser.email,
-    national_id:  national_id,
-    expiry_date: expiry_date,
+    national_id:  national_id.toString(),
+    expiry_date: expiry_date.toString(),
+    username:associated_user_id.username.toString(),
+  
+    
   })
   const selectedUser = userForEdit
   const cancel = (withRefresh?: boolean) => 
@@ -73,7 +77,7 @@ let [userForEdit] = useState<User & National_id>({
           refetch()
           selectedPayslipOption = ""
         }
-      setItemIdForUpdate(undefined)
+      setItemIqamaForUpdate(undefined)
     }
 
   const blankImg = toAbsoluteUrl('media/svg/avatars/blank.svg')
@@ -134,7 +138,7 @@ let [userForEdit] = useState<User & National_id>({
               )}
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
-              value = {selectedUser.firstName + " " + selectedUser.lastName}
+              value = {selectedUser.associated_user_id?.username}
             />
             {formik.touched.firstName && formik.errors.firstName && (
               <div className='fv-plugins-message-container'>
@@ -168,7 +172,7 @@ let [userForEdit] = useState<User & National_id>({
               name='email'
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
-              value = {selectedUser.email}
+              value = {selectedUser.associated_user_id?.email}
             />
             {/* end::Input */}
             {formik.touched.email && formik.errors.email && (
@@ -190,7 +194,7 @@ let [userForEdit] = useState<User & National_id>({
             {/* begin::Input */}
             <input
               placeholder='Iqama Number'
-              {...formik.getFieldProps('number')}
+              {...formik.getFieldProps('string')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
                 {'is-invalid': formik.touched.national_id && formik.errors.national_id},
@@ -199,7 +203,7 @@ let [userForEdit] = useState<User & National_id>({
                 }
               )}
               type='string'
-              name='Basic Allowance'
+              name='National Id'
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
               value={national_id}
@@ -226,7 +230,7 @@ let [userForEdit] = useState<User & National_id>({
             {/* begin::Input */}
             <input
               placeholder='Expiry Date'
-              {...formik.getFieldProps('number')}
+              {...formik.getFieldProps('expiry_date')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
                 {'is-invalid': formik.touched.expiry_date && formik.errors.expiry_date},
@@ -235,7 +239,7 @@ let [userForEdit] = useState<User & National_id>({
                 }
               )}
               type='string'
-              name='HRA'
+              name='Expiry Date'
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
               value={expiry_date}

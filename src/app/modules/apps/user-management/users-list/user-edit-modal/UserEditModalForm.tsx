@@ -29,6 +29,7 @@ type Props = {
   earnings_total: number
   deductions_total: number
   total_net_salary: number
+  user_id:{username:string,email:string}
   payslipOptions:payslipOptions
 }
 const payslipOption = payslipOptions
@@ -59,7 +60,7 @@ const editUserSchema = Yup.object().shape({
 
 
 
-const UserEditModalForm: FC<Props> = ({user, salary, isUserLoading, basic_allowance, hr_allowance, travel_allowance, lop_days, salary_advance, lop_salary_total, holidays, earnings_total, deductions_total, total_net_salary, employee_request}) => {
+const UserEditModalForm: FC<Props> = ({user, salary, isUserLoading,user_id, basic_allowance, hr_allowance, travel_allowance, lop_days, salary_advance, lop_salary_total, holidays, earnings_total, deductions_total, total_net_salary, employee_request}) => {
 const {setItemIdForUpdate} = useListView()
 const {refetch} = useQueryResponse()
 let [userForEdit] = useState<User & Salary>({
@@ -80,6 +81,7 @@ let [userForEdit] = useState<User & Salary>({
     earnings_total: earnings_total.toString(),
     deductions_total: deductions_total.toString(),
     total_net_salary: total_net_salary.toString(),
+    username:user_id.username.toString(),
     payslilpOptionSelected: salary.payslilpOptionSelected
   })
   const selectedUser = userForEdit
@@ -152,7 +154,7 @@ let [userForEdit] = useState<User & Salary>({
               )}
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
-              value = {selectedUser.firstName + " " + selectedUser.lastName}
+              value = {selectedUser.user_id?.username}
             />
             {formik.touched.firstName && formik.errors.firstName && (
               <div className='fv-plugins-message-container'>
@@ -186,7 +188,7 @@ let [userForEdit] = useState<User & Salary>({
               name='email'
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
-              value = {selectedUser.email}
+              value = {selectedUser.user_id?.email}
             />
             {/* end::Input */}
             {formik.touched.email && formik.errors.email && (

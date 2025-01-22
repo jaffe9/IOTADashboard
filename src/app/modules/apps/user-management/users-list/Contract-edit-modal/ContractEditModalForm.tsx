@@ -2,7 +2,7 @@ import {FC, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import {isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
-import {Contract, initialUser, National_id, payslipOptions, Salary, User} from '../core/_models'
+import {Contract, initialUser, payslipOptions, User} from '../core/_models'
 import clsx from 'clsx'
 import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
@@ -191,7 +191,7 @@ let [userForEdit] = useState<User & Contract> ({
 
             {/* begin::Input */}
             <input
-              placeholder='Iqama Number'
+              placeholder='Contract Number'
               {...formik.getFieldProps('number')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
@@ -227,7 +227,7 @@ let [userForEdit] = useState<User & Contract> ({
 
             {/* begin::Input */}
             <input
-              placeholder='Expiry Date'
+              placeholder='Contract Date'
               {...formik.getFieldProps('number')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
@@ -261,7 +261,7 @@ let [userForEdit] = useState<User & Contract> ({
 
             {/* begin::Input */}
             <input
-              placeholder='Expiry Date'
+              placeholder='Contract end date'
               {...formik.getFieldProps('number')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',

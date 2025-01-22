@@ -1,11 +1,9 @@
 import {useEffect} from 'react'
 import { UserEditModalHeaderIqama } from './IqamaEditModalHeader'
 import { UserEditModalFormWrapperIqama } from './IqamaEditModalFormWrapper'
-//
-console.log("Clicked here")
+
 const IqamaEditModal = () => {
   useEffect(() => {
-    console.log("Clicked here inside")
     document.body.classList.add('modal-open')
     return () => {
       document.body.classList.remove('modal-open')
