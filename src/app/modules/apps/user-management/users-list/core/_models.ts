@@ -1,5 +1,6 @@
 import { string } from 'yup'
 import { ID, Response } from '../../../../../../_metronic/helpers'
+import { StickyComponent } from '../../../../../../_metronic/assets/ts/components'
 
 export enum payslipOptions { download = "download", email = "email" }
 
@@ -17,6 +18,7 @@ export type User = {
   employeeJoiningDate?: string
   employeeId?: string
   pic?: string
+  accountManagerName?:string
 }
 
 export type TempUser = {
@@ -48,11 +50,15 @@ export type Expenses = {
 }
 
 export type Contract = {
-associatedAccountManager?:number
 id?:number
 contract_no?:string
 contract_date?:string
 contract_end_date?:string
+billing_months?:number
+billing_value?:number
+client_id?:{ client_name : string }
+associatedAccountManager?:{ accountManagerName: string }
+associated_user_id?: { username : string , email : string }
 }
 
 export type ResourceOnboardingStatus = {

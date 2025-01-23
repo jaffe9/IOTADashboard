@@ -9,9 +9,6 @@ import {createUser, updateUser} from '../core/_requests'
 import {useQueryResponse} from '../core/QueryResponseProvider'
 import { useIqamaListView } from '../core/IqamaListViewProvider'
 
-const date = new Date();
-const payslipDate = date.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}).replace(/ /g, '-');
-const payslipMonth = date.toLocaleDateString('en-GB', {month: 'short', year: 'numeric'}).replace(/ /g, '-');
 
 type Props = {
   isUserLoading: boolean
@@ -23,19 +20,7 @@ type Props = {
   associated_user_id:{username:string,email:string}
   payslipOptions:payslipOptions
 }
-const payslipOption = payslipOptions
 let selectedPayslipOption = ""
-function setPayslipOption(payslipOption: payslipOptions)
-{
-  if(payslipOptions.download === payslipOption)
-    {
-      selectedPayslipOption = payslipOptions.download
-    }
-    else
-    {
-      selectedPayslipOption = payslipOptions.email
-    }
-}
 
 const editUserSchema = Yup.object().shape({
   email: Yup.string()
@@ -80,8 +65,6 @@ let [userForEdit] = useState<User & National_id>({
       setItemIqamaForUpdate(undefined)
     }
 
-  const blankImg = toAbsoluteUrl('media/svg/avatars/blank.svg')
-  const userAvatarImg = toAbsoluteUrl(`media/${userForEdit.pic}`)
   const formik = useFormik({
     initialValues: userForEdit,
     validationSchema: editUserSchema,
@@ -259,19 +242,19 @@ let [userForEdit] = useState<User & National_id>({
           {/* begin::Input group */}
 
           <div className='mb-7'>
-            {/* begin::Label */}
+            {/* begin::Label }
             <label className='required fw-bold fs-6 mb-5'>For the month</label>
             <div className='text-gray-600'>
                     {payslipMonth}
                   </div>
                   <br></br><br></br>
-            {/* end::Label */}
-            {/* begin::Roles */}
-            {/* begin::Input row */}
+            {/* end::Label }
+            {/* begin::Roles }
+            {/* begin::Input row }
             <div className='d-flex fv-row'>
-              {/* begin::Radio */}
+              {/* begin::Radio }
               <div className='form-check form-check-custom form-check-solid'>
-                {/* begin::Input */}
+                {/* begin::Input }
                 <input
                   className='form-check-input me-3'
                   {...formik.getFieldProps('payslipOptions')}
@@ -286,25 +269,25 @@ let [userForEdit] = useState<User & National_id>({
                   disabled={formik.isSubmitting || isUserLoading}
                 />
 
-                {/* end::Input */}
-                {/* begin::Label */}
+                {/* end::Input }
+                {/* begin::Label }
                 <label className='form-check-label' htmlFor='kt_modal_update_role_option_0'>
                   <div className='fw-bolder text-gray-800'>Download</div>
                   <div className='text-gray-600'>
                     Generated and downloaded without sending an email to employee
                   </div>
                 </label>
-                {/* end::Label */}
+                {/* end::Label }
               </div>
-              {/* end::Radio */}
+              {/* end::Radio }
             </div>
-            {/* end::Input row */}
+            {/* end::Input row }
             <div className='separator separator-dashed my-5'></div>
-            {/* begin::Input row */}
+            {/* begin::Input row }
             <div className='d-flex fv-row'>
-              {/* begin::Radio */}
+              {/* begin::Radio }
               <div className='form-check form-check-custom form-check-solid'>
-                {/* begin::Input */}
+                {/* begin::Input }
                 <input
                   className='form-check-input me-3'
                   {...formik.getFieldProps('payslipOptions')}
@@ -317,17 +300,17 @@ let [userForEdit] = useState<User & National_id>({
                   checked={selectedPayslipOption === payslipOptions.email}//{(formik.values.payslilpOptionSelected === payslipOptions.email)}
                   disabled={formik.isSubmitting || isUserLoading}
                 />
-                {/* end::Input */}
-                {/* begin::Label */}
+                {/* end::Input }
+                {/* begin::Label }
                 <label className='form-check-label' htmlFor='kt_modal_update_role_option_1'>
                   <div className='fw-bolder text-gray-800'>Generate and eMail</div>
                   <div className='text-gray-600'>
                   Generated and sent as an email to employee
                   </div>
                 </label>
-                {/* end::Label */}
+                {/* end::Label }
               </div>
-              {/* end::Radio */}
+              {/* end::Radio }
             </div>
             {/* end::Roles */}
           </div>
