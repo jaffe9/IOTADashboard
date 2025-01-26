@@ -328,7 +328,7 @@ const handleClaimupload = async () => {
                   > 
                     <option value="">Select Account Manager</option>
                     {allUserInfo.manager.map((data: any, i: number) => (
-                      <option key={i} value={data.accountManagerName} disabled={data.isDisabled == true}>
+                      <option key={i} value={data.accountManagerName} hidden={data.isDisabled == true}>
                         {data.accountManagerName}
                       </option>
                     ))}

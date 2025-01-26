@@ -18,32 +18,33 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
   // State variables
   const [categories, setCategories] = useState<string[]>([]);
   const [pendingInvoices, setPendingInvoices] = useState<number[]>([]);
-  const [PaidInvoices, setPaidInvoices] = useState<number[]>([]);
+  const [paidInvoices, setPaidInvoices] = useState<number[]>([]);
 
-  // Memoized function to prevent recreation on each render
   const fetchInvoiceData = useCallback(async () => {
     try {
-      const today = dayjs(); // Get today's date
-      const startDate = today.subtract(6, 'months').startOf('month'); // Start of 6 months ago
-      const endDate = today.endOf('month'); // End of the current month
+      const today = dayjs(); // Current date
+      console.log("today",today.toDate())
+      const startDate = today.subtract(6, 'months').startOf('months'); // Start of 6 months ago and start off will set the date to month start
+      console.log("Six months back :",startDate.toDate() )
       const months = Array.from({ length: 6 }, (_, i) =>
-        startDate.add(i, 'month').format('MMM')
-      ); // Generate last 6 months
+        startDate.add(i, 'month').format('MMM YYYY')
+      ); // Generate categories for last 6 months
       setCategories(months);
+      console.log("six months :", months)
+      // Fetch pending and paid invoices
+      const [pendingResponse, paidResponse] = await Promise.all([
+        apiHelper.getPendingInvoices(),
+        apiHelper.getPaidInvoices(),
+      ]);
 
-      // Fetch pending invoices and group by month
-      const pendingResponse = await apiHelper.getPendingInvoices();
       const pendingData = pendingResponse?.data
-        ? groupInvoicesByMonth(pendingResponse.data, startDate, endDate)
+        ? groupInvoicesByMonth(pendingResponse.data, startDate)
         : Array(6).fill(0);
 
-      // Fetch paid invoices and group by month
-      const paidResponse = await apiHelper.getPaidInvoices();
       const paidData = paidResponse?.data
-        ? groupInvoicesByMonth(paidResponse.data, startDate, endDate)
+        ? groupInvoicesByMonth(paidResponse.data, startDate)
         : Array(6).fill(0);
 
-      // Update series data
       setPendingInvoices(pendingData);
       setPaidInvoices(paidData);
     } catch (error) {
@@ -51,14 +52,16 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
     }
   }, []);
 
-  const groupInvoicesByMonth = (data: any[], startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): number[] => {
-    const grouped = Array(6).fill(0); // Initialize an array of 6 months with 0 values
+  const groupInvoicesByMonth = (data: any[], startDate: dayjs.Dayjs): number[] => {
+    const grouped = Array(6).fill(0); // Initialize a 6-element array with zeros
     data.forEach((invoice) => {
-      const invoiceDate = dayjs(invoice.invoice_date); // Parse invoice date
-      if (invoiceDate.isAfter(startDate) && invoiceDate.isBefore(dayjs())) {
-        const monthIndex = invoiceDate.diff(startDate, 'month'); // Calculate month index
+      const match = invoice.internal_invoice_no?.match(/_(\d{2})_(\d{4})$/);
+      if (match) {
+        const [_, month, year] = match;
+        const invoiceDate = dayjs(`${year}-${month}-01`);
+        const monthIndex = invoiceDate.diff(startDate, 'month'); // Month offset from start date
         if (monthIndex >= 0 && monthIndex < 6) {
-          grouped[monthIndex] += invoice.invoice_value; // Sum up invoice values
+          grouped[monthIndex] += invoice.invoice_value; // Sum invoice value into the correct month
         }
       }
     });
@@ -73,10 +76,10 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
     const chart = new ApexCharts(chartRef.current, getChartOptions(height));
     chart.render();
     return chart;
-  }, [categories, pendingInvoices, PaidInvoices]);
+  }, [categories, pendingInvoices, paidInvoices]);
 
   useEffect(() => {
-    fetchInvoiceData(); // Fetch data only once
+    fetchInvoiceData(); // Fetch data once on component mount
   }, [fetchInvoiceData]);
 
   useEffect(() => {
@@ -102,7 +105,7 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
         },
         {
           name: 'Paid',
-          data: PaidInvoices,
+          data: paidInvoices,
         },
       ],
       chart: {
@@ -121,10 +124,10 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
         },
       },
       legend: {
-        show: true,
+        show: false,
       },
       dataLabels: {
-        enabled: false,
+        enabled: false, // to hide the values on bar graphs 
       },
       stroke: {
         show: true,
@@ -132,7 +135,7 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
         colors: ['transparent'],
       },
       xaxis: {
-        categories: categories, // Dynamic categories
+        categories: categories, // Updated categories
         axisBorder: {
           show: false,
         },
@@ -146,58 +149,12 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
           },
         },
       },
-      yaxis: {
-        labels: {
-          style: {
-            colors: labelColor,
-            fontSize: '12px',
-          },
-        },
-      },
-      fill: {
-        opacity: 1,
-      },
-      states: {
-        normal: {
-          filter: {
-            type: 'none',
-            value: 0,
-          },
-        },
-        hover: {
-          filter: {
-            type: 'none',
-            value: 0,
-          },
-        },
-        active: {
-          allowMultipleDataPointsSelection: false,
-          filter: {
-            type: 'none',
-            value: 0,
-          },
-        },
-      },
       tooltip: {
-        style: {
-          fontSize: '12px',
-        },
         y: {
-          formatter: function (val) {
-            return 'SAR ' + val;
-          },
+          formatter: (val) => `SAR ${val}`,
         },
       },
       colors: [baseColor, secondaryColor],
-      grid: {
-        borderColor: borderColor,
-        strokeDashArray: 4,
-        yaxis: {
-          lines: {
-            show: true,
-          },
-        },
-      },
     };
   }
 
@@ -209,15 +166,7 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
           <span className="text-muted fw-semibold fs-7">For the last 6 months</span>
         </h3>
         <div className="card-toolbar">
-          <button
-            type="button"
-            className="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-            data-kt-menu-trigger="click"
-            data-kt-menu-placement="bottom-end"
-            data-kt-menu-flip="top-end"
-          >
-            <KTIcon iconName="category" className="fs-2" />
-          </button>
+          <KTIcon iconName="category" className="fs-2" />
           <Dropdown1 />
         </div>
       </div>

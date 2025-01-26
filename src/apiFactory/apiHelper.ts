@@ -175,7 +175,7 @@ export const getSalaryInfoByEmployee = async (id: string) => {
 export const getIqamaForAction = async (id: string) => {
   try {
     const { data } = await axiosInstance.get(`nationalIdInfo?associated_user_id=eq.${id}&select=id,national_id,expiry_date,associated_user_id(username,email)`);
-    return  data[0];
+    return  await data[0];
   }
   catch (error) {
     console.error("Error fetching data: ", error);
@@ -185,7 +185,7 @@ export const getIqamaForAction = async (id: string) => {
 export const getContractForAction = async (id: string) => {
   try {
     const { data } = await axiosInstance.get(`contract?associated_user_id=eq.${id}&select=id,client_id(client_name),contract_no,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)`);
-    return  data[0];
+    return  await data[0];
   }
   catch (error) {
     console.error("Error fetching data: ", error);
