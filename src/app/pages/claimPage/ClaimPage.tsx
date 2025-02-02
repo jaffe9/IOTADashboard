@@ -328,7 +328,7 @@ const handleClaimupload = async () => {
                   > 
                     <option value="">Select Account Manager</option>
                     {allUserInfo.manager.map((data: any, i: number) => (
-                      <option key={i} value={data.accountManagerName} disabled={data.isDisabled == true}>
+                      <option key={i} value={data.accountManagerName} >
                         {data.accountManagerName}
                       </option>
                     ))}
@@ -349,7 +349,7 @@ const handleClaimupload = async () => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={this}
+                    onClick={handleClaimupload}
                     
                   >
                     {!loading && "Save Changes"}

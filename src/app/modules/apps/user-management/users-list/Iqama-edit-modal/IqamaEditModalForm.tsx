@@ -1,14 +1,23 @@
 import {FC, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
-import {isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
+import Flatpickr from "react-flatpickr";
+import {Iqama, isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
 import {initialUser, National_id, payslipOptions, User} from '../core/_models'
 import clsx from 'clsx'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
-import {createUser, updateUser} from '../core/_requests'
 import {useQueryResponse} from '../core/QueryResponseProvider'
 import { useIqamaListView } from '../core/IqamaListViewProvider'
+import { IProfileDetailsNationalId, profileDetailsInitValuesNationalId as initialValues } from '../../../../accounts/components/settings/SettingsModel'
+import { UpdateIqamaExp, getEmpForIqamaInForm } from '../core/_requests';
 
+
+
+
+
+var allUserInfo: any = await getEmpForIqamaInForm().then(async (data) => {
+  return data.data;
+});
 
 type Props = {
   isUserLoading: boolean
@@ -19,26 +28,38 @@ type Props = {
   expiry_date : string
   associated_user_id:{username:string,email:string}
   payslipOptions:payslipOptions
+  id: number | undefined
 }
-let selectedPayslipOption = ""
+let updatedUserInfo:IProfileDetailsNationalId = initialValues;
 
-const editUserSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Wrong email format')
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Email is required'),
-  name: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Name is required'),
-})
 
 
 
 const UserEditModalFormIqama: FC<Props> = ({user, iqama , isUserLoading, associated_user_id,national_id,expiry_date  }) => {
 const {setItemIqamaForUpdate} = useIqamaListView()
 const {refetch} = useQueryResponse()
+const [ data , setData ] = useState<IProfileDetailsNationalId>(updatedUserInfo)
+ const updateData = (fieldsToUpdate: Partial<IProfileDetailsNationalId>): void => {
+    const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
+    setData(updatedData);
+  };
+
+ const handleUserChange = async (id: number) => {
+  const hasMatch = allUserInfo.find((value: National_id) => value.id === id);
+  if (!hasMatch) return;
+
+  if (hasMatch.associated_user_id.username !== selectedUser.associated_user_id.username) {
+    alert("Selected employee name does not match the displayed Employee Name field.");
+  }
+    updateData({
+       id : id,
+       national_id: hasMatch.national_id,
+       expiry_date : hasMatch.expiry_date,
+       associated_user_id : hasMatch.associated_user_id,
+    });
+  };
+
+
 let [userForEdit] = useState<User & National_id>({
     ...user,...iqama ,
     id: user.id || initialUser.id,
@@ -54,38 +75,54 @@ let [userForEdit] = useState<User & National_id>({
     
   })
   const selectedUser = userForEdit
-  const cancel = (withRefresh?: boolean) => 
+  const  cancel = (withRefresh?: boolean) => 
     {
-      alert("Cancelled")
+     // alert("Cancelled")
       if (withRefresh) 
         {
           refetch()
-          selectedPayslipOption = ""
+          
         }
       setItemIqamaForUpdate(undefined)
     }
 
-  const formik = useFormik({
-    initialValues: userForEdit,
-    validationSchema: editUserSchema,
-    onSubmit: async (values, {setSubmitting}) => {
-      alert("Submitted")
-      console.log("Submitted")
-      setSubmitting(true)
-      try {
-        if (isNotEmpty(values.id)) {
-          await updateUser(values)
-        } else {
-          await createUser(values)
-        }
-      } catch (ex) {
-        console.error(ex)
-      } finally {
-        setSubmitting(true)
-        cancel(true)
-      }
-    },
-  })
+   const [loading, setLoading] = useState(false);
+   const formik = useFormik<IProfileDetailsNationalId>({
+     initialValues,
+     onSubmit:async () => {
+       setLoading(true);
+       setTimeout(async () => {
+         const updatedData = Object.assign(data, updatedUserInfo);
+         setData(updatedData);
+         if(  !data.associated_user_id?.username )
+         {
+           alert(`Please Select Employee From Select Field `)
+           setLoading(false)
+           return
+         }
+         const iqama : National_id = {
+          id : data.id,
+          national_id: data.national_id,
+          expiry_date : data.expiry_date,
+          associated_user_id : data.associated_user_id
+           };
+                 console.log("updated salary  response:" , iqama)
+                 const apiResponse = await UpdateIqamaExp(iqama)
+               
+                 if (apiResponse.status === 204)
+                   {
+                     alert("Iqama updated Successful");
+                     setLoading(false);
+                   }
+                   else
+                   {
+                     alert("An error occurred, please try again later");
+                     setLoading(false);
+                   }
+               }, 1000);
+             },
+           });
+
   return (
     <>
       <form id='kt_modal_add_user_form' className='form' onSubmit={formik.handleSubmit} noValidate>
@@ -103,7 +140,7 @@ let [userForEdit] = useState<User & National_id>({
           
           <div className='fv-row mb-7'>
             {/* begin::Label */}
-            <label className='fw-bold fs-6 mb-2'>Full Name</label>
+            <label className='fw-bold fs-6 mb-2'>Employee Name</label>
             {/* end::Label */}
 
             {/* begin::Input */}
@@ -114,19 +151,19 @@ let [userForEdit] = useState<User & National_id>({
               name='firstName'
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
-                {'is-invalid': formik.touched.firstName && formik.errors.firstName},
+                {'is-invalid': formik.touched.associated_user_id && formik.errors.associated_user_id},
                 {
-                  'is-valid': formik.touched.firstName && !formik.errors.firstName,
+                  'is-valid': formik.touched.associated_user_id && !formik.errors.associated_user_id,
                 }
               )}
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
               value = {selectedUser.associated_user_id?.username}
             />
-            {formik.touched.firstName && formik.errors.firstName && (
+            {formik.touched.associated_user_id && formik.errors.associated_user_id && (
               <div className='fv-plugins-message-container'>
                 <div className='fv-help-block'>
-                  <span role='alert'>{formik.errors.firstName}</span>
+                  <span role='alert'>{formik.errors.associated_user_id}</span>
                 </div>
               </div>
             )}
@@ -146,9 +183,9 @@ let [userForEdit] = useState<User & National_id>({
               {...formik.getFieldProps('email')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
-                {'is-invalid': formik.touched.email && formik.errors.email},
+                {'is-invalid': formik.touched.associated_user_id && formik.errors.associated_user_id},
                 {
-                  'is-valid': formik.touched.email && !formik.errors.email,
+                  'is-valid': formik.touched.associated_user_id && !formik.errors.associated_user_id,
                 }
               )}
               type='email'
@@ -158,15 +195,45 @@ let [userForEdit] = useState<User & National_id>({
               value = {selectedUser.associated_user_id?.email}
             />
             {/* end::Input */}
-            {formik.touched.email && formik.errors.email && (
+            {formik.touched.associated_user_id && formik.errors.associated_user_id && (
               <div className='fv-plugins-message-container'>
-                <span role='alert'>{formik.errors.email}</span>
+                <span role='alert'>{formik.errors.associated_user_id}</span>
               </div>
             )}
           </div>
           {/* end::Input group */}
 
           {/* Begin Basic Allowance Information*/}
+
+           {/* begin::Input group */}
+           <div className='fv-row mb-7'>
+            {/* begin::Label */}
+            <label className='disabled fw-bold fs-6 mb-2 required'>Select Employee</label>
+            {/* end::Label */}
+
+            {/* begin::Input */}
+            <select
+              id="id"
+               className="form-select form-select-solid form-select-lg fw-bold required"
+                 {...formik.getFieldProps("associated_user_id.username")}
+                required  
+                onChange={async (value) => {
+                 await  handleUserChange(parseInt(value.target.value));
+                 formik.setFieldValue("associated_user_id.username",updatedUserInfo.id)
+                   }}
+                    //  value={initialValues.user_id}
+                    > 
+                      <option value="" disabled >Select Employee </option>
+                      {allUserInfo.map((data: any, i: number) => (
+                        <option key={i} value={data.id} hidden={data.id==1}>
+                          {data.associated_user_id.username}
+                        </option>
+                      ))}
+                    </select>
+            {/* end::Input */}
+          </div>
+          {/* end::Input group */}
+
 
           {/* begin::Input group */}
           <div className='fv-row mb-7'>
@@ -202,18 +269,16 @@ let [userForEdit] = useState<User & National_id>({
 
           {/* End of Basic Salary Information*/}
 
-          {/* Begin Expiry Date Information*/}
-
-          {/* begin::Input group */}
+           
           <div className='fv-row mb-7'>
             {/* begin::Label */}
-            <label className='disabled fw-bold fs-6 mb-2'>Expiry Date</label>
+            <label className='disabled fw-bold fs-6 mb-2'>Current Expiry Date</label>
             {/* end::Label */}
 
             {/* begin::Input */}
             <input
-              placeholder='Expiry Date'
-              {...formik.getFieldProps('expiry_date')}
+              placeholder='Iqama Number'
+              {...formik.getFieldProps('string')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
                 {'is-invalid': formik.touched.expiry_date && formik.errors.expiry_date},
@@ -222,11 +287,47 @@ let [userForEdit] = useState<User & National_id>({
                 }
               )}
               type='string'
-              name='Expiry Date'
+              name='National Id'
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
               value={expiry_date}
             />
+            {/* end::Input */}
+            {formik.touched.expiry_date && formik.errors.expiry_date && (
+              <div className='fv-plugins-message-container'>
+                <span role='alert'>{formik.errors.expiry_date}</span>
+              </div>
+            )}
+          </div>
+          {/* end::Input group */}
+
+          {/* End of Basic Salary Information*/}
+
+
+          {/* Begin Expiry Date Information*/}
+
+          {/* begin::Input group */}
+          <div className='fv-row mb-7'>
+            {/* begin::Label */}
+            <label className='disabled fw-bold fs-6 mb-2'>Update Expiry Date</label>
+            {/* end::Label */}
+
+            {/* begin::Input */}
+            <Flatpickr
+                className="form-control form-control-lg form-control-solid"
+                placeholder="Click To Select Date"
+                options={{
+                mode: "single",
+                dateFormat: "d-m-Y",
+                 }}
+                onChange={(dateStr) => {
+                 updateData({ expiry_date: dateStr.toLocaleString("en",{
+                 year: "numeric",
+                 month: "2-digit",
+                 day : "2-digit"
+                  }).replace(/\//g, "-") });
+                  }}
+                 ></Flatpickr>        
             {/* end::Input */}
             {formik.touched.expiry_date && formik.errors.expiry_date && (
               <div className='fv-plugins-message-container'>
@@ -242,77 +343,7 @@ let [userForEdit] = useState<User & National_id>({
           {/* begin::Input group */}
 
           <div className='mb-7'>
-            {/* begin::Label }
-            <label className='required fw-bold fs-6 mb-5'>For the month</label>
-            <div className='text-gray-600'>
-                    {payslipMonth}
-                  </div>
-                  <br></br><br></br>
-            {/* end::Label }
-            {/* begin::Roles }
-            {/* begin::Input row }
-            <div className='d-flex fv-row'>
-              {/* begin::Radio }
-              <div className='form-check form-check-custom form-check-solid'>
-                {/* begin::Input }
-                <input
-                  className='form-check-input me-3'
-                  {...formik.getFieldProps('payslipOptions')}
-                  name='download'
-                  type='radio'
-                //  defaultChecked={false}
-                  value='Download'
-                  id='kt_modal_update_role_option_0'
-                  onClick={() =>setPayslipOption(payslipOptions.download)}
-                  //onChange = {() => paySlipOptionOnChange("Download")}
-                  checked={selectedPayslipOption === payslipOption.download}//{(formik.values.payslilpOptionSelected === payslipOptions.download)}
-                  disabled={formik.isSubmitting || isUserLoading}
-                />
-
-                {/* end::Input }
-                {/* begin::Label }
-                <label className='form-check-label' htmlFor='kt_modal_update_role_option_0'>
-                  <div className='fw-bolder text-gray-800'>Download</div>
-                  <div className='text-gray-600'>
-                    Generated and downloaded without sending an email to employee
-                  </div>
-                </label>
-                {/* end::Label }
-              </div>
-              {/* end::Radio }
-            </div>
-            {/* end::Input row }
-            <div className='separator separator-dashed my-5'></div>
-            {/* begin::Input row }
-            <div className='d-flex fv-row'>
-              {/* begin::Radio }
-              <div className='form-check form-check-custom form-check-solid'>
-                {/* begin::Input }
-                <input
-                  className='form-check-input me-3'
-                  {...formik.getFieldProps('payslipOptions')}
-                  name='role'
-                  type='radio'
-               //   defaultChecked={false}
-                  value='eMail'
-                  id='kt_modal_update_role_option_1'
-                  onClick={() =>setPayslipOption(payslipOptions.email)}
-                  checked={selectedPayslipOption === payslipOptions.email}//{(formik.values.payslilpOptionSelected === payslipOptions.email)}
-                  disabled={formik.isSubmitting || isUserLoading}
-                />
-                {/* end::Input }
-                {/* begin::Label }
-                <label className='form-check-label' htmlFor='kt_modal_update_role_option_1'>
-                  <div className='fw-bolder text-gray-800'>Generate and eMail</div>
-                  <div className='text-gray-600'>
-                  Generated and sent as an email to employee
-                  </div>
-                </label>
-                {/* end::Label }
-              </div>
-              {/* end::Radio }
-            </div>
-            {/* end::Roles */}
+           
           </div>
           {/* end::Input group */}
         </div>
@@ -331,19 +362,22 @@ let [userForEdit] = useState<User & National_id>({
           </button>
 
           <button
-            type='submit'
-            className='btn btn-primary'
-            data-kt-users-modal-action='submit'
-            disabled={isUserLoading || formik.isSubmitting}
-          >
-            <span className='indicator-label'>Submit</span>
-            {(formik.isSubmitting || isUserLoading) && (
-              <span className='indicator-progress'>
-                Please wait...{' '}
-                <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-              </span>
-            )}
-          </button>
+            type="submit"
+             className="btn btn-primary"
+             disabled={loading}
+              
+              >
+              {!loading && "Save Changes"}
+              {loading && (
+               <span
+                className="indicator-progress"
+                 style={{ display: "block" }}
+                   >
+                  Updating Iqama Expiry...{" "}
+                 <span className="spinner-border spinner-border-sm align-middle ms-2"></span>
+                 </span>
+                    )}
+           </button>
         </div>
         {/* end::Actions */}
       </form>

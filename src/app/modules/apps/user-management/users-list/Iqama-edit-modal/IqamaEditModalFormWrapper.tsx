@@ -10,12 +10,13 @@ import { useIqamaListView } from '../core/IqamaListViewProvider'
 import { string } from 'yup'
 import { resourceUsage } from 'process'
 //
-const getIqamaDataFromApi = async (id : string) => 
+export const getIqamaDataFromApi = async (id : string) => 
   {
     return await apiHelper.getIqamaForAction(id).then(function(result){return result})
   }
 
 var national_id = 0
+var id = 0  || undefined
 var expiry_date = ""
 var associated_user_id = {username : "" , email : ""}
 var iqama:National_id = {}
@@ -58,21 +59,21 @@ useEffect(() =>
   )
   
   if (!itemIqamaForUpdate) {
-    return <UserEditModalFormIqama isUserLoading={isLoading} user={{ id: undefined }} iqama={iqama} 
-    national_id={national_id} 
-    expiry_date={expiry_date} 
-  
-    associated_user_id={associated_user_id}
-    payslipOption={payslipOptions.download}
-    payslipOptions={payslipOptions.email} />
+    return <UserEditModalFormIqama isUserLoading={isLoading} user={{ id: undefined }} iqama={iqama}
+    national_id={national_id}
+    expiry_date={expiry_date}
+
+
+    associated_user_id={associated_user_id} payslipOption={payslipOptions.download} payslipOptions={payslipOptions.download} id={iqama.id}    />
   }
 
   if (!isLoading && !error && user) {
     return <UserEditModalFormIqama isUserLoading={isLoading} user={user} iqama={iqama}
+
+
     associated_user_id={associated_user_id}
-    national_id={national_id} expiry_date={expiry_date} 
-    payslipOption={payslipOptions.download}
-    payslipOptions={payslipOptions.email}/>
+    national_id={national_id} expiry_date={expiry_date} payslipOption={payslipOptions.download} payslipOptions={payslipOptions.download} id={iqama.id}    
+  />
   }
 
   return null

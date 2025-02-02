@@ -14,6 +14,10 @@ const UserClientNameCell: FC<Props> = ({ companyName }) => {
         return 'badge-light-primary'; // Blue color
       case 'InnovWayz Technologies':
         return 'badge-light-info'; // Red color
+      case 'American Express':
+        return 'badge-light-warning' // yellow color
+      case 'Saudi Telecom Company':
+        return 'badge-light fw-bold'
       default:
         return 'badge-light-danger'; // Default color (yellow)
     }

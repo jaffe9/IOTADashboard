@@ -2,7 +2,6 @@ import {useEffect} from 'react'
 import { UserEditModalHeaderContract } from './ContractEditModalHeader'
 import { UserEditModalFormWrapperContract } from './ContractEditModalFormWrapper'
 //
-console.log("Clicked here")
 const ContractEditModal = () => {
   useEffect(() => {
     console.log("Clicked here inside")

@@ -2,7 +2,7 @@
 import {useEffect} from 'react'
 import {Outlet, Link} from 'react-router-dom'
 import {toAbsoluteUrl} from '../../../_metronic/helpers'
-console.log("5")
+
 const AuthLayout = () => {
   useEffect(() => {
     const root = document.getElementById('root')
@@ -100,5 +100,5 @@ const AuthLayout = () => {
     </div>
   )
 }
-console.log("5 End")
+
 export {AuthLayout}

@@ -188,7 +188,7 @@ let [userForEdit] = useState<User & Salary>({
               name='email'
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
-              value = {selectedUser.user_id?.email}
+              value={selectedUser.user_id?.email}
             />
             {/* end::Input */}
             {formik.touched.email && formik.errors.email && (

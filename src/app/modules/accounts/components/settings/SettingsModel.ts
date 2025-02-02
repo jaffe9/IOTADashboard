@@ -1,3 +1,5 @@
+import { StickyComponent } from "../../../../../_metronic/assets/ts/components";
+
 export interface IProfileDetails {
   associatedUserId: number;
   password : string ;
@@ -59,6 +61,7 @@ export interface IProfileDetailsInvoice {
 }
 
 export interface IProfileDetailsContract {
+  id : number
   contract_end_date: string;
   contract_date: string;
   associated_user_id: any;
@@ -74,6 +77,63 @@ export interface IProfileDetailsContract {
   username : string
 
 }
+
+export interface IProfileDetailsContractForAction {
+  id : number
+  contract_end_date: string;
+  contract_date: string;
+  associated_user_id: {
+    username:string,
+    email:string,
+  };
+  contract_no : string,
+  billing_value: string,
+  billing_start_date : string,
+  billing_end_date : string,
+  billing_months : number,
+  associatedAccountManager : number,
+  status:null,
+  contract_file_location:null,
+  client_id: any;
+  username : string
+
+}
+export type IProfileDetailsNationalId = {
+  id?:number
+  national_id?: string
+  expiry_date?: string
+  associated_user_id?:{
+    username : string
+    email : string
+    id : number
+  } 
+}
+
+export type IProfileDetailsSalary = {
+  pay_date?: string;
+  id?: number
+  pay_period: string
+  basic_allowance: string
+  hr_allowance: string
+  end_of_service_allowance: string
+  travel_other_allowance: string
+  earnings_total: string
+  lop_days: string
+  employee_request: string
+  salary_advance: string
+  lop_salary_total: string
+  total_net_salary: string
+  total_net_salary_words: string
+  salary_pay_mode: string
+  working_days: string
+  holidays: string
+  deductions_total: string
+  user_id:{
+    username : String 
+    email : string
+  }
+}
+
 
 export interface IUpdateEmail {
   newEmail: string;
@@ -184,6 +244,27 @@ export const profileDetailsInitValues: IProfileDetails = {
 
 export const profileDetailsInitValuesContract: IProfileDetailsContract = {
   associated_user_id: 0,
+  id : 0,
+  username : "",
+  contract_no : "",
+  billing_value: "",
+  billing_start_date : "",
+  billing_end_date : "",
+  billing_months : 0,
+  associatedAccountManager : 0,
+  status:null,
+  contract_date :"",
+  contract_end_date : "",
+  contract_file_location:null,
+  client_id: 0,
+}
+
+export const profileDetailsInitValuesContractForAction: IProfileDetailsContractForAction = {
+  associated_user_id: {
+    username:'',
+    email:'',
+  },
+  id : 0,
   username : "",
   contract_no : "",
   billing_value: "",
@@ -215,6 +296,43 @@ export const profileDetailsInitValuesInvoice: IProfileDetailsInvoice = {
   invoice_paid_amount: "",
   associated_user_id: "",
 };
+
+export const  profileDetailsSalaryInitialValues: IProfileDetailsSalary = {
+  id: 0,
+  pay_period: "",
+  pay_date:"",
+  basic_allowance:"", 
+  hr_allowance: "",
+  end_of_service_allowance: "",
+  travel_other_allowance:"",
+  earnings_total: "",
+  lop_days: "",
+  employee_request: "",
+  salary_advance: "",
+  lop_salary_total:"",
+  total_net_salary: "",
+  total_net_salary_words: "",
+  salary_pay_mode: "",
+  working_days: "",
+  holidays: "",
+  deductions_total: "",
+  user_id:{
+    username : "",
+    email : ""
+  },
+}
+
+export const profileDetailsInitValuesNationalId : IProfileDetailsNationalId = {
+  id:0,
+  national_id:"",
+  expiry_date:"",
+  associated_user_id:{
+    username:"",
+    id:0,
+    email:"",
+  }
+}
+
 export const updateEmail: IUpdateEmail = {
   newEmail: "support@keenthemes.com",
   confirmPassword: "",

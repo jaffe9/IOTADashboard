@@ -14,7 +14,7 @@ type LeaveBalanceRecord = {
   leaves_used: number;
   leave_left_current_year:number;
   year:number;
-  user_id: { username: string , companyName:string , employeeJoiningDate:string };
+  user_id: { username: string , companyName:string , employeeJoiningDate:string , contract_id:{billing_months: number} };
 };
 
 const ListsWidget3: React.FC<Props> = ({ className }) => {
@@ -126,6 +126,7 @@ const renderTable = (records: LeaveBalanceRecord[]) => {
             <th className="px-px min-w-100px">Leaves Used</th>
             <th className="px-px min-w-50px">Leave Left</th>
             <th className="px-px min-w-50px">Joining Date</th>
+            <th className="px-px min-w-50px">Billing Months</th>
           </tr>
         </thead>
         <tbody className='border border-grey border-2 hover-success'>
@@ -156,6 +157,7 @@ const renderTable = (records: LeaveBalanceRecord[]) => {
               <td className="text-warning fw-bold">{record.leaves_used}</td>
               <td className="text-danger fw-bold">{record.leave_left_current_year}</td>
               <td className="text-primary fw-bold">{record.user_id?.employeeJoiningDate}</td>
+              <th className="text-primary fw-bold">{record.user_id.contract_id.billing_months}</th>
             </tr>
           ))}
         </tbody>

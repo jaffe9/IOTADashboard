@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 import { resourceLimits } from "worker_threads";
-import { ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 
@@ -8,6 +8,8 @@ import { create } from "domain";
 import { file } from "@form-validation/bundle/popular";
 import { url } from "inspector";
 import { error } from "console";
+import { string } from "yup";
+import dayjs from "dayjs";
 
 class getUserDataParams {
   baseUrl: string | undefined
@@ -26,7 +28,7 @@ const GET_TEMP_USERS_URL = `${API_URL}/tempUser`;
 const GET_EXPENSE = `${API_URL}/expensesType`;
 const GET_ACCOUNT_MANAGER = `${API_URL}/accountManager`;
 const GET_USER_SALARY_URL = `${API_URL}/salary`;
-const GET_CLIENT_DETAILS_URL = `${API_URL}/clients`
+const GET_CLIENT_DETAILS_URL = `${API_URL}/clients`;
 const GET_USER_SALARY_DETAIL_URL = `${API_URL}/salaryDetails`;
 const GET_USER_CONTRACT_URL = `${API_URL}/contract`;
 const GET_EMPLOYEEONBOARDING_URL = `${API_URL}/employeeOnboarding`;
@@ -35,6 +37,37 @@ const GET_TIMESHEET_URL = `${API_URL}/employeeTimesheet`;
 const DIGITAL_OCEAN_SECRET_KEY = `XbcuQv5Z/NiKom3Q4domcuCjr5yCRXYd/SvkQ/EDLqI`;
 const DIGITAL_OCEAN_ACCESS_KEY = `DO00J84DXXRHLZHJBHJF`;
 const DIGITAL_OCEAN_PERSONAL_ACCESS_TOKEN = `dop_v1_8812d0f4fbefad3d4a7e9317bc8be87ac1a14c22d20e8ad6b7876ea07b7cc80b`;
+
+// date format for Form //
+const today = new Date();
+const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of previous month
+
+const pay_period = lastMonth.toLocaleDateString("en-IN", {
+  year: "numeric",
+  month: "short",
+}).replace(/\//g, "");
+
+const pay_date = lastMonth.toLocaleDateString("en-IN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).replace(/\//g, "-");
+
+const update_date = lastMonth.toLocaleDateString("en-IN",{
+  year: "numeric",
+  month: "short",
+}).replace(/\//g, "_");
+
+const getYear = today.toLocaleString("en-IN",{
+     year : "numeric"
+}).replace(/\//g,"")
+const setYear = `Year_${getYear}`
+
+const update_ClaimDate = today.toLocaleDateString("en-IN",{
+  year: "numeric",
+  month: "short",
+}).replace(/\//g, "_");
+
 // User Count
 const axiosInstance = axios.create({
   baseURL: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/',
@@ -98,7 +131,7 @@ export const getInvoiceDetails = async () => {
 // Fetching the data related to national_id
 export const getLeavesLeft = async () => {
   try{
-    const response = await axiosInstance.get("leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate)&order=id");
+    const response = await axiosInstance.get("leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id");
     return response.data;
   }catch (error){
     console.error('Error fetching Leaves Left for employees:', error);
@@ -192,6 +225,7 @@ export const getContractForAction = async (id: string) => {
   }
 };
 
+
 export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
   const d = await axios
     .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associated_account_manager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
@@ -203,6 +237,13 @@ export const getAllClaimEmployees = async (): Promise<UsersQueryResponse> => {
     .get(`${GET_USERS_URL}?select=*&isActive=eq.true&order=id`);
   return d;
 };
+
+export const getEmpForSalaryIncrement = async () : Promise<UsersQueryResponse> => {
+  const d = await axios
+  .get(`${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)&order=id`);
+  return d;
+}
+
 
 export const getExpenses = async (): Promise<UsersQueryResponse> => {
   const d = await axios
@@ -277,31 +318,62 @@ export const getTempUserDetails = async () : Promise<any> => {
   return d;
 };
 
-// Update IqamaEspiry of the user
-export const updateUserIqamaExp =  async (id : any ,national_id: any ,expiry_date : any ) => {
-  const config = {
-    method : "PATCH",
-    maxBodyLength : Infinity ,
-    url : 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/nationalIdInfo?select=*,associated_user_id(username,companyName)',
-    headers :  {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-      'Content-Type': 'application/json'
-    },
-    data : [id,national_id,expiry_date]
-  };
-  try {
-  const res = await axios.request(config);
-  console.log( `UserId updated to True: ${JSON.stringify(res.data)}`)
-  return res.data
-  }catch(e){
-   if (axios.isAxiosError(e)){
-    console.error("Axios Error in update userId : ", e.response?.data || e.message)
-   }else{
-    console.error("Error in updating userId to false " , e)
-   }
+// Salary update Starts here 
+
+export const updateSalaryIncrement = async ( s:Salary ) : Promise<any> => {
+let data = JSON.stringify([
+  {
+      pay_date: s.pay_date,
+      pay_period : s.pay_period,
+      basic_allowance : s.basic_allowance,
+      hr_allowance : s.hr_allowance, 
+      end_of_service_allowance : s.end_of_service_allowance,
+      travel_other_allowance : s.travel_other_allowance,
+      earnings_total : s.earnings_total,
+      lop_days : s.lop_days,
+      employee_request:s.employee_request,
+      salary_advance : s.salary_advance,
+      lop_salary_total : s.lop_salary_total,
+      total_net_salary : s.total_net_salary,
+      total_net_salary_words : s.total_net_salary_words, 
+      salary_pay_mode : s.salary_pay_mode, 
+      working_days : s. working_days, 
+      holidays : s.holidays,
+      deductions_total : s.deductions_total, 
   }
-} 
+]);
+
+let config = {
+  method: 'patch',
+  maxBodyLength: Infinity,
+  url: `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/salary?id=eq.${s.id}`,
+  headers: { 
+    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+    'Content-Type': 'application/json', 
+    'Authorization': 'Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
+  },
+  data : data
+};
+
+try {
+  const response = await axios.request(config);
+  
+  if (response.status === 204) {
+    return { status: response.status, message: "Success" }; // Return an object
+  } else {
+   return { status: response.status, message: "Failed" }; // Return an object
+  }
+} catch (error) {
+  if (axios.isAxiosError(error)){
+    console.error("error in SalaryUpdate:",error.response?.data  || error.message)
+  }else{
+    console.error("Unexpected error:",error);
+  }
+
+  return { status: 500, message: "Successfully Updated Salary Data" };
+}
+}
+// End of salary upda
 
 // Api update tempUser Status to false 
 export const updateUserId =  async (id : any ) => {
@@ -483,7 +555,7 @@ export const uploadInvoiceToSupabase = async (file:File) => {
   const Iconfig = {
     method : "POST",
     maxBodyLength : Infinity,
-    url :  `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_invoice_file/Dec_2024/${file.name}`,
+    url :  `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_invoice_file/${setYear}/${update_date}/${file.name}`,
     headers : {
       "Authorization" :  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
       "Content-Type"  : file.type
@@ -568,7 +640,7 @@ export const uploadContractToSupabase = async (file:File) => {
   const Cconfig = {
     method : "POST",
     maxBodyLength : Infinity,
-    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_contracts/${file.name}` ,
+    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_contracts/${setYear}/${file.name}` ,
     headers : {
       'Authorization' : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
       'Content-Type' : file.type
@@ -582,7 +654,7 @@ export const uploadContractToSupabase = async (file:File) => {
     if (response.status === 200){
       //Extract the file path 
       const fileKey = response.data.file;
-      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_contracts/${fileKey}`;
+      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_contracts/${setYear}/${fileKey}`;
       return publicUrl;
     }else{
       throw new Error('Contract Upload Failed')
@@ -654,7 +726,7 @@ export const uploadClaimsToSupabase = async (file:File) => {
   const Cconfig = {
     method : "POST",
     maxBodyLength : Infinity,
-    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/Jan_2025/${file.name}` ,
+    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/Year_2025/${update_ClaimDate}/${file.name}` ,
     headers : {
       'Authorization' : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
       'Content-Type' : file.type
@@ -668,7 +740,7 @@ export const uploadClaimsToSupabase = async (file:File) => {
     if (response.status === 200){
       //Extract the file path 
       const fileKey = response.data.file;
-      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/Jan_2025/${fileKey}`;
+      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/${update_ClaimDate}/${fileKey}`;
       return publicUrl;
     }else{
       throw new Error('Claim Upload Failed')
@@ -676,7 +748,7 @@ export const uploadClaimsToSupabase = async (file:File) => {
    }catch (error) {
     console.error('Error in Cconfig',error)
   }
-    
+    console.log(Cconfig.url)
 }
 /// End of claim
 
@@ -685,7 +757,7 @@ export const uploadFileToSupabase = async (file:File) => {
      const Tconfig = {
       method : "POST",
       maxBodyLength : Infinity,
-      url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/Dec_2024/${file.name}`,
+      url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/${setYear}/${update_date}/${file.name}`,
       headers : {
         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
         'Content-Type': file.type,
@@ -700,7 +772,7 @@ export const uploadFileToSupabase = async (file:File) => {
       if (response.status === 200){
         //Extract the file path 
         const fileKey = response.data.file;
-        const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/Dec_2024/${fileKey}`; // hase a folder
+        const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/${setYear}/${update_date}/${fileKey}`; // hase a folder
         return publicUrl;
       }else{
         throw new Error('Timesheet Upload Failed')

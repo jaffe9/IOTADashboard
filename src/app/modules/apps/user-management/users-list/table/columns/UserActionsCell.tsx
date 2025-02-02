@@ -113,7 +113,4 @@ const UserActionsCell: FC<Props> = ({ id, iqama , contract}) => {
 };
 
 export { UserActionsCell };
-  function useContractLisView(): any {
-    throw new Error("Function not implemented.");
-  }
 

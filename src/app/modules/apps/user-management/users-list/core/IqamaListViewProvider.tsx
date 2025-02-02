@@ -12,7 +12,7 @@ import {
 } from '../../../../../../_metronic/helpers'
 import {useQueryResponse, useQueryResponseData} from './QueryResponseProvider'
 
-console.log("Iqama Here")
+
 const IqamaListViewContext = createContext<IqamaListViewContextProps>(iqamaInitialListView)
 
 const IqamaListViewProvider: FC<WithChildren> = ({children}) => {

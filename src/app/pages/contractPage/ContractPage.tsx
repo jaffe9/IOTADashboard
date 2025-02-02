@@ -403,7 +403,7 @@ const ContractPage: FC = () => {
                   > 
                     <option value="">Select Account Manager</option>
                     {allUserInfo.manager.map((data: any, i: number) => (
-                      <option key={i} value={data.id}>
+                      <option key={i} value={data.id} hidden={data.isDisabled == true}>
                         {data.accountManagerName} 
                       </option>
                     ))}
@@ -424,7 +424,7 @@ const ContractPage: FC = () => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={this}
+                    onClick={handleContractUpload}
                   >
                     {!loading && "Save Changes"}
                     {loading && (

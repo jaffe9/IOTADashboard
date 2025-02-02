@@ -20,6 +20,8 @@ const SidebarMenuMain = () => {
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Account Manager Section</span>
         </div>
       </div>
+      <SidebarMenuItem to='/updateSalary' icon='finance-calculator' title='Update Salary' fontIcon='bi-layers' />
+      <div className='menu-item'></div>
       <SidebarMenuItem to='/createTempEmp' icon='profile-user' title='Create New Employee' fontIcon='bi-layers' />
       <div className='menu-item'></div>
       <SidebarMenuItem to='/employeetimesheet' icon='calendar-add' title='Employee Timesheet' fontIcon='bi-layers' />

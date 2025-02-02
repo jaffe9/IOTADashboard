@@ -12,7 +12,7 @@ import {
 } from '../../../../../../_metronic/helpers'
 import {useQueryResponse, useQueryResponseData} from './QueryResponseProvider'
 
-console.log("Contract Here")
+
 const ContractListViewContext = createContext<ContractListViewContextProps>(contractInitialListView)
 
 const ContractListViewProvider: FC<WithChildren> = ({children}) => {

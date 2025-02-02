@@ -77,8 +77,8 @@ useEffect(() =>
     associatedAccountManager={associatedAccountManager}
     client_id={client_id}
     associated_user_id={associated_user_id}
-    payslipOption={payslipOptions.download}
-    payslipOptions={payslipOptions.email} />
+
+     />
   }
 
   if (!isLoading && !error && user) {
@@ -91,8 +91,8 @@ useEffect(() =>
     associatedAccountManager={associatedAccountManager}
     associated_user_id={associated_user_id}
     client_id={client_id}
-    payslipOption={payslipOptions.download}
-    payslipOptions={payslipOptions.email} />
+
+     />
   }
 
   return null

@@ -63,10 +63,10 @@ const AuthInit: FC<WithChildren> = ({children}) => {
         if (!currentUser) 
           {
           const {data} = await getUserByToken(auth!.user.id)
-          console.log(data);
+          
           if (data) 
             {
-              console.log(data);
+              
               setCurrentUser(data)
             }
           }

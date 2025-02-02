@@ -8,7 +8,7 @@ import {getUsersByLoginId, login} from '../core/_requests'
 import {toAbsoluteUrl} from '../../../../_metronic/helpers'
 import {useAuth} from '../core/Auth'
 import * as Sentry from "@sentry/react";
-console.log("4")
+
 const loginSchema = Yup.object().shape({
   email: Yup.string()
     .email('Wrong email format')

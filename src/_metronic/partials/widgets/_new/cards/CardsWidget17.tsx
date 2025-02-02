@@ -42,7 +42,7 @@ const CardsWidget17: FC<Props> = ({
       <div className='card-header pt-5'>
         <div className='card-title d-flex flex-column'>
           <div className='d-flex align-items-center'>
-            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>$</span>
+            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
             <span id = 'unpaidTotalValueTag' className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'></span>
             <span className='badge badge-light-success fs-base'>
               <KTIcon iconName='arrow-up' className='fs-5 text-success ms-n1' />2.2%</span>
@@ -66,19 +66,19 @@ const CardsWidget17: FC<Props> = ({
           <div className='d-flex fw-semibold align-items-center'>
             <div className='bullet w-8px h-3px rounded-2 bg-success me-3'></div>
             <div id = 'clientName1' className='text-gray-500 flex-grow-1 me-4'>ANB</div>
-            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>$</span>
+            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
             <div id = 'unpaidClient1Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
           <div className='d-flex fw-semibold align-items-center my-3'>
             <div className='bullet w-8px h-3px rounded-2 bg-primary me-3'></div>
             <div id = 'clientName2' className='text-gray-500 flex-grow-1 me-4'>RB</div>
-            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>$</span>
+            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
             <div id = 'unpaidClient2Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
           <div className='d-flex fw-semibold align-items-center'>
             <div className='bullet w-8px h-3px rounded-2 bg-white me-3'></div>
             <div id = 'clientName4' className='text-gray-500 flex-grow-1 me-4'>ARB</div>
-            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>$</span>
+            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
             <div id = 'unpaidClient4Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
           <div className='d-flex fw-semibold align-items-center'>

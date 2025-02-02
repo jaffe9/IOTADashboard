@@ -1,6 +1,7 @@
 import { string } from 'yup'
 import { ID, Response } from '../../../../../../_metronic/helpers'
 import { StickyComponent } from '../../../../../../_metronic/assets/ts/components'
+import { StepTypeMap } from '@mui/material'
 
 export enum payslipOptions { download = "download", email = "email" }
 
@@ -54,10 +55,12 @@ id?:number
 contract_no?:string
 contract_date?:string
 contract_end_date?:string
+billing_start_date?:string
+billing_end_date?:string
 billing_months?:number
-billing_value?:number
+billing_value?:string
 client_id?:{ client_name : string }
-associatedAccountManager?:{ accountManagerName: string }
+associatedAccountManager?: number
 associated_user_id?: { username : string , email : string }
 }
 
@@ -80,6 +83,7 @@ export type EmployeeOnboarding = {
 export type Salary = {
   id?: number
   pay_period?: string
+  pay_date?:string
   basic_allowance?: string
   hr_allowance?: string
   end_of_service_allowance?: string
@@ -96,7 +100,10 @@ export type Salary = {
   holidays?: string
   deductions_total?: string
   payslilpOptionSelected?: payslipOptions
-  user_id?:{username:string,email:string}
+  user_id?: { 
+    username?: string 
+    email?: string
+  }
 }
 
 export type National_id = {
@@ -106,6 +113,7 @@ export type National_id = {
   associated_user_id?:{
     username : string
     email : string
+    id : number
   }
 }
 

@@ -1,21 +1,22 @@
 import {FC, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
-import {isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
-import {Contract, initialUser, payslipOptions, User} from '../core/_models'
+import Flatpickr from "react-flatpickr";
+import {Contract, initialUser, User} from '../core/_models'
 import clsx from 'clsx'
-import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
-import {createUser, updateUser} from '../core/_requests'
+import {createUser, getEmpForContractInForm, UpdateContractExp, updateUser} from '../core/_requests'
 import {useQueryResponse} from '../core/QueryResponseProvider'
-//co
-const date = new Date();
-const payslipDate = date.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}).replace(/ /g, '-');
-const payslipMonth = date.toLocaleDateString('en-GB', {month: 'short', year: 'numeric'}).replace(/ /g, '-');
+import {  IProfileDetailsContractForAction, profileDetailsInitValuesContractForAction as initialValues} from '../../../../accounts/components/settings/SettingsModel'
+import { useContractListView } from '../core/ContractListViewProvider';
+
+
+var allUserInfo:any = await getEmpForContractInForm().then(async (data) =>  {
+  return data.data;
+});
 
 type Props = {
   isUserLoading: boolean
-  payslipOption: payslipOptions
   user: User
   contract:Contract
   contract_no: string
@@ -26,39 +27,36 @@ type Props = {
   client_id : { client_name : string }
   associatedAccountManager : { accountManagerName : string }
   associated_user_id : { username: string , email : string }
-  payslipOptions:payslipOptions
-}
-const payslipOption = payslipOptions
-let selectedPayslipOption = ""
-function setPayslipOption(payslipOption: payslipOptions)
-{
-  if(payslipOptions.download === payslipOption)
-    {
-      selectedPayslipOption = payslipOptions.download
-    }
-    else
-    {
-      selectedPayslipOption = payslipOptions.email
-    }
+  
 }
 
-const editUserSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Wrong email format')
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Email is required'),
-  name: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Name is required'),
-})
-
-
+let  updatedUserInfo : IProfileDetailsContractForAction = initialValues;
 
 const UserEditModalFormContract: FC<Props> = ({user, contract,contract_no, isUserLoading,contract_date,contract_end_date, billing_months, billing_value ,client_id , associated_user_id , associatedAccountManager}) => {
-const {setItemIdForUpdate} = useListView()
+const {setItemContractForUpdate} = useContractListView()
 const {refetch} = useQueryResponse()
+const [ data , setData ] = useState<IProfileDetailsContractForAction>(updatedUserInfo)
+const updateData = (fieldsToUpdate: Partial<IProfileDetailsContractForAction>): void => {
+    const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
+    setData(updatedData);
+  };
+const handleUserChange = async (id: number) => {
+  const hasMatch = allUserInfo.find((value: Contract) => value.id === id);
+  if (!hasMatch) return;
+
+  if (hasMatch.associated_user_id.username !== selectedUser.associated_user_id.username) {
+    alert("Selected employee name does not match the displayed Employee Name field.");
+  }
+    updateData({
+       id : id,
+       contract_date: hasMatch.contract_data,
+       contract_end_date : hasMatch.contract_end_date,
+       contract_no : hasMatch.contract_no,
+    });
+  };
+  
+const hiddenIds = [10,11];
+
 let [userForEdit] = useState<User & Contract> ({
     ...user,...contract,
     id: user.id || initialUser.id,
@@ -71,46 +69,61 @@ let [userForEdit] = useState<User & Contract> ({
     contract_date: contract_date,
     contract_end_date: contract_end_date,
     billing_months : billing_months,
-    billing_value : billing_value,
+    
     companyName : client_id.client_name,
-    username:associated_user_id.username.toString(),
+    
     accountManagerName : associatedAccountManager.accountManagerName,
   })
+
   const selectedUser = userForEdit
   const cancel = (withRefresh?: boolean) => 
     {
-      alert("Cancelled")
+     // alert("Cancelled")
       if (withRefresh) 
         {
           refetch()
-          selectedPayslipOption = ""
+          
         }
-      setItemIdForUpdate(undefined)
+      setItemContractForUpdate(undefined)
     }
-
-  const blankImg = toAbsoluteUrl('media/svg/avatars/blank.svg')
-  const userAvatarImg = toAbsoluteUrl(`media/${userForEdit.pic}`)
-  const formik = useFormik({
-    initialValues: userForEdit,
-    validationSchema: editUserSchema,
-    onSubmit: async (values, {setSubmitting}) => {
-      alert("Submitted")
-      console.log("Submitted")
-      setSubmitting(true)
-      try {
-        if (isNotEmpty(values.id)) {
-          await updateUser(values)
-        } else {
-          await createUser(values)
-        }
-      } catch (ex) {
-        console.error(ex)
-      } finally {
-        setSubmitting(true)
-        cancel(true)
-      }
-    },
-  })
+    const [loading, setLoading] = useState(false);
+    const formik = useFormik<IProfileDetailsContractForAction>({
+      initialValues,
+      onSubmit:async () => {
+        setLoading(true);
+        setTimeout(async () => {
+          const updatedData = Object.assign(data, updatedUserInfo);
+          setData(updatedData);
+          if( !data.associated_user_id.username )
+          {
+            alert("Please Select Employee From Select Field")
+            setLoading(false)
+            return
+          }
+          const contract : Contract = {
+           id:data.id,
+           contract_date:data.contract_date,
+           contract_end_date:data.contract_end_date,
+           contract_no:data.contract_no,
+            };
+      
+                  console.log("updated Contract e:" , contract)
+                  const apiResponse = await UpdateContractExp(contract)
+                
+                  if (apiResponse.status === 204)
+                    {
+                      alert("contract updated Successful");
+                      setLoading(false);
+                    }
+                    else
+                    {
+                      alert("An error occurred, please try again later");
+                      setLoading(false);
+                    }
+                }, 1000);
+              },
+            });
+ 
   return (
     <>
       <form id='kt_modal_add_user_form' className='form' onSubmit={formik.handleSubmit} noValidate>
@@ -128,38 +141,65 @@ let [userForEdit] = useState<User & Contract> ({
           
           <div className='fv-row mb-7'>
             {/* begin::Label */}
-            <label className='fw-bold fs-6 mb-2'>Full Name</label>
+            <label className='fw-bold fs-6 mb-2'>Employee Name</label>
             {/* end::Label */}
 
             {/* begin::Input */}
             <input
-              placeholder='Full name'
+              placeholder='Employee name'
               {...formik.getFieldProps('username')}
               type='text'
               name='User Name'
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
-                {'is-invalid': formik.touched.firstName && formik.errors.firstName},
+                {'is-invalid': formik.touched.username && formik.errors.username},
                 {
-                  'is-valid': formik.touched.firstName && !formik.errors.firstName,
+                  'is-valid': formik.touched.username && !formik.errors.username,
                 }
               )}
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
               value = {selectedUser.associated_user_id?.username}
             />
-            {formik.touched.firstName && formik.errors.firstName && (
+            {formik.touched.username && formik.errors.username && (
               <div className='fv-plugins-message-container'>
                 <div className='fv-help-block'>
-                  <span role='alert'>{formik.errors.firstName}</span>
+                  <span role='alert'>{formik.errors.username}</span>
                 </div>
               </div>
             )}
             {/* end::Input */}
           </div>
-          {/* end::Input group */}
+          
+          <div className='fv-row mb-7'>
+            {/* begin::Label */}
+            <label className='fw-bold fs-6 mb-2'>Employee Id</label>
+            {/* end::Label */}
 
-          {/* begin::Input group */}
+            {/* begin::Input */}
+          
+            <select
+              id="id"
+               className="form-select form-select-solid form-select-lg fw-bold required"
+                 {...formik.getFieldProps("associated_user_id.username")}
+                      
+                onChange={async (value) => {
+                 await  handleUserChange(parseInt(value.target.value));
+                 formik.setFieldValue("associated_user_id.username",updatedUserInfo.id)
+                   }}
+                    //  value={initialValues.user_id}
+                    > 
+                      <option value="" >Select Employee </option>
+                      {allUserInfo.map((data: any, i: number) => (
+                        <option key={i} value={data.id} hidden={data.associated_user_id == null} >
+                          {data.associated_user_id?.username}
+                        </option>
+                      ))}
+                    </select>
+        
+            {/* end::Input */}
+          </div>
+
           <div className='fv-row mb-7'>
             {/* begin::Label */}
             <label className='disabled fw-bold fs-6 mb-2'>Email</label>
@@ -171,9 +211,9 @@ let [userForEdit] = useState<User & Contract> ({
               {...formik.getFieldProps('email')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
-                {'is-invalid': formik.touched.email && formik.errors.email},
+                {'is-invalid': formik.touched.associated_user_id && formik.errors.associated_user_id},
                 {
-                  'is-valid': formik.touched.email && !formik.errors.email,
+                  'is-valid': formik.touched.associated_user_id && !formik.errors.associated_user_id,
                 }
               )}
               type='email'
@@ -183,26 +223,22 @@ let [userForEdit] = useState<User & Contract> ({
               value = {selectedUser.associated_user_id?.email}
             />
             {/* end::Input */}
-            {formik.touched.email && formik.errors.email && (
+            {formik.touched.associated_user_id && formik.errors.associated_user_id && (
               <div className='fv-plugins-message-container'>
-                <span role='alert'>{formik.errors.email}</span>
+                <span role='alert'></span>
               </div>
             )}
           </div>
-          {/* end::Input group */}
-
-          {/* Begin Basic Allowance Information*/}
-
-          {/* begin::Input group */}
+      
+          
+        
           <div className='fv-row mb-7'>
-            {/* begin::Label */}
+          
             <label className='disabled fw-bold fs-6 mb-2'>Contract Number</label>
-            {/* end::Label */}
-
-            {/* begin::Input */}
+    
             <input
               placeholder='Contract Number'
-              {...formik.getFieldProps('number')}
+              {...formik.getFieldProps('contract_no')}
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
                 {'is-invalid': formik.touched.contract_no && formik.errors.contract_no},
@@ -216,20 +252,46 @@ let [userForEdit] = useState<User & Contract> ({
               disabled={formik.isSubmitting || isUserLoading}
               value={contract_no}
             />
-            {/* end::Input */}
+    
             {formik.touched.contract_no && formik.errors.contract_no && (
               <div className='fv-plugins-message-container'>
                 <span role='alert'>{formik.errors.contract_no}</span>
               </div>
             )}
           </div>
-          {/* end::Input group */}
 
-          {/* End of Basic Salary Information*/}
-
-          {/* Begin Expiry Date Information*/}
-
-          {/* begin::Input group */}
+          <div className='fv-row mb-7'>
+          
+          <label className='disabled fw-bold fs-6 mb-2'>Update Contract Number</label>
+  
+          <input
+            placeholder='Contract Number'
+            {...formik.getFieldProps('contract_no')}
+            className={clsx(
+              'form-control form-control-solid mb-3 mb-lg-0',
+              {'is-invalid': formik.touched.contract_no && formik.errors.contract_no},
+              {
+                'is-valid': formik.touched.contract_no && !formik.errors.contract_no,
+              }
+            )}
+            type='string'
+            name='Contract No'
+            autoComplete='off'
+            
+            onChange={(value) => {
+               updateData({ contract_no:value.target.value});
+               formik.setFieldValue("contract_no",updatedUserInfo.contract_no)
+            }
+          }
+          />
+  
+          {formik.touched.contract_no && formik.errors.contract_no && (
+            <div className='fv-plugins-message-container'>
+              <span role='alert'>{formik.errors.contract_no}</span>
+            </div>
+          )}
+        </div>
+      
           <div className='fv-row mb-7'>
             {/* begin::Label */}
             <label className='disabled fw-bold fs-6 mb-2'>Contract Date</label>
@@ -259,9 +321,37 @@ let [userForEdit] = useState<User & Contract> ({
               </div>
             )}
           </div>
-          {/* end::Input group */}
+          
+            <div className='fv-row mb-7'>
+                      {/* begin::Label */}
+                      <label className='disabled fw-bold fs-6 mb-2'>Update Contract Date</label>
+                      {/* end::Label */}
+          
+                      {/* begin::Input */}
+                      <Flatpickr
+                          className="form-control form-control-lg form-control-solid"
+                          placeholder="Click To Select Date"
+                          options={{
+                          mode: "single",
+                          dateFormat: "d-m-Y",
+                           }}
+                          onChange={(dateStr) => {
+                           updateData({ contract_date: dateStr.toLocaleString("en",{
+                           year: "numeric",
+                           month: "2-digit",
+                           day : "2-digit"
+                            }).replace(/\//g, "-") });
+                            }}
+                           ></Flatpickr>        
+                      {/* end::Input */}
+                      {formik.touched.contract_date && formik.errors.contract_date && (
+                        <div className='fv-plugins-message-container'>
+                          <span role='alert'>{formik.errors.contract_date}</span>
+                        </div>
+                      )}
+                    </div>
 
-          {/* End of Expiry Date Information*/}
+      
 
            {/* begin::Input group */}
            <div className='fv-row mb-7'>
@@ -293,9 +383,36 @@ let [userForEdit] = useState<User & Contract> ({
               </div>
             )}
           </div>
-          {/* end::Input group */}
+          
+          <div className='fv-row mb-7'>
+                      {/* begin::Label */}
+                      <label className='disabled fw-bold fs-6 mb-2'>Update Contract End Date</label>
+                      {/* end::Label */}
+          
+                      {/* begin::Input */}
+                      <Flatpickr
+                          className="form-control form-control-lg form-control-solid"
+                          placeholder="Click To Select Date"
+                          options={{
+                          mode: "single",
+                          dateFormat: "d-m-Y",
+                           }}
+                          onChange={(dateStr) => {
+                           updateData({ contract_end_date: dateStr.toLocaleString("en",{
+                           year: "numeric",
+                           month: "2-digit",
+                           day : "2-digit"
+                            }).replace(/\//g, "-") });
+                            }}
+                           ></Flatpickr>        
+                      {/* end::Input */}
+                      {formik.touched.contract_end_date && formik.errors.contract_end_date && (
+                        <div className='fv-plugins-message-container'>
+                          <span role='alert'>{formik.errors.contract_end_date}</span>
+                        </div>
+                      )}
+                    </div>
 
-           {/* begin::Input group */}
            <div className='fv-row mb-7'>
             {/* begin::Label */}
             <label className='disabled fw-bold fs-6 mb-2'>Billing Months</label>
@@ -429,77 +546,6 @@ let [userForEdit] = useState<User & Contract> ({
           {/* begin::Input group */}
 
           <div className='mb-7'>
-            {/* begin::Label }
-            <label className='required fw-bold fs-6 mb-5'>For the month</label>
-            <div className='text-gray-600'>
-                    {payslipMonth}
-                  </div>
-                  <br></br><br></br>
-            {/* end::Label }
-            {/* begin::Roles }
-            {/* begin::Input row }
-            <div className='d-flex fv-row'>
-              {/* begin::Radio }
-              <div className='form-check form-check-custom form-check-solid'>
-                {/* begin::Input }
-                <input
-                  className='form-check-input me-3'
-                  {...formik.getFieldProps('payslipOptions')}
-                  name='download'
-                  type='radio'
-                //  defaultChecked={false}
-                  value='Download'
-                  id='kt_modal_update_role_option_0'
-                  onClick={() =>setPayslipOption(payslipOptions.download)}
-                  //onChange = {() => paySlipOptionOnChange("Download")}
-                  checked={selectedPayslipOption === payslipOption.download}//{(formik.values.payslilpOptionSelected === payslipOptions.download)}
-                  disabled={formik.isSubmitting || isUserLoading}
-                />
-
-                {/* end::Input }
-                {/* begin::Label }
-                <label className='form-check-label' htmlFor='kt_modal_update_role_option_0'>
-                  <div className='fw-bolder text-gray-800'>Download</div>
-                  <div className='text-gray-600'>
-                    Generated and downloaded without sending an email to employee
-                  </div>
-                </label>
-                {/* end::Label }
-              </div>
-              {/* end::Radio }
-            </div>
-            {/* end::Input row }
-            <div className='separator separator-dashed my-5'></div>
-            {/* begin::Input row }
-            <div className='d-flex fv-row'>
-              {/* begin::Radio }
-              <div className='form-check form-check-custom form-check-solid'>
-                {/* begin::Input }
-                <input
-                  className='form-check-input me-3'
-                  {...formik.getFieldProps('payslipOptions')}
-                  name='role'
-                  type='radio'
-               //   defaultChecked={false}
-                  value='eMail'
-                  id='kt_modal_update_role_option_1'
-                  onClick={() =>setPayslipOption(payslipOptions.email)}
-                  checked={selectedPayslipOption === payslipOptions.email}//{(formik.values.payslilpOptionSelected === payslipOptions.email)}
-                  disabled={formik.isSubmitting || isUserLoading}
-                />
-                {/* end::Input }
-                {/* begin::Label }
-                <label className='form-check-label' htmlFor='kt_modal_update_role_option_1'>
-                  <div className='fw-bolder text-gray-800'>Generate and eMail</div>
-                  <div className='text-gray-600'>
-                  Generated and sent as an email to employee
-                  </div>
-                </label>
-                {/* end::Label }
-              </div>
-              {/* end::Radio }
-            </div>
-            {/* end::Roles */}
           </div>
            {/* end::Input group */ }
         </div>
@@ -507,7 +553,7 @@ let [userForEdit] = useState<User & Contract> ({
 
         {/* begin::Actions */}
         <div className='text-center pt-15'>
-          <button
+        <button
             type='reset'
             onClick={() => cancel()}
             className='btn btn-light me-3'
@@ -518,19 +564,22 @@ let [userForEdit] = useState<User & Contract> ({
           </button>
 
           <button
-            type='submit'
-            className='btn btn-primary'
-            data-kt-users-modal-action='submit'
-            disabled={isUserLoading || formik.isSubmitting}
-          >
-            <span className='indicator-label'>Submit</span>
-            {(formik.isSubmitting || isUserLoading) && (
-              <span className='indicator-progress'>
-                Please wait...{' '}
-                <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-              </span>
-            )}
-          </button>
+            type="submit"
+             className="btn btn-primary"
+             disabled={loading}
+              
+              >
+              {!loading && "Save Changes"}
+              {loading && (
+               <span
+                className="indicator-progress"
+                 style={{ display: "block" }}
+                   >
+                  Updating Contract Expiry...{" "}
+                 <span className="spinner-border spinner-bor  der-sm align-middle ms-2"></span>
+                 </span>
+                    )}
+           </button>
         </div>
         {/* end::Actions */}
       </form>
