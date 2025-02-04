@@ -19,7 +19,7 @@ export type User = {
   employeeJoiningDate?: string
   employeeId?: string
   pic?: string
-  accountManagerName?:string
+  associatedAccountManage?:number
 }
 
 export type TempUser = {
@@ -154,6 +154,7 @@ export type InvoiceRequest = {
    "invoice_url":string,
    "invoice_paid_date":string,
    "invoice_paid_amount":string,
+   "associatedAccountManager":number,
 }
 
 export type ContractRequest = {

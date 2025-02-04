@@ -10,6 +10,7 @@ import { url } from "inspector";
 import { error } from "console";
 import { string } from "yup";
 import dayjs from "dayjs";
+import { EOF } from "dns";
 
 class getUserDataParams {
   baseUrl: string | undefined
@@ -375,6 +376,42 @@ try {
 }
 // End of salary upda
 
+//update paid Status
+export const updateInvoiceStatus =  async (id : any , invoice_paid_amount : any ) => {
+  let data = JSON.stringify([
+    {
+      "invoice_paid_status": true,
+      "invoice_paid_date" : today,
+      invoice_paid_amount :invoice_paid_amount
+    }
+  ]);
+  
+  let config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/invoice?id=eq.${id}`,
+    headers: { 
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    if (axios.isAxiosError(error)){
+      console.error("Axios Error in update Invoice Status : ", error.response?.data || error.message)
+     }else{
+      console.error("Error in updating InvoiceStatus to true " , error)
+     }
+  });
+} 
+// end of Update paid status
+
 // Api update tempUser Status to false 
 export const updateUserId =  async (id : any ) => {
   const config = {
@@ -512,6 +549,7 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
       external_invoice_no: i.external_invoice_no,
       invoice_date: i.invoice_date,
       invoice_value: i.invoice_value,
+      associatedAccountManager: i.associatedAccountManager,
       invoice_paid_status: false,
       invoice_url: null,
       invoice_paid_date:null,

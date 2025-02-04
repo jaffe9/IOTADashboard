@@ -76,10 +76,16 @@ const CardsWidget17: FC<Props> = ({
             <div id = 'unpaidClient2Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
           <div className='d-flex fw-semibold align-items-center'>
-            <div className='bullet w-8px h-3px rounded-2 bg-white me-3'></div>
+            <div className='bullet w-8px h-3px rounded-2 bg-danger me-3'></div>
             <div id = 'clientName4' className='text-gray-500 flex-grow-1 me-4'>ARB</div>
             <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
             <div id = 'unpaidClient4Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+          </div>
+          <div className='d-flex fw-semibold align-items-center'>
+            <div className='bullet w-8px h-3px rounded-2 bg-warning me-3'></div>
+            <div id = 'clientName5' className='text-gray-500 flex-grow-1 me-4'>AMEX</div>
+            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+            <div id = 'unpaidClient5Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
           </div>
           <div className='d-flex fw-semibold align-items-center'>
             <div
@@ -170,24 +176,38 @@ function setValues()
   let clientNameValue1 = document.getElementById('clientName1')
   
   let clientNameValue2 = document.getElementById('clientName2')
+
+  let clientNameValue4 = document.getElementById('clientName4')
+
+  let clientNameValue5 = document.getElementById('clientName5')
   
   let client1ValueTag = document.getElementById('client1Value')
   
   let client2ValueTag = document.getElementById('client2Value')
 
+  let client4ValueTag = document.getElementById('client4Value')
+
+  let client5ValueTag = document.getElementById('client5Value')
+
   let unpaidTotalValueTag = document.getElementById('unpaidTotalValueTag'); // New element for unpaid total
   let unpaidClient1ValueTag = document.getElementById('unpaidClient1Value'); // New element for unpaid client1
   let unpaidClient2ValueTag = document.getElementById('unpaidClient2Value');
+
+  let unpaidClient4ValueTag = document.getElementById('unpaidClient4Value');
+  let unpaidClient5ValueTag = document.getElementById('unpaidClient5Value');
   
   apiHelper.getInvoiceTotalValue().then((response: any) => {
     let totalInvoiceValue = 0.0;
     let client1TotalValue = 0.0;
     let client2TotalValue = 0.0;
+    let client4TotalValue = 0.0;
+    let client5TotalValue = 0.0;
 
     let unpaidTotalValue = 0.0;
     let unpaidClient1Value = 0.0;
     let unpaidClient2Value = 0.0;
     let unpaidClient4Value = 0.0;
+    let unpaidClient5Value = 0.0;
 
     // Loop through response data
     response.data.forEach((item: any) => {
@@ -202,6 +222,12 @@ function setValues()
       } else if (item.client_id === 2) {
         client2TotalValue += billingValue;
         if (!isPaid) unpaidClient2Value += billingValue;
+      } else if (item.client_id === 4) {
+        client4TotalValue += billingValue;
+        if (!isPaid) unpaidClient4Value += billingValue;
+      } else if (item.client_id === 5) {
+        client5TotalValue += billingValue;
+        if (!isPaid) unpaidClient5Value += billingValue;
       }
 
       if (!isPaid) unpaidTotalValue += billingValue;
@@ -215,14 +241,29 @@ function setValues()
     if (invoiceTotalValue) invoiceTotalValue.innerHTML = formatValue(totalInvoiceValue);
     if (clientNameValue1) clientNameValue1.innerHTML = "ANB";
     if (client1ValueTag) client1ValueTag.innerHTML = formatValue(client1TotalValue);
+
     if (clientNameValue2) clientNameValue2.innerHTML = "RB";
     if (client2ValueTag) client2ValueTag.innerHTML = formatValue(client2TotalValue);
+
+    if (clientNameValue4) clientNameValue4.innerHTML = "ARB";
+    if (client4ValueTag) client4ValueTag.innerHTML = formatValue(client4TotalValue);
+
+    if (clientNameValue5) clientNameValue5.innerHTML = "AMEX";
+    if (client5ValueTag) client5ValueTag.innerHTML = formatValue(client5TotalValue);
 
     // Update unpaid invoice values
     if (unpaidTotalValueTag) unpaidTotalValueTag.innerHTML = formatValue(unpaidTotalValue);
     if (clientNameValue1) clientNameValue1.innerHTML = "ANB";
     if (unpaidClient1ValueTag) unpaidClient1ValueTag.innerHTML = formatValue(unpaidClient1Value);
+
     if (clientNameValue2) clientNameValue2.innerHTML = "RB";
     if (unpaidClient2ValueTag) unpaidClient2ValueTag.innerHTML = formatValue(unpaidClient2Value);
+    
+    if (clientNameValue4) clientNameValue4.innerHTML = "ARB";
+    if (unpaidClient4ValueTag) unpaidClient4ValueTag.innerHTML = formatValue(unpaidClient4Value);
+    
+    if (clientNameValue5) clientNameValue5.innerHTML = "AMEX";
+    if (unpaidClient5ValueTag) unpaidClient5ValueTag.innerHTML = formatValue(unpaidClient5Value);
+
   });
   }

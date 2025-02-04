@@ -58,6 +58,7 @@ export interface IProfileDetailsInvoice {
   contract_id:string;
   invoice_paid_date:string;
   invoice_paid_status:boolean,
+  associatedAccountManager:number,
 }
 
 export interface IProfileDetailsContract {
@@ -288,6 +289,7 @@ export const profileDetailsInitValuesInvoice: IProfileDetailsInvoice = {
   invoice_value: "",
   invoice_url: "",
   invoice_date: "",
+  associatedAccountManager:0,
   // communications: {
   //   email: true,
   //   phone: true
