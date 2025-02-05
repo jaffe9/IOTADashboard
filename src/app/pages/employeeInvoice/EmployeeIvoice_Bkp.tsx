@@ -6,7 +6,7 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createEmployeeInvoice } from "../../../apiFactory/apiHelper";
+import { apiHelper, createEmployeeInvoice, uploadInvoiceToSupabase } from "../../../apiFactory/apiHelper";
 import {
   User,
   InvoiceRequest
@@ -14,9 +14,15 @@ import {
 
 
 
-var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
-  return data.data;
-});
+// var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
+//   return data.data;
+// });
+
+var allUserInfo:any =  await Promise.all(
+  [apiHelper.getAllEmployees(), apiHelper.getAccountManager()]
+).then(([employee , manager]) => {
+  return {employee : employee.data , manager:manager.data }
+})
 let updatedUserInfo: IProfileDetailsInvoice = initialValues;
 const profileDetailsSchema = Yup.object().shape({
   sEmployee: Yup.string().required("Please select an employee from list"),
@@ -33,12 +39,36 @@ const profileDetailsSchema = Yup.object().shape({
 
 const EmployeeInvoice: FC = () => {
   const [data, setData] = useState<IProfileDetailsInvoice>(updatedUserInfo);
+  const [file,setFile] = useState(null)
   const updateData = (fieldsToUpdate: Partial<IProfileDetailsInvoice>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
+
+  const handleFileChange = (event:any ) =>{
+    setFile(event.target.files[0])
+  }
+  const handleInvoiceUpload = async() =>{
+    if(!file){
+      alert("Please Select Invoice")
+      return ;
+    }
+    try{
+     await uploadInvoiceToSupabase(file)
+     alert('Invoice Uploaded')
+    }catch(error){
+     console.error("Error Uploading Invoice:",error)
+    }
+  }
+   
+  const handleAccountManagerChange = async (accountManagerid : number) => {
+    updateData({
+      associatedAccountManager: accountManagerid,
+    })
+  }
+
   const handleUserChange = async (contract_id: string) => {
-    var hasMatch = allUserInfo.find(function (value: User) {
+    var hasMatch = allUserInfo.employee.find(function (value: User) {
       return value.contract_id == contract_id;
     });
     const today = new Date();
@@ -86,11 +116,15 @@ const EmployeeInvoice: FC = () => {
           invoice_paid_amount: data.invoice_paid_amount,
           status: 0,
           associated_user_id:data.associated_user_id,
+          associatedAccountManager:data.associatedAccountManager,
         };
+
+        console.log("Invoice data :", invoiceRequest)
         var apiResponse = await createEmployeeInvoice(invoiceRequest)
+
         if (apiResponse.status === 201)
           {
-            alert("Success");
+            alert("Invoice Submitted Successfully");
             setLoading(false);
           }
           else
@@ -140,9 +174,9 @@ const EmployeeInvoice: FC = () => {
                     value={initialValues.contract_id}
                   > 
                     <option value="">Select ID</option>
-                    {allUserInfo.map((data: any, i: number) => (
+                    {allUserInfo.employee.map((data: any, i: number) => (
                       <option key={i} value={data.contract_id}>
-                        {data.firstName} {data.contract_id}
+                        {data.firstName} 
                       </option>
                     ))}
                   </select>
@@ -155,7 +189,14 @@ const EmployeeInvoice: FC = () => {
               </div>
             </div>
             <div id="kt_account_profile_details" className="collapse show">
-              <form onSubmit={formik.handleSubmit}  noValidate className="form">
+            <form
+                onSubmit={(e) => {
+                  e.preventDefault(); // Prevent default form submission
+                  formik.handleSubmit();
+                }}
+                noValidate
+                className="form"
+              >
                 <div className="card-body border-top p-9">
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label  fw-bold fs-6"> 
@@ -164,6 +205,7 @@ const EmployeeInvoice: FC = () => {
                     <div className="col-lg-8 fv-row">
                       <input
                         type="text"
+                        readOnly
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Client Id"
                         {...formik.getFieldProps("client_id")}
@@ -188,6 +230,7 @@ const EmployeeInvoice: FC = () => {
                     <div className="col-lg-8 fv-row">
                       <input
                         type="text"
+                        readOnly
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Associated User Id"
                         {...formik.getFieldProps("associated_user_id")}
@@ -211,6 +254,7 @@ const EmployeeInvoice: FC = () => {
                     </label>
                     <div className="col-lg-8 fv-row">
                       <input
+                        readOnly
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Internal Invoice Number"
@@ -294,14 +338,71 @@ const EmployeeInvoice: FC = () => {
                       >
                       </input>
                     </div>
-                  </div>                  
+                  </div>   
+
+                   <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      File Upload
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <div className="input-group"> 
+                      <input
+                      type="file"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Upload TimeSheet"
+                      onChange={handleFileChange}
+                      />
+                      <span className="input-group-badge badge badge-success cursor-pointer"
+                      onClick={handleInvoiceUpload}>
+                        Click To Upload
+                        </span>
+                        </div>
+                     
+                    </div>
+                    </div>
+
+
+
+                    <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label fw-bold fs-6 required">
+                      <span className="">Contract By</span>
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <select
+                    id="associatedAccountManager"
+                    className="form-select form-select-solid form-select-lg fw-bold"
+                    {...formik.getFieldProps("associatedAccountManager")}
+                    
+                    onChange={async (e) => {
+                      await handleAccountManagerChange(parseInt(e.target.value));
+                      formik.setFieldValue("associatedAccountManager", updatedUserInfo.associatedAccountManager);
+                    }}
+                    
+                  > 
+                    <option value="">Select Account Manager</option>
+                    {allUserInfo.manager.map((data: any, i: number) => (
+                      <option key={i} value={data.id} hidden={data.isDisabled == true}>
+                        {data.accountManagerName} 
+                      </option>
+                    ))}
+                  </select>
+                      {formik.touched.associatedAccountManager && formik.errors.associatedAccountManager && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            {formik.errors.associatedAccountManager}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>    
+
                 </div>
                 <div className="card-footer d-flex justify-content-end py-6 px-9">
                   <button
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={this}
+                    onClick={handleInvoiceUpload}
                   >
                     {!loading && "Save Changes"}
                     {loading && (

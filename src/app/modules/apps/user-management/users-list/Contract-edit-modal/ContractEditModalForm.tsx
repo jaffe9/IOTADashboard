@@ -94,7 +94,7 @@ let [userForEdit] = useState<User & Contract> ({
         setTimeout(async () => {
           const updatedData = Object.assign(data, updatedUserInfo);
           setData(updatedData);
-          if( !data.associated_user_id.username )
+          if( !data.id)
           {
             alert("Please Select Employee From Select Field")
             setLoading(false)

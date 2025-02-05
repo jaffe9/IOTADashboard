@@ -129,11 +129,11 @@ const UpdateContractExp = async(c:Contract) : Promise<any> => {
    }
   }catch(error){
     if (axios.isAxiosError(error)){
-      console.error("error in update Iqama Exp:", error.response?.data || error.message)
+      console.error("error in update Contract Exp:", error.response?.data || error.message)
     }else{
-      console.log("Unexpected Error in update Iqama Expiry :" , error)
+      console.log("Unexpected Error in update Contract Expiry :" , error)
     }
-  return { status : 500 , message : "Error updating Iqama Expiry "}
+  return { status : 500 , message : "Error updating Contract Expiry "}
   }
   }
  const getEmpForContractInForm = async () : Promise<UsersQueryResponse> => {

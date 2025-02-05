@@ -61,6 +61,7 @@ billing_months?:number
 billing_value?:string
 client_id?:{ client_name : string }
 associatedAccountManager?: number
+accountManagerName ?: string 
 associated_user_id?: { username : string , email : string }
 }
 
