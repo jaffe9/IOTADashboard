@@ -44,6 +44,7 @@ export interface IProfileDetails {
     phone: boolean;
   }
   loadDefault: boolean;
+  associatedAccountManager : number;
 }
 
 export interface IProfileDetailsInvoice {
@@ -240,7 +241,8 @@ export const profileDetailsInitValues: IProfileDetails = {
   timeZone: "",
   associated_account_manager: 0,
   address: "",
-  email: ""
+  email: "",
+  associatedAccountManager:0,
 };
 
 export const profileDetailsInitValuesContract: IProfileDetailsContract = {

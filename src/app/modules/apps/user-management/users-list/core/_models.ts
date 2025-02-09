@@ -138,7 +138,7 @@ export type TimesheetRequest = {
   "holidayDates": string,
   "leaveDays": string,
   "leaveDates": string,
-  "createdBy": string,
+  "createdBy": number,
   "status": number
 }
 

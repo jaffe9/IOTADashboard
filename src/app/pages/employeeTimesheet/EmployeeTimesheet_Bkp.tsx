@@ -6,17 +6,20 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createEmployeeTimesheet } from "../../../apiFactory/apiHelper";
+import { apiHelper, createEmployeeTimesheet, uploadFileToSupabase } from "../../../apiFactory/apiHelper";
 import {
   User,
-  TimesheetRequest
+  TimesheetRequest, 
 } from "../../modules/apps/user-management/users-list/core/_models";
+import axios from "axios";
 
 
 
-var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
-  return data.data;
-});
+var allUserInfo:any =  await Promise.all(
+  [apiHelper.getAllEmployees(), apiHelper.getAccountManager()]
+).then(([employee , manager]) => {
+  return {employee : employee.data , manager:manager.data }
+})
 let updatedUserInfo: IProfileDetails = initialValues;
 const profileDetailsSchema = Yup.object().shape({
   sEmployee: Yup.string().required("Please select an employee from list"),
@@ -34,14 +37,42 @@ const profileDetailsSchema = Yup.object().shape({
 
 const EmployeeTimesheet: FC = () => {
   const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
-
+  const [ file , setFile ] = useState(null);
+  const [ uploadstatus , setUploadstatus ] = useState("") ;
   const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
 
+  const handleFileChange = (event : any) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleFileUpload = async () =>{
+    if(!file){
+      alert('Please Upload TimeSheet');
+      return ;
+    }
+    try{
+     setUploadstatus('...uploading');
+      await uploadFileToSupabase(file);
+     alert('Timesheet File Uploaded',)
+     
+    }catch(error){
+     alert('File Upload Failed ')
+     console.error(error)
+    }
+
+  }
+
+  const handleAccountManagerChange = async (accountManagerid : number) => {
+    updateData({
+      associatedAccountManager: accountManagerid,
+    })
+  }
+
   const handleUserChange = async (userName: string) => {
-    var hasMatch = allUserInfo.find(function (value: User) {
+    var hasMatch = allUserInfo.employee.find(function (value: User) {
       return value.firstName == userName;
     });
     updateData({
@@ -78,7 +109,7 @@ const EmployeeTimesheet: FC = () => {
           holidayDates: data.holidaysStr,
           leaveDays: data.leaves,
           leaveDates: data.leavesStr,
-          createdBy: "Jaffar",
+          createdBy: data.associatedAccountManager,
           status: 0,
           timesheetFileLocation:"",
           sentToFinance: "",
@@ -90,7 +121,7 @@ const EmployeeTimesheet: FC = () => {
         const apiResponse = await createEmployeeTimesheet(timeSheetRequest)
         if (apiResponse.status === 201)
           {
-            alert("Success");
+            alert("TimeSheet Submitted Successfully");
             setLoading(false);
           }
           else
@@ -132,12 +163,12 @@ const EmployeeTimesheet: FC = () => {
                     
                     onChange={async (e) => {
                       await handleUserChange(e.target.value);
-                      formik.setFieldValue("company", updatedUserInfo.client);
+                      formik.setFieldValue("client", updatedUserInfo.client);
                     }}
                     value={initialValues.fName}
                   > 
                     <option value="">Select Employee</option>
-                    {allUserInfo.map((data: any, i: number) => (
+                    {allUserInfo.employee.map((data: any, i: number) => (
                       <option key={i} value={data.firstName}>
                         {data.firstName}
                       </option>
@@ -155,18 +186,19 @@ const EmployeeTimesheet: FC = () => {
               <form onSubmit={formik.handleSubmit}  noValidate className="form">
                 <div className="card-body border-top p-9">
                   <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
+                    <label className="col-lg-4 col-form-label fw-bold fs-6">
                       Client
                     </label>
                     <div className="col-lg-8 fv-row">
                       <input
+                        readOnly
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Company name"
-                        {...formik.getFieldProps("company")}
+                        {...formik.getFieldProps("client")}
                         onChange={(value) => {
                           updateData({ client: value.target.value });
-                          formik.setFieldValue("Company",value.target.value)
+                          formik.setFieldValue("client",value.target.value)
                         }}
                       />
                       {formik.touched.client && formik.errors.client && (
@@ -183,26 +215,7 @@ const EmployeeTimesheet: FC = () => {
                       Working Days
                     </label>
                     <div className="col-lg-8 fv-row">
-                      {/* <Flatpickr
-                        className="form-control form-control-lg form-control-solid"
-                        options={
-                          {
-                            mode: "multiple",
-                            dateFormat: "d-m-Y"
-                          }
-                      }
-                        onChange={(dateStr) => {
-                          updateData({ dates: dateStr.length.toString() });
-                          updateData({ datesStr: dateStr.toString()});
-                        }}
-                      ></Flatpickr>
-                      {formik.touched.dates && formik.errors.dates && (
-                        <div className="fv-plugins-message-container">
-                          <div className="fv-help-block">
-                            {formik.errors.dates}
-                          </div>
-                        </div>
-                      )} */}
+                    
                       <input
                       type="text"
                       className="form-control form-control-lg form-control-solid"
@@ -226,17 +239,17 @@ const EmployeeTimesheet: FC = () => {
                         className="form-control form-control-lg form-control-solid"
                         options={{
                           mode: "single",
-                          defaultDate: new Date(),
-                          dateFormat: "M-y",
+                         // defaultDate: new Date(),
+                          dateFormat: "m-Y",
                         }}
                         onChange={(dateStr) => {
                           updateData({
                             monthyear: new Date(dateStr.toString())
                               .toLocaleDateString("en-IN", {
-                                year: "numeric",
                                 month: "short",
+                                year: "numeric",
                               })
-                              .replace(/ /g, "-"),
+                              .replace(/\//g, "-"),
                           });
                         
                         }}
@@ -304,13 +317,68 @@ const EmployeeTimesheet: FC = () => {
                     </div>
                   </div>
                   
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      File Upload
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <div className="input-group"> 
+                      <input
+                      type="file"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Upload TimeSheet"
+                      onChange={handleFileChange}
+                      />
+                      <span className="input-group-badge badge badge-success cursor-pointer"
+                      onClick={handleFileUpload}>
+                        Click To Upload
+                        </span>
+                        </div>
+                     
+                    </div>
+                  </div>
+
+                  
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label fw-bold fs-6 required">
+                      <span className="">Created By</span>
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <select
+                    id="associatedAccountManager"
+                    className="form-select form-select-solid form-select-lg fw-bold"
+                    {...formik.getFieldProps("associatedAccountManager")}
+                    
+                    onChange={async (e) => {
+                      await handleAccountManagerChange(parseInt(e.target.value));
+                      formik.setFieldValue("associatedAccountManager", updatedUserInfo.associatedAccountManager);
+                    }}
+                    
+                  > 
+                    <option value="">Select Account Manager</option>
+                    {allUserInfo.manager.map((data: any, i: number) => (
+                      <option key={i} value={data.id} hidden={data.isDisabled == true}>
+                        {data.accountManagerName} 
+                      </option>
+                    ))}
+                  </select>
+                      {formik.touched.associatedAccountManager && formik.errors.associatedAccountManager && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            {formik.errors.associatedAccountManager}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>    
+
                 </div>
                 <div className="card-footer d-flex justify-content-end py-6 px-9">
                   <button
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={this}
+                    onClick={handleFileUpload}
                     
                   >
                     {!loading && "Save Changes"}
@@ -335,3 +403,5 @@ const EmployeeTimesheet: FC = () => {
 };
 
 export { EmployeeTimesheet };
+
+

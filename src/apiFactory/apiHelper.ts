@@ -241,7 +241,7 @@ export const getAllClaimEmployees = async (): Promise<UsersQueryResponse> => {
 
 export const getEmpForSalaryIncrement = async () : Promise<UsersQueryResponse> => {
   const d = await axios
-  .get(`${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)&order=id`);
+  .get(`${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id`);
   return d;
 }
 
@@ -375,6 +375,37 @@ try {
 }
 }
 // End of salary upda
+
+// Update the Leave Record
+export const updateLeaveRecord = async (id : any ,  updatedLeaves: { leaves_used: number; leave_left_current_year: number }) => {
+  let data = JSON.stringify([updatedLeaves]);
+
+let config = {
+  method: 'patch',
+  maxBodyLength: Infinity,
+  url: `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/leaveEntitlment?id=eq.${id}`,
+  headers: { 
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+    'Content-Type': 'application/json'
+  },
+  data : data
+};
+
+axios.request(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  if(axios.isAxiosError(error)){
+    console.error(`Error in updating Leave Record For Id: ${id}` , error.response?.data || error.message) 
+  }else{
+    console.error("Some Other Error in Updating Leave Record : ", error)
+  }
+});
+
+}
+// End of update Leave Record 
 
 //update paid Status
 export const updateInvoiceStatus =  async (id : any , invoice_paid_amount : any ) => {

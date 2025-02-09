@@ -144,7 +144,7 @@ const UpdateSalary: FC = () => {
                     > 
                       <option value="">Select Employee </option>
                       {allUserInfo.map((data: any, i: number) => (
-                        <option key={i} value={data.id}>
+                        <option key={i} value={data.id} hidden={data.isDisabled == true}>
                           {data.user_id.username} 
                         </option>
                       ))}

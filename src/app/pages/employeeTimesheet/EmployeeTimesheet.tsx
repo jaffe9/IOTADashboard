@@ -15,9 +15,11 @@ import axios from "axios";
 
 
 
-var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
-  return data.data;
-});
+var allUserInfo:any =  await Promise.all(
+  [apiHelper.getAllEmployees(), apiHelper.getAccountManager()]
+).then(([employee , manager]) => {
+  return {employee : employee.data , manager:manager.data }
+})
 let updatedUserInfo: IProfileDetails = initialValues;
 const profileDetailsSchema = Yup.object().shape({
   sEmployee: Yup.string().required("Please select an employee from list"),
@@ -55,6 +57,7 @@ const EmployeeTimesheet: FC = () => {
      setUploadstatus('...uploading');
       await uploadFileToSupabase(file);
      alert('Timesheet File Uploaded',)
+     
     }catch(error){
      alert('File Upload Failed ')
      console.error(error)
@@ -62,9 +65,14 @@ const EmployeeTimesheet: FC = () => {
 
   }
 
+  const handleAccountManagerChange = async (accountManagerid : number) => {
+    updateData({
+      associatedAccountManager: accountManagerid,
+    })
+  }
 
   const handleUserChange = async (userName: string) => {
-    var hasMatch = allUserInfo.find(function (value: User) {
+    var hasMatch = allUserInfo.employee.find(function (value: User) {
       return value.firstName == userName;
     });
     updateData({
@@ -101,7 +109,7 @@ const EmployeeTimesheet: FC = () => {
           holidayDates: data.holidaysStr,
           leaveDays: data.leaves,
           leaveDates: data.leavesStr,
-          createdBy: "Jaffar",
+          createdBy: data.associatedAccountManager,
           status: 0,
           timesheetFileLocation:"",
           sentToFinance: "",
@@ -160,7 +168,7 @@ const EmployeeTimesheet: FC = () => {
                     value={initialValues.fName}
                   > 
                     <option value="">Select Employee</option>
-                    {allUserInfo.map((data: any, i: number) => (
+                    {allUserInfo.employee.map((data: any, i: number) => (
                       <option key={i} value={data.firstName}>
                         {data.firstName}
                       </option>
@@ -330,13 +338,47 @@ const EmployeeTimesheet: FC = () => {
                     </div>
                   </div>
 
+                  
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label fw-bold fs-6 required">
+                      <span className="">Created By</span>
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    <select
+                    id="associatedAccountManager"
+                    className="form-select form-select-solid form-select-lg fw-bold"
+                    {...formik.getFieldProps("associatedAccountManager")}
+                    
+                    onChange={async (e) => {
+                      await handleAccountManagerChange(parseInt(e.target.value));
+                      formik.setFieldValue("associatedAccountManager", updatedUserInfo.associatedAccountManager);
+                    }}
+                    
+                  > 
+                    <option value="">Select Account Manager</option>
+                    {allUserInfo.manager.map((data: any, i: number) => (
+                      <option key={i} value={data.id} hidden={data.isDisabled == true}>
+                        {data.accountManagerName} 
+                      </option>
+                    ))}
+                  </select>
+                      {formik.touched.associatedAccountManager && formik.errors.associatedAccountManager && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            {formik.errors.associatedAccountManager}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>    
+
                 </div>
                 <div className="card-footer d-flex justify-content-end py-6 px-9">
                   <button
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={this}
+                    onClick={handleFileUpload}
                     
                   >
                     {!loading && "Save Changes"}
