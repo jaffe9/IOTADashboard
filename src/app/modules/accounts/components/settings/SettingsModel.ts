@@ -136,6 +136,29 @@ export type IProfileDetailsSalary = {
   }
 }
 
+export type IProfileDetailsTypeSalary = {
+  pay_date?: string;
+  id?: number
+  pay_period: string
+  basic_allowance: string
+  hr_allowance: string
+  end_of_service_allowance: string
+  travel_other_allowance: string
+  earnings_total: string
+  lop_days: string
+  employee_request: string
+  salary_advance: string
+  lop_salary_total: string
+  total_net_salary: string
+  total_net_salary_words: string
+  salary_pay_mode: string
+  working_days: string
+  holidays: string
+  deductions_total: string
+  user_id: string
+  username : string
+}
+
 
 export interface IUpdateEmail {
   newEmail: string;
@@ -324,6 +347,28 @@ export const  profileDetailsSalaryInitialValues: IProfileDetailsSalary = {
     username : "",
     email : ""
   },
+}
+export const  profileDetailsTypeSalaryInitialValues: IProfileDetailsTypeSalary = {
+  id: 0,
+  pay_period: "",
+  pay_date:"",
+  basic_allowance:"", 
+  hr_allowance: "",
+  end_of_service_allowance: "",
+  travel_other_allowance:"",
+  earnings_total: "",
+  lop_days: "",
+  employee_request: "",
+  salary_advance: "",
+  lop_salary_total:"",
+  total_net_salary: "",
+  total_net_salary_words: "",
+  salary_pay_mode: "",
+  working_days: "",
+  holidays: "",
+  deductions_total: "",
+  user_id:"",
+  username: "",
 }
 
 export const profileDetailsInitValuesNationalId : IProfileDetailsNationalId = {

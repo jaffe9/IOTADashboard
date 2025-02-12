@@ -106,6 +106,29 @@ export type Salary = {
     email?: string
   }
 }
+export type AddTypeSalary = {
+  id?: number
+  pay_period?: string
+  pay_date?:string
+  basic_allowance?: string
+  hr_allowance?: string
+  end_of_service_allowance?: string
+  travel_other_allowance?: string
+  earnings_total?: string
+  lop_days?: string
+  employee_request?: string
+  salary_advance?: string
+  lop_salary_total?: string
+  total_net_salary?: string
+  total_net_salary_words?: string
+  salary_pay_mode?: string
+  working_days?: string
+  holidays?: string
+  deductions_total?: string
+  payslilpOptionSelected?: payslipOptions
+  user_id?: string
+  username : string
+}
 
 export type National_id = {
   id?:number

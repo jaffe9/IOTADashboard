@@ -6,8 +6,8 @@ const updateSalaryWrapper: FC = () => {
   return (
     <>
     <script src='chart.js'></script>
-      <PageTitle breadcrumbs={[]}>Create Page</PageTitle>
-      <UpdateSalary />
+      <PageTitle breadcrumbs={[]}>Salary Page</PageTitle>
+      <UpdateSalary /> 
     </>
   )
 }

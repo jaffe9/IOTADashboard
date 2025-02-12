@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 import { resourceLimits } from "worker_threads";
-import { ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { AddTypeSalary, ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 
@@ -244,7 +244,11 @@ export const getEmpForSalaryIncrement = async () : Promise<UsersQueryResponse> =
   .get(`${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id`);
   return d;
 }
-
+export const getEmpForSalary = async () : Promise<UsersQueryResponse> => {
+  const d = await axios
+  .get(`${GET_USERS_URL}?select*&onSalary=eq.false&order=id`);
+  return d;
+}
 
 export const getExpenses = async (): Promise<UsersQueryResponse> => {
   const d = await axios
@@ -318,6 +322,106 @@ export const getTempUserDetails = async () : Promise<any> => {
     .get(`${GET_TEMP_USERS_URL}?select=*&order=id&userId=eq.false`);
   return d;
 };
+
+
+// Salary Add  Starts here 
+
+export const AddSalary = async ( s:AddTypeSalary ) : Promise<any> => {
+  let data = JSON.stringify([
+    {   
+        user_id : s.user_id,
+        pay_date: s.pay_date,
+        pay_period : s.pay_period,
+        basic_allowance : s.basic_allowance,
+        hr_allowance : s.hr_allowance, 
+        end_of_service_allowance : s.end_of_service_allowance,
+        travel_other_allowance : s.travel_other_allowance,
+        earnings_total : s.earnings_total,
+        lop_days : s.lop_days,
+        employee_request:s.employee_request,
+        salary_advance : s.salary_advance,
+        lop_salary_total : s.lop_salary_total,
+        total_net_salary : s.total_net_salary,
+        total_net_salary_words : s.total_net_salary_words, 
+        salary_pay_mode : s.salary_pay_mode, 
+        working_days : s. working_days, 
+        holidays : s.holidays,
+        deductions_total : s.deductions_total, 
+    }
+  ]);
+  
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/salary',
+    headers: { 
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+      'Content-Type': 'application/json', 
+      'Authorization': 'Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
+    },
+    data : data
+  };
+  
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 204) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("error in SalaryUpdate:",error.response?.data  || error.message)
+    }else{
+      console.error("Unexpected error:",error);
+    }
+  
+    return { status: 500, message: "Successfully Added  Salary Data" };
+  }
+  }
+  // End of salary
+  
+                  //  Change onSalary  Status from False to True 
+                  export const updateOnSalary = async ( s:AddTypeSalary ) : Promise<any> => {
+                    let data = JSON.stringify([
+                      {   
+                          onSalary : true 
+                      }
+                    ]);
+                    
+                    let config = {
+                      method: 'patch',
+                      maxBodyLength: Infinity,
+                      url: `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/user?id=eq.${s.id}`,
+                      headers: { 
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+                        'Content-Type': 'application/json', 
+                        'Authorization': 'Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
+                      },
+                      data : data
+                    };
+                    
+                    try {
+                      const response = await axios.request(config);
+                      
+                      if (response.status === 204) {
+                        return { status: response.status, message: "Success" }; // Return an object
+                      } else {
+                       return { status: response.status, message: "Failed" }; // Return an object
+                      }
+                    } catch (error) {
+                      if (axios.isAxiosError(error)){
+                        console.error("error in Updating onSalary to true:",error.response?.data  || error.message)
+                      }else{
+                        console.error("Unexpected error:",error);
+                      }
+                    
+                      return { status: 500, message: "Successfully Updated onSalary status to true " };
+                    }
+                    }
+                    // End of salary 
+                  //End of Change onSalary status fronm false to true 
 
 // Salary update Starts here 
 

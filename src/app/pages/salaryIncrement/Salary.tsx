@@ -1,43 +1,43 @@
 import { useState, FC } from "react";
 import {
   IProfileDetailsSalary,
-  profileDetailsSalaryInitialValues as initialValues,
+  IProfileDetailsTypeSalary,
+  profileDetailsTypeSalaryInitialValues as initialValues,
 } from "../../modules/accounts/components/settings/SettingsModel";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, updateSalaryIncrement } from "../../../apiFactory/apiHelper";
+import { AddSalary, apiHelper, updateOnSalary } from "../../../apiFactory/apiHelper";
 import {
-  Salary,
+  AddTypeSalary,
 } from "../../modules/apps/user-management/users-list/core/_models";
 import { Value } from "sass";
+import axios from "axios";
 
 
 
-
-
-
-var allUserInfo: any = await apiHelper.getEmpForSalaryIncrement().then(async (data) => {
+var allUserInfo: any = await apiHelper.getEmpForSalary().then(async (data) => {
   return data.data;
 });
 
-let updatedUserInfo: IProfileDetailsSalary = initialValues;
+let updatedUserInfo: IProfileDetailsTypeSalary = initialValues;
 
 
-const UpdateSalary: FC = () => {
-  const [data, setData] = useState<IProfileDetailsSalary>(updatedUserInfo);
-  const updateData = (fieldsToUpdate: Partial<IProfileDetailsSalary>): void => {
+const AddNewSalary: FC = () => {
+  const [data, setData] = useState<IProfileDetailsTypeSalary>(updatedUserInfo);
+  const updateData = (fieldsToUpdate: Partial<IProfileDetailsTypeSalary>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
 
 
   const handleUserChange = async (id: number) => {
-    var hasMatch = allUserInfo.find(function (value: Salary) {
-      return value.id == id;
+    var hasMatch = allUserInfo.find(function (value: AddTypeSalary) {
+      return value.id === id;
     });
     updateData({
-       id : id,
+      id :id ,
+       user_id:hasMatch.id,
        pay_period: hasMatch.pay_period,
        pay_date : hasMatch.pay_date,
        basic_allowance : hasMatch.basic_allowance,
@@ -59,11 +59,14 @@ const UpdateSalary: FC = () => {
   };
 
   const [loading, setLoading] = useState(false);
-  const formik = useFormik<IProfileDetailsSalary>({
+  const formik = useFormik<IProfileDetailsTypeSalary>({
     initialValues,
     onSubmit:async () => {
       setLoading(true);
       setTimeout(async () => {
+        const payload = {
+          ...updatedUserInfo,
+        };
         const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
         if( data.working_days.length < 1  )
@@ -72,8 +75,9 @@ const UpdateSalary: FC = () => {
           setLoading(false)
           return
         }
-        const salary : Salary = {
-          id: data.id,
+        const salary : AddTypeSalary = {
+          id : data.id,
+          user_id: data.user_id,
           pay_period: data.pay_period,
           pay_date: data.pay_date,
           basic_allowance: data.basic_allowance,
@@ -87,18 +91,26 @@ const UpdateSalary: FC = () => {
           lop_salary_total: data.lop_salary_total,
           total_net_salary: data.total_net_salary,
           total_net_salary_words: data.total_net_salary_words,
-          salary_pay_mode: data.salary_pay_mode,
+          salary_pay_mode: "Bank",
           working_days: data.working_days,
           holidays: data.holidays,
           deductions_total: data.deductions_total,
-
+          username: ""
         };
-        console.log("updated salary  response:" , salary)
-        const apiResponse = await updateSalaryIncrement(salary)
+        const apiResponse = await AddSalary(salary)
       
-        if (apiResponse.status === 204)
+        if (apiResponse.status === 200)
           {
-            alert("Salary Updated Successfully");
+            alert("Salary added Successfully ");
+             try{
+                  await updateOnSalary(salary)
+             }catch(er){
+                  if (axios.isAxiosError(er)){
+                    console.error("Error in updating onSalary Status to true", er.response?.data || er.message)
+                  }else{
+                    console.error("Internal Server Error : ", er)
+                  }
+             }
             setLoading(false);
           }
           else
@@ -124,7 +136,7 @@ const UpdateSalary: FC = () => {
               aria-controls="kt_account_profile_details"
             >
               <div className="card-title m-0">
-                <h3 className="fw-bolder m-0">Update Salary</h3>
+                <h3 className="fw-bolder m-0">Open Salary Account </h3>
               </div>
             </div>
             <div className="card-body border-top p-9">
@@ -140,14 +152,14 @@ const UpdateSalary: FC = () => {
                       
                       onChange={async (value) => {
                         await handleUserChange(parseInt(value.target.value));
-                        formik.setFieldValue("user_id.username",updatedUserInfo.user_id.username)
+                        formik.setFieldValue("user_id",updatedUserInfo.user_id)
                       }}
                     //  value={initialValues.user_id}
                     > 
                       <option value="">Select Employee </option>
                       {allUserInfo.map((data: any, i: number) => (
-                        <option key={i} value={data.id} hidden={data.isDisabled == true}>
-                          {data.user_id.username} 
+                        <option key={i} value={data.id} >
+                          {data.username} 
                         </option>
                       ))}
                     </select>
@@ -230,7 +242,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Loss Of Pay Days"
-                       {...formik.getFieldProps("lop_days")}
+                     //  {...formik.getFieldProps("lop_days")}
                         onChange={(value) => {
                           updateData({ lop_days: value.target.value });
                           formik.setFieldValue("lop_days",updatedUserInfo.lop_days)
@@ -256,7 +268,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Basic Allowance"
-                        {...formik.getFieldProps("basic_allowance")}
+                       // {...formik.getFieldProps("basic_allowance")}
                         onChange={(value) => {
                           updateData({ basic_allowance: value.target.value });
                           formik.setFieldValue("basic_allowance",updatedUserInfo.basic_allowance)
@@ -283,7 +295,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter House Rent Allowance"
-                        {...formik.getFieldProps("hr_allowance")}
+                     //   {...formik.getFieldProps("hr_allowance")}
                         onChange={(value) => {
                           updateData({ hr_allowance: value.target.value });
                           formik.setFieldValue("hr_allowance",updatedUserInfo.hr_allowance)
@@ -310,7 +322,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Travel And Other Allowance"
-                        {...formik.getFieldProps("travel_other_allowance")}
+                     //   {...formik.getFieldProps("travel_other_allowance")}
                         onChange={(value) => {
                           updateData({ travel_other_allowance: value.target.value });
                           formik.setFieldValue("travel_other_allowance",updatedUserInfo.travel_other_allowance)
@@ -336,7 +348,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter End Of Service Allowance"
-                       {...formik.getFieldProps("end_of_service_allowance")}
+                     //  {...formik.getFieldProps("end_of_service_allowance")}
                         onChange={(value) => {
                           updateData({ end_of_service_allowance: value.target.value });
                           formik.setFieldValue("end_of_service_allowance",updatedUserInfo.end_of_service_allowance)
@@ -362,7 +374,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Salary Advance"
-                       {...formik.getFieldProps("salary_advance")}
+                      // {...formik.getFieldProps("salary_advance")}
                         onChange={(value) => {
                           updateData({ salary_advance: value.target.value });
                           formik.setFieldValue("salary_advance",updatedUserInfo.salary_advance)
@@ -388,7 +400,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Employee Request Amount"
-                       {...formik.getFieldProps("employee_request")}
+                      // {...formik.getFieldProps("employee_request")}
                         onChange={(value) => {
                           updateData({ employee_request: value.target.value });
                           formik.setFieldValue("employee_request",updatedUserInfo.employee_request)
@@ -414,7 +426,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Holidays"
-                       {...formik.getFieldProps("holidays")}
+                  //     {...formik.getFieldProps("holidays")}
                         onChange={(value) => {
                           updateData({ holidays: value.target.value });
                           formik.setFieldValue("holidays",updatedUserInfo.holidays)
@@ -440,7 +452,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Working Days"
-                       {...formik.getFieldProps("working_days")}
+                      // {...formik.getFieldProps("working_days")}
                         onChange={(value) => {
                           updateData({ working_days: value.target.value });
                           formik.setFieldValue("working_days",updatedUserInfo.working_days);
@@ -466,7 +478,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Total Loss Of Pay"
-                       {...formik.getFieldProps("lop_salary_total")}
+                    //   {...formik.getFieldProps("lop_salary_total")}
                         onChange={(value) => {
                           updateData({ lop_salary_total: value.target.value });
                           formik.setFieldValue("lop_salary_total",updatedUserInfo.lop_salary_total)
@@ -492,7 +504,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Earnings Total"
-                        {...formik.getFieldProps("earnings_total")}
+                   //     {...formik.getFieldProps("earnings_total")}
                         onChange={(value) => {
                           updateData({ earnings_total: value.target.value });
                           formik.setFieldValue("earnings_total",updatedUserInfo.earnings_total)
@@ -520,7 +532,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Deductions Total"
-                       {...formik.getFieldProps("deductions_total")}
+                    //   {...formik.getFieldProps("deductions_total")}
                         onChange={(value) => {
                           updateData({ deductions_total: value.target.value });
                           formik.setFieldValue("deductions_total",updatedUserInfo.deductions_total)
@@ -546,7 +558,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Total Net Salary"
-                       {...formik.getFieldProps("total_net_salary")}
+                    //   {...formik.getFieldProps("total_net_salary")}
                         onChange={(value) => {
                           updateData({ total_net_salary: value.target.value });
                           formik.setFieldValue("total_net_salary",updatedUserInfo.total_net_salary)
@@ -572,7 +584,7 @@ const UpdateSalary: FC = () => {
                         type="text"
                         className="form-control form-control-lg form-control-solid"
                         placeholder="Enter Net Salary In Words"
-                       {...formik.getFieldProps("total_net_salary_words")}
+                 //      {...formik.getFieldProps("total_net_salary_words")}
                         onChange={(value) => {
                           updateData({ total_net_salary_words: value.target.value });
                           formik.setFieldValue("total_net_salary_words",updatedUserInfo.total_net_salary_words)
@@ -595,7 +607,7 @@ const UpdateSalary: FC = () => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={this}
+                    
                     
                   >
                     {!loading && "Save Changes"}
@@ -619,4 +631,4 @@ const UpdateSalary: FC = () => {
   );
 };
 
-export { UpdateSalary };
+export { AddNewSalary };
