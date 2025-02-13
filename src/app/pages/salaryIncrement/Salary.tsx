@@ -97,20 +97,22 @@ const AddNewSalary: FC = () => {
           deductions_total: data.deductions_total,
           username: ""
         };
+        
         const apiResponse = await AddSalary(salary)
+            try{
+              await updateOnSalary(salary)
+            }catch(er){
+              if (axios.isAxiosError(er)){
+                console.error("Error in updating onSalary Status to true", er.response?.data || er.message)
+              }else{
+                console.error("Internal Server Error : ", er)
+              }
+        }
       
-        if (apiResponse.status === 200)
+        if (apiResponse.status === 201)
           {
             alert("Salary added Successfully ");
-             try{
-                  await updateOnSalary(salary)
-             }catch(er){
-                  if (axios.isAxiosError(er)){
-                    console.error("Error in updating onSalary Status to true", er.response?.data || er.message)
-                  }else{
-                    console.error("Internal Server Error : ", er)
-                  }
-             }
+            
             setLoading(false);
           }
           else
