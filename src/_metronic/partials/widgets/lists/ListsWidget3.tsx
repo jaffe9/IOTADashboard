@@ -7,6 +7,7 @@ import { numeric } from '@form-validation/bundle/popular'
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios'
 import { Value } from 'sass'
+import { left } from '@popperjs/core'
 type Props = {
   className: string
 }
@@ -17,7 +18,7 @@ type LeaveBalanceRecord = {
   leaves_used: number;
   leave_left_current_year:number;
   year:number;
-  user_id: { username: string , companyName:string , employeeJoiningDate:string , contract_id:{billing_months: number} };
+  user_id: { id : number , username: string , companyName:string , employeeJoiningDate:string , contract_id:{billing_months: number} };
 };
 
 const ListsWidget3: React.FC<Props> = ({ className }) => {
@@ -242,6 +243,34 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
   );
 };
 
+
+// To dynamically change logo of clients based on activeTab
+const updatePicUrl = (user_id : { username: string}) => {
+  switch (user_id.username){
+    case 'bala' :
+      return '/media/svg/ConsultantPhotos/Bala Pic.jpeg'
+    case 'baskar' :
+      return '/media/svg/ConsultantPhotos/Baskar Pic.jpg'
+    case 'hala' :
+      return '/media/svg/ConsultantPhotos/Hala Pic.jpeg'
+    case 'rakesh':
+      return '/media/svg/ConsultantPhotos/Rakesh pic.png'
+    case 'sadath' :
+      return '/media/svg/ConsultantPhotos/Sadath Pic.jpeg'
+    case 'samiullah' :
+      return '/media/svg/ConsultantPhotos/Samiullah Pic.jpeg'
+    case 'sandeep' :
+      return '/media/svg/ConsultantPhotos/Sandeep Pic.jpeg'
+    case 'thameem' :
+      return '/media/svg/ConsultantPhotos/Thameem Pic.jpeg'
+    case 'vignesh' :
+      return '/media/svg/ConsultantPhotos/Vignesh Pic.jpeg'
+    case 'waseem' :
+      return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
+  }
+}
+
+
 // Helper Function to Render Table
 const renderTable = (records: LeaveBalanceRecord[] , handleOpenModal: any  ) => {
   return (
@@ -256,21 +285,31 @@ const renderTable = (records: LeaveBalanceRecord[] , handleOpenModal: any  ) => 
             <th className="px-px min-w-50px">Leave Left</th>
             <th className="px-px min-w-50px">Joining Date</th>
             <th className="px-px min-w-50px">Billing Months</th>
-            <th className="px-px min-w-50px">Update</th>
+            <th className="px-px min-w-50px"
+            style={{
+              paddingRight: '10px' 
+            }}
+            >Update</th>
           </tr>
         </thead>
         <tbody className='border border-grey border-2 hover-success'>
           {records.map((record, index) => (
             <tr key={index}>
               <td>
-                <div className="symbol symbol-45px me-2">
+                <div className="h-screen flex items-center justify-center">
                   <span className="symbol-label">
                     <img
-                      src={toAbsoluteUrl(
-                        `media/svg/brand-logos/${['plurk', 'telegram', 'vimeo', 'bebo', 'kickstarter'][index % 5]}.svg`
-                      )}
-                      className="h-50 align-self-center"
-                      alt="logo"
+                      src={updatePicUrl({username: record.user_id.username})}
+                      className=""
+                      style={{
+                        height : '60px',
+                        width : '50px',
+                        marginLeft : '10px',
+                        border : '1px solid black',
+                        borderRadius : '10px',
+                        padding : '2px'
+                      }}
+                      alt="Image"
                     />
                   </span>
                 </div>

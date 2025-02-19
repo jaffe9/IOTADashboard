@@ -70,4 +70,7 @@ export interface UserModel {
   address?: UserAddressModel
   socialNetworks?: UserSocialNetworksModel
   login_id?: string
+  accountManager?:{
+    id?:number
+  }
 }

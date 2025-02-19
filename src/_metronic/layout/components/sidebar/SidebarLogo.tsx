@@ -52,8 +52,9 @@ const SidebarLogo = (props: PropsType) => {
       <Link to='/dashboard'>
         {config.layoutType === 'dark-sidebar' ? (
           <img
+            width={'50'}
             alt='Logo'
-            src={toAbsoluteUrl('src/_metronic/assets/fonticon/InnovwayzIcon.jpg')}
+            src={toAbsoluteUrl('src/_metronic/assets/fonticon/innovwayzLogo.png')}
             className='h-25px app-sidebar-logo-default'
           />
         ) : (
@@ -72,8 +73,10 @@ const SidebarLogo = (props: PropsType) => {
         )}
 
         <img
+           width={'40px'}
+           height={'40px'}
           alt='Logo'
-          src={toAbsoluteUrl('src/_metronic/assets/fonticon/InnovwayzIcon.jpg')}
+          src={toAbsoluteUrl('src/_metronic/assets/fonticon/innovwayzLogo.png')}
           className='h-20px app-sidebar-logo-minimize'
         />
       </Link>

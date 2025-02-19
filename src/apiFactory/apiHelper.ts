@@ -11,6 +11,7 @@ import { error } from "console";
 import { string } from "yup";
 import dayjs from "dayjs";
 import { EOF } from "dns";
+import { getUsersByLoginId } from "../app/modules/auth/core/_requests.ts";
 
 class getUserDataParams {
   baseUrl: string | undefined
@@ -71,10 +72,10 @@ const update_ClaimDate = today.toLocaleDateString("en-IN",{
 
 // User Count
 const axiosInstance = axios.create({
-  baseURL: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/',
+  baseURL: `${API_URL}`,
   headers: {
-    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
+    'apikey': `${axios.defaults.headers.common['apikey']}`,
+    'Authorization': `${axios.defaults.headers.common['Authorization']}`
   }
 });
 
@@ -353,11 +354,11 @@ export const AddSalary = async ( s:AddTypeSalary ) : Promise<any> => {
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/salary',
+    url: `${API_URL}/salary`,
     headers: { 
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
       'Content-Type': 'application/json', 
-      'Authorization': 'Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`
     },
     data : data
   };
@@ -393,11 +394,11 @@ export const AddSalary = async ( s:AddTypeSalary ) : Promise<any> => {
                     let config = {
                       method: 'patch',
                       maxBodyLength: Infinity,
-                      url: `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/user?id=eq.${s.id}`,
+                      url: `${API_URL}/user?id=eq.${s.id}`,
                       headers: { 
-                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+                        'apikey': `${axios.defaults.headers.common['apikey']}`, 
                         'Content-Type': 'application/json', 
-                        'Authorization': 'Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
+                        'Authorization': `${axios.defaults.headers.common['Authorization']}`
                       },
                       data : data
                     };
@@ -451,11 +452,11 @@ let data = JSON.stringify([
 let config = {
   method: 'patch',
   maxBodyLength: Infinity,
-  url: `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/salary?id=eq.${s.id}`,
+  url: `${API_URL}/salary?id=eq.${s.id}`,
   headers: { 
-    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+    'apikey': `${axios.defaults.headers.common['apikey']}`, 
     'Content-Type': 'application/json', 
-    'Authorization': 'Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
+    'Authorization': `${axios.defaults.headers.common['Authorization']}`
   },
   data : data
 };
@@ -487,10 +488,10 @@ export const updateLeaveRecord = async (id : any ,  updatedLeaves: { leaves_used
 let config = {
   method: 'patch',
   maxBodyLength: Infinity,
-  url: `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/leaveEntitlment?id=eq.${id}`,
+  url: `${API_URL}/leaveEntitlment?id=eq.${id}`,
   headers: { 
-    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
-    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+    'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+    'apikey': `${axios.defaults.headers.common['apikey']}`, 
     'Content-Type': 'application/json'
   },
   data : data
@@ -524,10 +525,10 @@ export const updateInvoiceStatus =  async (id : any , invoice_paid_amount : any 
   let config = {
     method: 'patch',
     maxBodyLength: Infinity,
-    url: `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/invoice?id=eq.${id}`,
+    url: `${API_URL}/invoice?id=eq.${id}`,
     headers: { 
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', 
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
       'Content-Type': 'application/json'
     },
     data : data
@@ -552,10 +553,10 @@ export const updateUserId =  async (id : any ) => {
   const config = {
     method : "PATCH",
     maxBodyLength : Infinity ,
-    url : `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/tempUser?select=*&id=eq.${id}`,
+    url : `${API_URL}/tempUser?select=*&id=eq.${id}`,
     headers :  {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
       'Content-Type': 'application/json'
     },
     data : { userId:true }
@@ -578,10 +579,10 @@ export const movetempUserToUser = async (userdata : any ) => {
 const config = {
   method : "POST" ,
   maxBodyLength : Infinity,
-  url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/user',
+  url: `${API_URL}/user`,
     headers: {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
       'Content-Type': 'application/json'
     },
   data : userdata //user data to be moved
@@ -642,10 +643,10 @@ export const createTempEmployee = async (t: temEmp): Promise<{status:number; mes
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/tempUser',
+    url: `${API_URL}/tempUser`,
     headers: {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
       'Content-Type': 'application/json'
     },
     data: data
@@ -695,10 +696,10 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/invoice',
+    url: `${API_URL}/invoice`,
     headers: {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
       'Content-Type': 'application/json'
     },
     data: data
@@ -728,9 +729,9 @@ export const uploadInvoiceToSupabase = async (file:File) => {
   const Iconfig = {
     method : "POST",
     maxBodyLength : Infinity,
-    url :  `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_invoice_file/${setYear}/${update_date}/${file.name}`,
+    url :  `${API_URL}/object/iwt_invoice_file/${setYear}/${update_date}/${file.name}`,
     headers : {
-      "Authorization" :  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      "Authorization" : `${axios.defaults.headers.common['Authorization']}`,
       "Content-Type"  : file.type
     },
     data : file
@@ -743,7 +744,7 @@ export const uploadInvoiceToSupabase = async (file:File) => {
     if (response.status === 200){
       //Extract the file path 
       const fileKey = response.data.file;
-      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_invoice_file/Dec_2024/${fileKey}`;
+      const publicUrl = `${API_URL}/object/iwt_invoice_file/Dec_2024/${fileKey}`;
       return publicUrl;
     }else{
       throw new Error('File Upload Failed')
@@ -780,10 +781,10 @@ export const createContractPage = async (c: ContractRequest): Promise<{status:nu
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/contract',
+    url: `${API_URL}/contract`,
     headers: {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
       'Content-Type': 'application/json'
     },
     data: data
@@ -813,9 +814,9 @@ export const uploadContractToSupabase = async (file:File) => {
   const Cconfig = {
     method : "POST",
     maxBodyLength : Infinity,
-    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_contracts/${setYear}/${file.name}` ,
+    url : `${API_URL}/object/iwt_contracts/${setYear}/${file.name}` ,
     headers : {
-      'Authorization' : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Authorization' : `${axios.defaults.headers.common['Authorization']}`,
       'Content-Type' : file.type
     },
     data : file,
@@ -827,7 +828,7 @@ export const uploadContractToSupabase = async (file:File) => {
     if (response.status === 200){
       //Extract the file path 
       const fileKey = response.data.file;
-      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_contracts/${setYear}/${fileKey}`;
+      const publicUrl = `${API_URL}/object/iwt_contracts/${setYear}/${fileKey}`;
       return publicUrl;
     }else{
       throw new Error('Contract Upload Failed')
@@ -866,10 +867,10 @@ export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; 
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/expenses',
+    url: `${API_URL}/expenses`,
     headers: {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
       'Content-Type': 'application/json'
     },
     data: data
@@ -899,9 +900,9 @@ export const uploadClaimsToSupabase = async (file:File) => {
   const Cconfig = {
     method : "POST",
     maxBodyLength : Infinity,
-    url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/Year_2025/${update_ClaimDate}/${file.name}` ,
+    url : `${API_URL}/object/iwt_claims/Year_2025/${update_ClaimDate}/${file.name}` ,
     headers : {
-      'Authorization' : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+      'Authorization' :`${axios.defaults.headers.common['Authorization']}`,
       'Content-Type' : file.type
     },
     data : file,
@@ -913,7 +914,7 @@ export const uploadClaimsToSupabase = async (file:File) => {
     if (response.status === 200){
       //Extract the file path 
       const fileKey = response.data.file;
-      const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_claims/${update_ClaimDate}/${fileKey}`;
+      const publicUrl = `${API_URL}/object/iwt_claims/${update_ClaimDate}/${fileKey}`;
       return publicUrl;
     }else{
       throw new Error('Claim Upload Failed')
@@ -930,9 +931,9 @@ export const uploadFileToSupabase = async (file:File) => {
      const Tconfig = {
       method : "POST",
       maxBodyLength : Infinity,
-      url : `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/${setYear}/${update_date}/${file.name}`,
+      url : `${API_URL}/object/iwt_timesheets/${setYear}/${update_date}/${file.name}`,
       headers : {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA',
+        'Authorization': `${axios.defaults.headers.common['Authorization']}`,
         'Content-Type': file.type,
       },
       data : file,
@@ -945,7 +946,7 @@ export const uploadFileToSupabase = async (file:File) => {
       if (response.status === 200){
         //Extract the file path 
         const fileKey = response.data.file;
-        const publicUrl = `https://zhplktaovpyenmypkjql.supabase.co/storage/v1/object/iwt_timesheets/${setYear}/${update_date}/${fileKey}`; // hase a folder
+        const publicUrl = `${API_URL}/object/iwt_timesheets/${setYear}/${update_date}/${fileKey}`; // hase a folder
         return publicUrl;
       }else{
         throw new Error('Timesheet Upload Failed')
@@ -979,10 +980,10 @@ export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<{sta
   console.log("APIData:" + data);
   const config = {
     method: 'post',
-    url: 'https://zhplktaovpyenmypkjql.supabase.co/rest/v1/employeeTimesheet',
+    url: `${API_URL}/employeeTimesheet`,
     headers: {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', // Use environment variable
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA', // Use environment variable
+      'apikey': `${axios.defaults.headers.common['apikey']}`, // Use environment variable
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, // Use environment variable
       'Content-Type': 'application/json'
     },
     data: data

@@ -121,6 +121,15 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
           borderRadius: 5,
         },
       },
+      states: {
+        hover: {
+          filter: {
+            type: 'darken', // Change brightness on hover
+            value: 0.2, // Adjust brightness level
+          },
+        },
+       
+      },
       legend:{
         show : false,
       },

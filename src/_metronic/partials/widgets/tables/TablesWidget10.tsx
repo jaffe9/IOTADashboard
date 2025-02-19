@@ -64,13 +64,13 @@ useEffect(() =>
             {/* end::Table head */}
             {/* begin::Table body */}
             
-            {[...Array(maxRowLength)].map((index) => 
+            {[...Array(maxRowLength)].map((item : any ,index) => 
             {
               return (
-                <tbody>
-                  {Object.values(apiData).map((item:any) => {
+                <tbody key={index}>
+                  {Object.values(apiData).map((item:any , index) => {
                     return (
-                      <tr>
+                      <tr key={index}>
                         <td>
                           <div className='d-flex justify-content-start flex-column'>
                             <a href='#' className='text-gray-900 fw-bold text-hover-primary fs-6'>

@@ -51,6 +51,33 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
     fetchExpiringContract();
   }, []);
 
+  // To dynamically change logo of clients based on activeTab
+const updatePicUrl = (associated_user_id : { username: string}) => {
+  switch (associated_user_id.username){
+    case 'bala' :
+      return '/media/svg/ConsultantPhotos/Bala Pic.jpeg'
+    case 'baskar' :
+      return '/media/svg/ConsultantPhotos/Baskar Pic.jpg'
+    case 'hala' :
+      return '/media/svg/ConsultantPhotos/Hala Pic.jpeg'
+    case 'rakesh':
+      return '/media/svg/ConsultantPhotos/Rakesh pic.png'
+    case 'sadath' :
+      return '/media/svg/ConsultantPhotos/Sadath Pic.jpeg'
+    case 'samiullah' :
+      return '/media/svg/ConsultantPhotos/Samiullah Pic.jpeg'
+    case 'sandeep' :
+      return '/media/svg/ConsultantPhotos/Sandeep Pic.jpeg'
+    case 'thameem' :
+      return '/media/svg/ConsultantPhotos/Thameem Pic.jpeg'
+    case 'vignesh' :
+      return '/media/svg/ConsultantPhotos/Vignesh Pic.jpeg'
+    case 'waseem' :
+      return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
+  }
+}
+
+
   return (
     <div className={`card ${className}`}>
     {/* begin::Header */}
@@ -115,23 +142,19 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
                     <td>
                       <div className='symbol symbol-45px me-2'>
                         <span className='symbol-label'>
-                          <img
-                            src={toAbsoluteUrl(
-                              `media/svg/brand-logos/${
-                                index % 5 === 0
-                                  ? 'plurk'
-                                  : index % 5 === 1
-                                  ? 'telegram'
-                                  : index % 5 === 2
-                                  ? 'vimeo'
-                                  : index % 5 === 3
-                                  ? 'bebo'
-                                  : 'kickstarter'
-                              }.svg`
-                            )}
-                            className='h-50 align-self-center'
-                            alt=''
-                          />
+                        <img
+                      src={updatePicUrl({username: record.associated_user_id.username})}
+                      className=""
+                      style={{
+                        height : '60px',
+                        width : '50px',
+                        marginLeft : '10px',
+                        border : '1px solid black',
+                        borderRadius : '10px',
+                        padding : '2px'
+                      }}
+                      alt="Image"
+                    />
                         </span>
                       </div>
                     </td>

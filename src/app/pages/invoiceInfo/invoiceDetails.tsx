@@ -142,22 +142,22 @@ const GetInvoiceDetails: React.FC<Props> = ({ className }) => {
           <div
             className={`tab-pane fade ${activeTab === 1 ? 'show active' : ''}`}
           >
-            {renderTable(filteredRecords , handleInvoiceStatusUpdate)}
+            {renderTable(filteredRecords , handleInvoiceStatusUpdate , activeTab)}
           </div>
           <div
             className={`tab-pane fade ${activeTab === 2 ? 'show active' : ''}`}
           >
-            {renderTable(filteredRecords , handleInvoiceStatusUpdate)}
+            {renderTable(filteredRecords , handleInvoiceStatusUpdate , activeTab)}
           </div>
           <div
             className={`tab-pane fade ${activeTab === 4 ? 'show active' : ''}`}
           >
-            {renderTable(filteredRecords , handleInvoiceStatusUpdate)}
+            {renderTable(filteredRecords , handleInvoiceStatusUpdate , activeTab)}
           </div>
           <div
             className={`tab-pane fade ${activeTab === 5 ? 'show active' : ''}`}
           >
-            {renderTable(filteredRecords , handleInvoiceStatusUpdate)}
+            {renderTable(filteredRecords , handleInvoiceStatusUpdate , activeTab)}
           </div>
           <div className="tab-pane fade" id="kt_table_widget_5_tab_3">
             {/* Tab 3 content (if applicable) */}
@@ -168,8 +168,24 @@ const GetInvoiceDetails: React.FC<Props> = ({ className }) => {
   );
 };
 
+// To dynamically change logo of clients based on activeTab
+const updateLogoUrl = (activeTab : number) => {
+  switch (activeTab){
+    case 1 :
+      return '/media/svg/bank-Logos/anbLogo.png'
+    case 2 :
+      return '/media/svg/bank-Logos/rbLogo.png'
+    case 3 :
+      return '/media/svg/bank-Logos/sabLogo.png'
+    case 4:
+      return '/media/svg/bank-Logos/arbLogo.png'
+    case 5 :
+      return '/media/svg/bank-Logos/amexLogo.jpeg'
+  }
+}
+
 // Helper Function to Render Table
-const renderTable = (records: invoiceDetails[] ,  handleInvoiceStatusUpdate : (id : any ,associated_user_id:{username:any} , external_invoice_no:any , invoice_paid_amount : any ) => void) => {
+const renderTable = (records: invoiceDetails[] ,  handleInvoiceStatusUpdate : (id : any ,associated_user_id:{username:any} , external_invoice_no:any , invoice_paid_amount : any ) => void , activeTab: number) => {
  
    
   return (
@@ -193,10 +209,16 @@ const renderTable = (records: invoiceDetails[] ,  handleInvoiceStatusUpdate : (i
                 <div className="symbol symbol-45px me-2">
                   <span className="symbol-label">
                     <img
-                      src={toAbsoluteUrl(
-                        `media/svg/brand-logos/${['plurk', 'telegram', 'vimeo', 'bebo', 'kickstarter'][index % 5]}.svg`
-                      )}
-                      className="h-50 align-self-center"
+                      src={ updateLogoUrl(activeTab)}
+                      className="h-55 align-self-center"
+                      style={{
+                        
+                        width : '55px',
+                        marginLeft : '15px',
+                        border : '1px solid black',
+                        borderRadius : '10px',
+                        padding : '10px'
+                      }}
                       alt="logo"
                     />
                   </span>
