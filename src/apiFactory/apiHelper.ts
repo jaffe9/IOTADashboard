@@ -64,14 +64,13 @@ const update_date = lastMonth.toLocaleDateString("en-IN",{
   month: "short",
 }).replace(/\//g, "_");
 
-console.log('This is the last month date :' , update_date  )
 
 
 const getYear = today.toLocaleString("en-IN",{
      year : "numeric"
 }).replace(/\//g,"")
 const setYear = `Year_${getYear}`
-console.log('This is the last year date :' , setYear  )
+
 
 const update_ClaimDate = today.toLocaleDateString("en-IN",{
   year: "numeric",
@@ -91,14 +90,14 @@ export const getUserCount = async () => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+   // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "user?select=*&isClientFacing=eq.1";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+    //  console.log("This is Account Manager Id: ", accountManagerId);
       url = `user?select=*&isClientFacing=eq.1&associated_account_manager=eq.${accountManagerId}`;
     }
 
@@ -116,14 +115,14 @@ export const getInvoiceTotalValue = async () => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+   // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "invoice?select=*";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+    //  console.log("This is Account Manager Id: ", accountManagerId);
       url = `invoice?select=*&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url);//changed 18 Nov
@@ -138,14 +137,14 @@ export const getContractExpiries = async () => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+     // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "contract?select=*,associated_user_id(username,companyName)";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+    //  console.log("This is Account Manager Id: ", accountManagerId);
       url = `contract?select=*,associated_user_id(username,companyName)&associatedAccountManager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url);
@@ -160,14 +159,14 @@ export const getNationalIdExp = async () => {
   try{
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+   // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "nationalIdInfo?select=*,associated_user_id(username,companyName)";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+    //  console.log("This is Account Manager Id: ", accountManagerId);
       url = `nationalIdInfo?select=*,associated_user_id(username,companyName)&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url);
@@ -189,7 +188,7 @@ export const getInvoiceDetails = async () => {
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+    //  console.log("This is Account Manager Id: ", accountManagerId);
       url = `invoice?select=*,associated_user_id(username,companyName,clientId(client_short_name))&invoice_paid_status=eq.false&order=id&associated_account_manager=eq.${accountManagerId}`;
     }
   const response = await axiosInstance.get(url)
@@ -204,14 +203,14 @@ export const getLeavesLeft = async () => {
   try{
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+   // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+     // console.log("This is Account Manager Id: ", accountManagerId);
       url = `leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url);
@@ -227,14 +226,14 @@ export const getAllOpportunities = async () => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "opportunities?select=*,clients(id,*),opportunityStatus(id,*)";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+      //console.log("This is Account Manager Id: ", accountManagerId);
       url = `opportunities?select=*,clients(id,*),opportunityStatus(id,*)&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url);
@@ -250,14 +249,14 @@ export const getAllSalaries = async () => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "salary?select=*, user(id,*)";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+      //console.log("This is Account Manager Id: ", accountManagerId);
       url = `salary?select=*, user(id,*)&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url, { timeout: 1500 });
@@ -273,14 +272,14 @@ export const getAllBilling = async () => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "salary?contract=*, user(id,*), client(id,*)";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+      //console.log("This is Account Manager Id: ", accountManagerId);
       url = `salary?contract=*, user(id,*), client(id,*)&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url, { timeout: 1500 });
@@ -296,14 +295,14 @@ export const getPendingInvoices = async () => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.false&order=id";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+      //console.log("This is Account Manager Id: ", accountManagerId);
       url = `invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.false&order=id&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url );
@@ -319,14 +318,14 @@ export const getPaidInvoices = async () => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.true&order=id";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+      //console.log("This is Account Manager Id: ", accountManagerId);
       url = `invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.true&order=id&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url );
@@ -341,14 +340,14 @@ export const getSalaryInfoByEmployee = async (id: string) => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = `salary?user_id=eq.${id}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)`;
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+      //console.log("This is Account Manager Id: ", accountManagerId);
       url = `salary?user_id=eq.${id}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)&associated_account_manager=eq.${accountManagerId}`;
     }
     const { data } = await axiosInstance.get(url);
@@ -364,14 +363,14 @@ export const getIqamaForAction = async (id: string) => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = `nationalIdInfo?associated_user_id=eq.${id}&select=id,national_id,expiry_date,associated_user_id(username,email)`;
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+      //console.log("This is Account Manager Id: ", accountManagerId);
       url = `nationalIdInfo?associated_user_id=eq.${id}&select=id,national_id,expiry_date,associated_user_id(username,email)&associated_account_manager=eq.${accountManagerId}`;
     }
     const { data } = await axiosInstance.get(url);
@@ -386,14 +385,14 @@ export const getContractForAction = async (id: string) => {
   try {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = `contract?associated_user_id=eq.${id}&select=id,client_id(client_name),contract_no,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)`;
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
-      console.log("This is Account Manager Id: ", accountManagerId);
+      //console.log("This is Account Manager Id: ", accountManagerId);
       url = `contract?associated_user_id=eq.${id}&select=id,client_id(client_name),contract_no,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)&associatedAccountManager=eq.${accountManagerId}`;
     }
     const { data } = await axiosInstance.get(url);
@@ -411,14 +410,14 @@ export const getContractForAction = async (id: string) => {
 export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+ // console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associated_account_manager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+   // console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associated_account_manager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -429,14 +428,14 @@ export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
 export const getAllClaimEmployees = async (): Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select=*&isActive=eq.true&order=id`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USERS_URL}?select=*&isActive=eq.true&order=id&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -447,14 +446,14 @@ export const getAllClaimEmployees = async (): Promise<UsersQueryResponse> => {
 export const getEmpForSalaryIncrement = async () : Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -464,14 +463,14 @@ export const getEmpForSalaryIncrement = async () : Promise<UsersQueryResponse> =
 export const getEmpForSalary = async () : Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select*&onSalary=eq.false&order=id`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USERS_URL}?select*&onSalary=eq.false&order=id&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -488,14 +487,14 @@ export const getExpenses = async (): Promise<UsersQueryResponse> => {
 export const getAccountManager = async (): Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_ACCOUNT_MANAGER}?select=*&order=id`;
   } else {
     // Account Manager case
     const id = await  getUserId();
-    console.log("This is user Id: ", id);
+    //console.log("This is user Id: ", id);
     url = `${GET_ACCOUNT_MANAGER}?select=*&order=id&userId=eq.${id}`;
   }
   const d = await axios
@@ -506,14 +505,14 @@ export const getAccountManager = async (): Promise<UsersQueryResponse> => {
 export const getPeerEmployees = async (clientId: string): Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -524,14 +523,14 @@ export const getPeerEmployees = async (clientId: string): Promise<UsersQueryResp
 export const getEmployeeInfo = async (employeeId: string): Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?id=eq.${employeeId}`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USERS_URL}?id=eq.${employeeId}&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -542,14 +541,14 @@ export const getEmployeeInfo = async (employeeId: string): Promise<UsersQueryRes
 export const getEmployeeSalaryInfo = async (employeeId: string): Promise<any> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USER_SALARY_URL}?id=eq.${employeeId}`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USER_SALARY_URL}?id=eq.${employeeId}&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -560,14 +559,14 @@ export const getEmployeeSalaryInfo = async (employeeId: string): Promise<any> =>
 export const getEmployeeSalaryDetailInfo = async (employeeId: string): Promise<any> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+ // console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USER_SALARY_DETAIL_URL}?associated_user_id=eq.${employeeId}`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+   // console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USER_SALARY_DETAIL_URL}?associated_user_id=eq.${employeeId}&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -578,14 +577,14 @@ export const getEmployeeSalaryDetailInfo = async (employeeId: string): Promise<a
 export const getEmployeeBillingInfo = async (associated_user_id: string): Promise<any> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USER_CONTRACT_URL}?id=eq.${associated_user_id}`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_USER_CONTRACT_URL}?id=eq.${associated_user_id}&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -596,14 +595,14 @@ export const getEmployeeBillingInfo = async (associated_user_id: string): Promis
 export const getEmployeeInvoiceInfo = async (associated_user_id: string): Promise<any> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_EMPLOYEEINVOICE_URL}?associated_user_id=eq.${associated_user_id}`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_EMPLOYEEINVOICE_URL}?associated_user_id=eq.${associated_user_id}&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -615,14 +614,14 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
   let response: EmployeeOnboardingResponse = {}
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_EMPLOYEEONBOARDING_URL}?select=*,resourceOnboardingStatus(id,*), resource_end_client(id,*)`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+    //console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_EMPLOYEEONBOARDING_URL}?select=*,resourceOnboardingStatus(id,*), resource_end_client(id,*)&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
@@ -639,14 +638,14 @@ export const getEmpOccupation = async () => {
 export const getClientDetails = async () : Promise<any> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_CLIENT_DETAILS_URL}?select=*&order=id`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+  //  console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_CLIENT_DETAILS_URL}?select=*&order=id&associated_account_manager=eq.${accountManagerId}`;
   }
   const d =  await axios
@@ -657,14 +656,14 @@ export const getClientDetails = async () : Promise<any> => {
 export const getTempUserDetails = async () : Promise<any> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+ // console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_TEMP_USERS_URL}?select=*&order=id&userId=eq.false`;
   } else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
-    console.log("This is Account Manager Id: ", accountManagerId);
+  //  console.log("This is Account Manager Id: ", accountManagerId);
     url = `${GET_TEMP_USERS_URL}?select=*&order=id&userId=eq.false&associated_account_manager=eq.${accountManagerId}`;
   }
   const d =  await axios
