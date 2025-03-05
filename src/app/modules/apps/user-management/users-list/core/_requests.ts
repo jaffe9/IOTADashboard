@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { ID, Response } from "../../../../../../_metronic/helpers";
 import { Contract, National_id, User, UsersQueryResponse } from "./_models";
+import { getAccountManagerId, getLoggedUser } from "../../../../auth/core/_authStore";
 
 //Set Axios Default
 axios.defaults.headers.common['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
@@ -13,6 +14,7 @@ const USER_URL = `${API_URL}/user`;
 const GET_USERS_URL = `${API_URL}/user`;
 const GET_IQAMA_DETAILS_URL = `${API_URL}/nationalIdInfo`;
 const GET_CONTRACT_DETAILS_URL = `${API_URL}/contract`
+const admin = "db273513-e759-4f6a-99b4-8371423a45b8";
 
 const getUsers = async (query: string): Promise<UsersQueryResponse> => {
   const d = await axios
@@ -89,8 +91,20 @@ const UpdateIqamaExp = async(iq:National_id) : Promise<any> => {
   }
   }
  const getEmpForIqamaInForm = async () : Promise<UsersQueryResponse> => {
+  let url = "";
+  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
+  console.log("From api Helper:", loggedUser)
+  if (loggedUser === `${admin}`) {
+    // Admin case
+    url = `${GET_IQAMA_DETAILS_URL}?select=id,national_id,expiry_date,associated_user_id(username,email)&order=id`;
+  } else {
+    // Account Manager case
+    const accountManagerId = await getAccountManagerId();
+    console.log("This is Account Manager Id: ", accountManagerId);
+    url = `${GET_IQAMA_DETAILS_URL}?select=id,national_id,expiry_date,associated_user_id(username,email)&order=id&associated_account_manager=eq.${accountManagerId}`;
+  }
     const d = await axios
-    .get(`${GET_IQAMA_DETAILS_URL}?select=id,national_id,expiry_date,associated_user_id(username,email)&order=id`);
+    .get(url);
     return d;
   }
 // End Of Iqama Update //
@@ -137,8 +151,20 @@ const UpdateContractExp = async(c:Contract) : Promise<any> => {
   }
   }
  const getEmpForContractInForm = async () : Promise<UsersQueryResponse> => {
+    let url = "";
+    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
+    console.log("From api Helper:", loggedUser)
+    if (loggedUser === `${admin}`) {
+      // Admin case
+      url = `${GET_CONTRACT_DETAILS_URL}?select=id,client_id(client_name),contract_no,billing_start_date,billing_end_date,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)&order=id`;
+    } else {
+      // Account Manager case
+      const accountManagerId = await getAccountManagerId();
+      console.log("This is Account Manager Id: ", accountManagerId);
+      url = `${GET_CONTRACT_DETAILS_URL}?select=id,client_id(client_name),contract_no,billing_start_date,billing_end_date,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)&order=id&associatedAccountManager=eq.${accountManagerId}`;
+    }
     const d = await axios
-    .get(`${GET_CONTRACT_DETAILS_URL}?select=id,client_id(client_name),contract_no,billing_start_date,billing_end_date,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)&order=id`);
+    .get(url);
     return d;
   }
 // End of contract Update

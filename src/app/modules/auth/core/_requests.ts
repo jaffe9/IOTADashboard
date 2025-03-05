@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { AuthModel, UserModel } from "./_models";
 import { number } from "yup";
+import { setAccountManagerId, setLoggedUser, setUserId } from "./_authStore";
 const API_URL = import.meta.env.VITE_APP_API_URL;
 
 //export const GET_USER_BY_ACCESSTOKEN_URL = `${API_URL}/verify_token`;
@@ -56,28 +57,46 @@ export async function getUserByToken(token: string) {
 //     .then((d: AxiosResponse<UserModel>) => d.data);
 // };
 
-const getUsersByLoginId = (login_id : string) : Promise<UserModel> => {
-  let url = '';
-  let admin = 'db273513-e759-4f6a-99b4-8371423a45b8'
-  let user1 = '89d2beb3-a837-44e6-acbb-f1f812d6d5e0'
+const getUsersByLoginId = async (login_id: string): Promise<UserModel> => {
+  let url = "";
+  let admin = "db273513-e759-4f6a-99b4-8371423a45b8";
+  let user1 = "89d2beb3-a837-44e6-acbb-f1f812d6d5e0";
+  let user2 = "1b77743c-3585-4bc0-8ea0-84f404d59f26";
+  
 
   switch (login_id) {
-    case `${admin}` :
-      url = `${GET_USER_BY_ACCESSTOKEN_URL}?loginId=eq.${login_id}&select=*`
-      console.log("Admin Logged In :",url)
+    case `${admin}`:
+      url = `${GET_USER_BY_ACCESSTOKEN_URL}?loginId=eq.${login_id}&select=*`;
       break;
-    case `${user1}` :
-      url = `${GET_USER_BY_ACCESSTOKEN_URL}?loginId=eq.${login_id}&select=*,accountManager!accountManager_userId_fkey(userId,*)&apikey=eq.${axios.defaults.headers.common['apikey']}`
-      console.log("User Logged In :" ,url)
+    case `${user1}`:
+      url = `${GET_USER_BY_ACCESSTOKEN_URL}?loginId=eq.${login_id}&select=*,accountManager!accountManager_userId_fkey(userId,*)&apikey=eq.${axios.defaults.headers.common["apikey"]}`;
       break;
-    default :
-      throw new Error ('invalid User or Login Id')
+    case `${user2}`:
+      url = `${GET_USER_BY_ACCESSTOKEN_URL}?loginId=eq.${login_id}&select=*,accountManager!accountManager_userId_fkey(userId,*)&apikey=eq.${axios.defaults.headers.common["apikey"]}`;
+      break;
+    default:
+      throw new Error("Invalid User or Login Id");
   }
 
-  return axios
-  .get(url)
-  .then((d:AxiosResponse<UserModel>) => d.data)
+  try {
+    setLoggedUser(login_id)
+    
+    //console.log("Logged User :", login_id)
+    const response = await axios.get(url);
+    const userData = response.data[0];
+    const c = userData.id
+    console.log("User data of logged user :", c)
+    setUserId(userData.id)
+    
+    if (userData.accountManager && userData.accountManager.length > 0) {
+      setAccountManagerId(userData.accountManager[0].id);
+    }
+   
+    return userData;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw error;
+  }
+};
 
-}
-
-export {getUsersByLoginId};
+export { getUsersByLoginId };

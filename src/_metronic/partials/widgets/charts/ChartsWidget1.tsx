@@ -151,9 +151,14 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
           },
         },
       },
+      yaxis: {
+        labels: {
+          formatter: (value) => value.toFixed(1), // Fixes decimal places to one digit
+        },
+      },
       tooltip: {
         y: {
-          formatter: (val) => `SAR ${val}`,
+          formatter: (val) => `SAR ${val.toFixed(2)}`,
         },
       },
       colors: [baseColor, secondaryColor],

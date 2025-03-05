@@ -19,7 +19,10 @@ const initAuthContextPropsState = {
   saveAuth: () => {},
   currentUser: undefined,
   setCurrentUser: () => {},
-  logout: () => {},
+  logout: () => {
+    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("accountManagerId");
+  },
 }
 
 const AuthContext = createContext<AuthContextProps>(initAuthContextPropsState)

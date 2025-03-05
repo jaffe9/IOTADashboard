@@ -267,6 +267,10 @@ const updatePicUrl = (user_id : { username: string}) => {
       return '/media/svg/ConsultantPhotos/Vignesh Pic.jpeg'
     case 'waseem' :
       return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
+    case 'Venkata Tejesh' :
+      return "/media/svg/ConsultantPhotos/Tejesh Pic.jpeg"
+    case 'Vignesh' :
+      return '/media/svg/ConsultantPhotos/Vignesh Pic.jpg'
   }
 }
 
