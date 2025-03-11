@@ -304,7 +304,7 @@ const EmployeeInvoice: FC = () => {
                           dateFormat: "d-m-Y",
                         }}
                         onChange={(dateStr) => {
-                          updateData({ invoice_date: dateStr.toLocaleString("en-IN",{
+                          updateData({ invoice_date: dateStr.toLocaleString("en",{
                             year: "numeric",
                             month: "2-digit",
                             day : "2-digit"

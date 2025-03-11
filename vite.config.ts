@@ -11,7 +11,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 8080 // change here
+    port: 81 // change here
   },
   logLevel:'info'
 })
