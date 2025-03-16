@@ -180,7 +180,7 @@ const updateLogoUrl = (activeTab : number) => {
     case 4:
       return '/media/svg/bank-Logos/arbLogo.png'
     case 5 :
-      return '/media/svg/bank-Logos/amexLogo.jpeg'
+      return '/media/svg/card-logos/american-express-dark.svg'
   }
 }
 

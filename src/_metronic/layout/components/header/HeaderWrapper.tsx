@@ -52,7 +52,7 @@ export function HeaderWrapper() {
                   <Link to='/dashboard' className='d-lg-none'>
                       <img
                         alt='Logo'
-                        src={toAbsoluteUrl('media/logos/default-small.svg')}
+                        src='/src/_metronic/assets/fonticon/innovwayzLogo.png'
                         className='h-30px'
                       />
                   </Link>

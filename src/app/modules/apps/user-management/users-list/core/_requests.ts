@@ -16,17 +16,56 @@ const GET_IQAMA_DETAILS_URL = `${API_URL}/nationalIdInfo`;
 const GET_CONTRACT_DETAILS_URL = `${API_URL}/contract`
 const admin = "db273513-e759-4f6a-99b4-8371423a45b8";
 
-const getUsers = async (query: string): Promise<UsersQueryResponse> => {
+// const getUsers = async (query: string): Promise<UsersQueryResponse> => {
+//   const d = await axios
+//     .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
+//   return d;
+// };
+
+const getUsers = async (query: string) : Promise<UsersQueryResponse> => {
+  let url = "";
+  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
+  console.log("From api Helper:", loggedUser)
+  if (loggedUser === `${admin}`) {
+    // Admin case
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`;
+  } else {
+    // Account Manager case
+    const accountManagerId = await getAccountManagerId();
+    console.log("This is Account Manager Id: ", accountManagerId);
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id&associatedAccountManager=eq.${accountManagerId}`;
+  }
   const d = await axios
-    .get(`${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`);
+  .get(url);
   return d;
-};
+}
+
+
+// const getUserById = async (id: ID): Promise<User | undefined> => {
+//   const response = await axios
+//     .get(`${GET_USERS_URL}?select=username,email,firstName,lastName,occupation,timeZone,phone,employeeJoiningDate,pic&id=eq.${id}`);
+//   return response.data;
+// };
 
 const getUserById = async (id: ID): Promise<User | undefined> => {
-  const response = await axios
-    .get(`${GET_USERS_URL}?select=username,email,firstName,lastName,occupation,timeZone,phone,employeeJoiningDate,pic&id=eq.${id}`);
-  return response.data;
-};
+  let url = "";
+  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
+  console.log("From api Helper:", loggedUser)
+  if (loggedUser === `${admin}`) {
+    // Admin case
+    url = `${GET_USERS_URL}?select=username,email,firstName,lastName,occupation,timeZone,phone,employeeJoiningDate,pic&id=eq.${id}`;
+  } else {
+    // Account Manager case
+    const accountManagerId = await getAccountManagerId();
+    console.log("This is Account Manager Id: ", accountManagerId);
+    url = `${GET_USERS_URL}?select=username,email,firstName,lastName,occupation,timeZone,phone,employeeJoiningDate,pic&id=eq.${id}&associatedAccountManager=eq.${accountManagerId}`;
+  }
+  const d = await axios
+  .get(url);
+  return d.data;
+}
+
+
 
 const createUser = (user: User): Promise<User | undefined> => {
   return axios
@@ -101,7 +140,7 @@ const UpdateIqamaExp = async(iq:National_id) : Promise<any> => {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     console.log("This is Account Manager Id: ", accountManagerId);
-    url = `${GET_IQAMA_DETAILS_URL}?select=id,national_id,expiry_date,associated_user_id(username,email)&order=id&associated_account_manager=eq.${accountManagerId}`;
+    url = `${GET_IQAMA_DETAILS_URL}?select=id,national_id,expiry_date,associated_user_id(username,email)&order=id&associatedAccountManager=eq.${accountManagerId}`;
   }
     const d = await axios
     .get(url);
