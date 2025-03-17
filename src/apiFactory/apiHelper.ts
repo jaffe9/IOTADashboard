@@ -239,6 +239,9 @@ export const getAllOpportunities = async () => {
     const response = await axiosInstance.get(url);
     return response;
   } catch (error) {
+    if (axios.isAxiosError(error)){
+     console.log( " Error in fetching data" , error.response?.data || error.message)
+    }
     console.error('Error fetching data:', error);
     return null
   }
