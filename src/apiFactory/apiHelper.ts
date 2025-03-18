@@ -94,7 +94,10 @@ export const getUserCount = async () => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "user?select=*&isClientFacing=eq.1";
-    } else {
+    } else if (loggedUser === null ) {
+      // null Case
+      url = "user?select=*&isClientFacing=eq.1";
+    }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
     //  console.log("This is Account Manager Id: ", accountManagerId);
@@ -119,7 +122,10 @@ export const getInvoiceTotalValue = async () => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "invoice?select=*";
-    } else {
+    } else if (loggedUser === null ) {
+      // null Case
+      url = "invoice?select=*";
+    }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
     //  console.log("This is Account Manager Id: ", accountManagerId);
@@ -141,7 +147,10 @@ export const getContractExpiries = async () => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "contract?select=*,associated_user_id(username,companyName)";
-    } else {
+    } else if (loggedUser === null ) {
+      // null Case
+      url = "contract?select=*,associated_user_id(username,companyName)";
+    }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
     //  console.log("This is Account Manager Id: ", accountManagerId);
@@ -162,6 +171,9 @@ export const getNationalIdExp = async () => {
    // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
+      url = "nationalIdInfo?select=*,associated_user_id(username,companyName)";
+    }  else if (loggedUser === null ) {
+      // null Case
       url = "nationalIdInfo?select=*,associated_user_id(username,companyName)";
     } else {
       // Account Manager case
@@ -185,6 +197,9 @@ export const getInvoiceDetails = async () => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "invoice?select=*,associated_user_id(username,companyName,clientId(client_short_name))&invoice_paid_status=eq.false&order=id";
+    }  else if (loggedUser === null ) {
+      // null Case
+      url = "invoice?select=*,associated_user_id(username,companyName,clientId(client_short_name))&invoice_paid_status=eq.false&order=id";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
@@ -207,7 +222,10 @@ export const getLeavesLeft = async () => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id";
-    } else {
+    }  else if (loggedUser === null ) {
+      // null Case
+      url = "leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id";
+    }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
      // console.log("This is Account Manager Id: ", accountManagerId);
@@ -229,6 +247,9 @@ export const getAllOpportunities = async () => {
     //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
+      url = "opportunities?select=*,clients(id,*),opportunityStatus(id,*)";
+    }  else if (loggedUser === null ) {
+      // null Case
       url = "opportunities?select=*,clients(id,*),opportunityStatus(id,*)";
     } else {
       // Account Manager case
@@ -256,6 +277,9 @@ export const getAllSalaries = async () => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "salary?select=*, user(id,*)";
+    }  else if (loggedUser === null ) {
+      // null Case
+      url = "salary?select=*, user(id,*)";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
@@ -278,6 +302,9 @@ export const getAllBilling = async () => {
     //console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
+      url = "salary?contract=*, user(id,*), client(id,*)";
+    } else if (loggedUser === null ) {
+      // null Case
       url = "salary?contract=*, user(id,*), client(id,*)";
     } else {
       // Account Manager case
@@ -302,6 +329,9 @@ export const getPendingInvoices = async () => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.false&order=id";
+    } else if (loggedUser === null ) {
+      // null Case
+      url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.false&order=id";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
@@ -325,6 +355,9 @@ export const getPaidInvoices = async () => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.true&order=id";
+    } else if (loggedUser === null ) {
+      // null Case
+      url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.true&order=id";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
@@ -347,7 +380,10 @@ export const getSalaryInfoByEmployee = async (id: string) => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = `salary?user_id=eq.${id}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)`;
-    } else {
+    } else if (loggedUser === null ) {
+      // null Case
+      url = `salary?user_id=eq.${id}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)`;
+    }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
       //console.log("This is Account Manager Id: ", accountManagerId);
@@ -370,7 +406,10 @@ export const getIqamaForAction = async (id: string) => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = `nationalIdInfo?associated_user_id=eq.${id}&select=id,national_id,expiry_date,associated_user_id(username,email)`;
-    } else {
+    } else if (loggedUser === null ) {
+      // null Case
+      url = `nationalIdInfo?associated_user_id=eq.${id}&select=id,national_id,expiry_date,associated_user_id(username,email)`;
+    }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
       //console.log("This is Account Manager Id: ", accountManagerId);
@@ -392,7 +431,10 @@ export const getContractForAction = async (id: string) => {
     if (loggedUser === `${admin}`) {
       // Admin case
       url = `contract?associated_user_id=eq.${id}&select=id,client_id(client_name),contract_no,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)`;
-    } else {
+    } else if (loggedUser === null ) {
+      // null Case
+      url = `contract?associated_user_id=eq.${id}&select=id,client_id(client_name),contract_no,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)`;
+    }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
       //console.log("This is Account Manager Id: ", accountManagerId);
@@ -417,7 +459,10 @@ export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associatedAccountManager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associatedAccountManager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
    // console.log("This is Account Manager Id: ", accountManagerId);
@@ -435,7 +480,10 @@ export const getAllClaimEmployees = async (): Promise<UsersQueryResponse> => {
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select=*&isActive=eq.true&order=id`;
-  } else {
+  }  else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USERS_URL}?select=*&isActive=eq.true&order=id`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -453,7 +501,10 @@ export const getEmpForSalaryIncrement = async () : Promise<UsersQueryResponse> =
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -470,7 +521,10 @@ export const getEmpForSalary = async () : Promise<UsersQueryResponse> => {
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select*&onSalary=eq.false&order=id`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USERS_URL}?select*&onSalary=eq.false&order=id`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -494,7 +548,10 @@ export const getAccountManager = async (): Promise<UsersQueryResponse> => {
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_ACCOUNT_MANAGER}?select=*&order=id`;
-  } else {
+  }  else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_ACCOUNT_MANAGER}?select=*&order=id`;
+  }  else {
     // Account Manager case
     const id = await  getUserId();
     //console.log("This is user Id: ", id);
@@ -512,7 +569,10 @@ export const getPeerEmployees = async (clientId: string): Promise<UsersQueryResp
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -530,7 +590,10 @@ export const getEmployeeInfo = async (employeeId: string): Promise<UsersQueryRes
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?id=eq.${employeeId}`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USERS_URL}?id=eq.${employeeId}`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -548,7 +611,10 @@ export const getEmployeeSalaryInfo = async (employeeId: string): Promise<any> =>
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USER_SALARY_URL}?id=eq.${employeeId}`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USER_SALARY_URL}?id=eq.${employeeId}`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -566,7 +632,10 @@ export const getEmployeeSalaryDetailInfo = async (employeeId: string): Promise<a
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USER_SALARY_DETAIL_URL}?associated_user_id=eq.${employeeId}`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USER_SALARY_DETAIL_URL}?associated_user_id=eq.${employeeId}`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
    // console.log("This is Account Manager Id: ", accountManagerId);
@@ -584,7 +653,10 @@ export const getEmployeeBillingInfo = async (associated_user_id: string): Promis
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USER_CONTRACT_URL}?id=eq.${associated_user_id}`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USER_CONTRACT_URL}?id=eq.${associated_user_id}`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -602,7 +674,10 @@ export const getEmployeeInvoiceInfo = async (associated_user_id: string): Promis
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_EMPLOYEEINVOICE_URL}?associated_user_id=eq.${associated_user_id}`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_EMPLOYEEINVOICE_URL}?associated_user_id=eq.${associated_user_id}`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -621,7 +696,10 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_EMPLOYEEONBOARDING_URL}?select=*,resourceOnboardingStatus(id,*), resource_end_client(id,*)`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_EMPLOYEEONBOARDING_URL}?select=*,resourceOnboardingStatus(id,*), resource_end_client(id,*)`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
@@ -645,7 +723,10 @@ export const getClientDetails = async () : Promise<any> => {
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_CLIENT_DETAILS_URL}?select=*&order=id`;
-  } else {
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_CLIENT_DETAILS_URL}?select=*&order=id`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
   //  console.log("This is Account Manager Id: ", accountManagerId);
@@ -663,7 +744,10 @@ export const getTempUserDetails = async () : Promise<any> => {
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_TEMP_USERS_URL}?select=*&order=id&userId=eq.false`;
-  } else {
+  }  else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_TEMP_USERS_URL}?select=*&order=id&userId=eq.false`;
+  }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
   //  console.log("This is Account Manager Id: ", accountManagerId);
