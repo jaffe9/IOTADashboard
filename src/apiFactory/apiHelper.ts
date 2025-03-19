@@ -751,7 +751,7 @@ export const getTempUserDetails = async () : Promise<any> => {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
   //  console.log("This is Account Manager Id: ", accountManagerId);
-    url = `${GET_TEMP_USERS_URL}?select=*&order=id&userId=eq.false&associated_account_manager=eq.${accountManagerId}`;
+    url = `${GET_TEMP_USERS_URL}?select=*&order=id&userId=eq.false&associatedAccountManager=eq.${accountManagerId}`;
   }
   const d =  await axios
     .get(url);
