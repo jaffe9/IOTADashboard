@@ -1,0 +1,144 @@
+The following is the step by step guide to install NGINX CERTIFICATIONS on your website 
+
+Step ! :  Install nginix into server 
+     example: ssh root@123.456.789.007 , enter your server password : <password> 
+     -> sudo apt update
+     -> sudo apt install nginx
+
+Step 2 : Adjust the FireWall
+
+      -> sudo ufw app list  
+         output -: Available applications:
+                    Nginx Full  : This profile opens both port 80 (normal, unencrypted web traffic) and port 443 (TLS/SSL encrypted traffic)
+                    Nginx HTTP  : This profile opens only port 80 (normal, unencrypted web traffic)
+                    Nginx HTTPS : This profile opens only port 443 (TLS/SSL encrypted traffic)
+                    OpenSSH 
+
+        ## Enable traffic on port 80 -> sudo ufw allow 'Nginx HTTP'
+
+        ## Verify Status of FireWall  -> sudo ufw status 
+         Output -: Status: active
+
+                    To                         Action      From
+                    --                         ------      ----
+                    OpenSSH                    ALLOW       Anywhere                  
+                    Nginx HTTP                 ALLOW       Anywhere                  
+                    OpenSSH (v6)               ALLOW       Anywhere (v6)             
+                    Nginx HTTP (v6)            ALLOW       Anywhere (v6)
+
+      Note : if you want both the http and https the use the below command  -> sudo ufw allow 'Nginx Full'
+
+Step 3 : Checking your Web Server
+      
+       -> systemctl status nginx  ##output will show active running 
+       
+       ## Access default NGINX landing page  -> curl -4 icanhazip.com  Output : http://your_server_ip 
+
+Step 4 : Managing the Nginx Process
+    
+        ## To stop web server        ->  sudo systemctl stop nginx
+        ## To start web server       ->  sudo systemctl start nginx
+        ## To restart web server     ->  sudo systemctl restart nginx
+        ## To reload web server      ->  sudo systemctl reload nginx
+        ## To disable web server     ->  sudo systemctl disable nginx
+        ## To enable web server      ->  sudo systemctl enable nginx
+
+Step 5 :  Setting Up Server Blocks (Recommended)
+     
+        ## Create the directory for your_domain as follows  -> sudo mkdir -p /var/www/your_domain/html
+        ## assign ownership of the directory with the $USER environment variable  -> sudo chown -R $USER:$USER /var/www/your_domain/html
+        ## To ensure that your permissions are correct and allow the owner to read, write, and execute the files while granting only read and execute permissions to groups and others, you can input the following command: -> sudo chmod -R 755 /var/www/your_domain
+        ## Next, create a sample index.html page using nano or your favorite editor: -> sudo nano /var/www/your_domain/html/index.html
+        ## nside, add the following sample HTML: 
+         ->          <html>
+                        <head>
+                            <title>Welcome to your_domain!</title>
+                        </head>
+                        <body>
+                            <h1>Success!  The your_domain server block is working!</h1>
+                        </body>
+                    </html>
+        ## In order for Nginx to serve this content, it’s necessary to create a server block with the correct directives. nstead of modifying the default configuration file directly, let’s make a new one at /etc/nginx/sites-available/your_domain:
+         -> sudo nano /etc/nginx/sites-available/your_domain or use your_domain.conf if .conf file is missing 
+        ## Paste in the following configuration block, which is similar to the default, but updated for our new directory and domain name:
+          ->        server {
+                                    listen 80;
+                                    listen [::]:80;
+
+                                    root /var/www/your_domain/html;
+                                    index index.html index.htm index.nginx-debian.html;
+
+                                    server_name your_domain www.your_domain;
+
+                                    location / {
+                                            try_files $uri $uri/ =404;
+                                    }
+                            }
+        ## Next, let’s enable the file by creating a link from it to the sites-enabled directory, which Nginx reads from during startup:
+
+          -> sudo ln -s /etc/nginx/sites-available/your_domain /etc/nginx/sites-enabled/
+          -> sudo nano /etc/nginx/nginx.conf   uncomment this line ...
+                                            http {
+                                                ...
+                                                server_names_hash_bucket_size 64;
+                                                ...
+                                            }
+                                            ...
+        ## Next, test to make sure that there are no syntax errors in any of your Nginx files: -> sudo nginx -t
+        ## If there aren’t any problems, restart Nginx to enable your changes: -> sudo systemctl restart nginx
+
+Step 6: install certificate on your server using this command
+       ->sudo certbot --nginx -d your_domain -d www.your_domain  the follow the steps 
+       Note :->  Ensure that port 80 is free and is only available for nginx . kill if any other process are running on it 
+             -> in your server add your domain name under AAA or A category  
+
+             thi is how the .conf file look 
+    
+    -> root@InnovWayzProdDashboard:~# cat /etc/nginx/sites-enabled/dashboard.innovwayz.tech.conf
+                                            server {
+
+                                                # root /var/www/dashboard.innovwayz.tech/html;
+                                                # index index.html index.htm index.nginx-debian.html;
+                                                #  root /var/www/dashboard.innovwayz.tech/dist;
+                                                    root  /var/www/dashboard.innovwayz.tech/dist;
+                                                    index  index.html;
+
+                                                    server_name dashboard.innovwayz.tech;
+
+                                                    location / {
+                                                    #try_files $uri $uri /=404;
+                                                    proxy_pass http://165.232.177.155:8080/;
+                                                    proxy_http_version 1.1;
+                                                    proxy_set_header Upgrade $http_upgrade;
+                                                    proxy_set_header Connection 'upgrade';
+                                                    proxy_set_header Host $host;
+                                                    proxy_set_header X-Real-IP $remote_addr;
+                                                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                                                    }
+
+
+
+
+                                                listen [::]:443 ssl ipv6only=on; # managed by Certbot
+                                                listen 443 ssl; # managed by Certbot
+                                                ssl_certificate /etc/letsencrypt/live/dashboard.innovwayz.tech/fullchain.pem; # managed by Certbot
+                                                ssl_certificate_key /etc/letsencrypt/live/dashboard.innovwayz.tech/privkey.pem; # managed by Certbot
+                                                include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+                                                ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+                                            }
+
+                                            server {
+                                                if ($host = dashboard.innovwayz.tech) {
+                                                    return 301 https://$host$request_uri;
+                                                } # managed by Certbot
+
+
+                                                    listen 80;
+                                                    listen [::]:80;
+
+                                                    server_name dashboard.innovwayz.tech;
+                                                return 404; # managed by Certbot
+
+
+                                            }
