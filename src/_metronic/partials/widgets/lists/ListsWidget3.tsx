@@ -247,7 +247,7 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
 // To dynamically change logo of clients based on activeTab
 const updatePicUrl = (user_id : { username: string}) => {
   switch (user_id.username){
-    case 'bala' :
+    case 'balasubramanian' :
       return '/media/svg/ConsultantPhotos/Bala Pic.jpeg'
     case 'baskar' :
       return '/media/svg/ConsultantPhotos/Baskar Pic.jpg'
@@ -267,10 +267,12 @@ const updatePicUrl = (user_id : { username: string}) => {
       return '/media/svg/ConsultantPhotos/Vignesh Pic.jpeg'
     case 'waseem' :
       return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
-    case 'Venkata Tejesh' :
+    case 'venkata tejesh' :
       return "/media/svg/ConsultantPhotos/Tejesh Pic.jpeg"
-    case 'Vignesh' :
-      return '/media/svg/ConsultantPhotos/Vignesh Pic.jpg'
+    case 'nandha kumar' :
+       return '/media/svg/ConsultantPhotos/Nandha_kumar_Ramamoorty_Pic.jpg'
+    case 'faiz' :
+        return '/media/svg/ConsultantPhotos/Faiz_Mahmood_Khan_Pic.jpg'
   }
 }
 

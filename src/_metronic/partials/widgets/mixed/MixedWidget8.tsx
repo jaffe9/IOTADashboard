@@ -54,30 +54,34 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
   // To dynamically change logo of clients based on activeTab
 const updatePicUrl = (associated_user_id : { username: string}) => {
   switch (associated_user_id.username){
-    case 'bala' :
-      return '/media/svg/ConsultantPhotos/Bala Pic.jpeg'
-    case 'baskar' :
-      return '/media/svg/ConsultantPhotos/Baskar Pic.jpg'
-    case 'hala' :
-      return '/media/svg/ConsultantPhotos/Hala Pic.jpeg'
-    case 'rakesh':
-      return '/media/svg/ConsultantPhotos/Rakesh pic.png'
-    case 'sadath' :
-      return '/media/svg/ConsultantPhotos/Sadath Pic.jpeg'
-    case 'samiullah' :
-      return '/media/svg/ConsultantPhotos/Samiullah Pic.jpeg'
-    case 'sandeep' :
-      return '/media/svg/ConsultantPhotos/Sandeep Pic.jpeg'
-    case 'thameem' :
-      return '/media/svg/ConsultantPhotos/Thameem Pic.jpeg'
-    case 'vignesh' :
-      return '/media/svg/ConsultantPhotos/Vignesh Pic.jpeg'
-    case 'waseem' :
-      return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
+     case 'balasubramanian' :
+           return '/media/svg/ConsultantPhotos/Bala Pic.jpeg'
+     case 'baskar' :
+           return '/media/svg/ConsultantPhotos/Baskar Pic.jpg'
+     case 'hala' :
+           return '/media/svg/ConsultantPhotos/Hala Pic.jpeg'
+     case 'rakesh':
+           return '/media/svg/ConsultantPhotos/Rakesh pic.png'
+      case 'sadath' :
+           return '/media/svg/ConsultantPhotos/Sadath Pic.jpeg'
+      case 'samiullah' :
+           return '/media/svg/ConsultantPhotos/Samiullah Pic.jpeg'
+      case 'sandeep' :
+           return '/media/svg/ConsultantPhotos/Sandeep Pic.jpeg'
+      case 'thameem' :
+           return '/media/svg/ConsultantPhotos/Thameem Pic.jpeg'
+      case 'vignesh' :
+           return '/media/svg/ConsultantPhotos/Vignesh Pic.jpeg'
+      case 'waseem' :
+           return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
       case 'Venkata Tejesh' :
-        return "/media/svg/ConsultantPhotos/Tejesh Pic.jpeg"
+           return "/media/svg/ConsultantPhotos/Tejesh Pic.jpeg"
       case 'Vignesh' :
-        return '/media/svg/ConsultantPhotos/Vignesh Pic.jpg'
+           return '/media/svg/ConsultantPhotos/Vignesh Pic.jpg'
+      case 'nandha kumar' :
+           return '/media/svg/ConsultantPhotos/Nandha_kumar_Ramamoorty_Pic.jpg'
+      case 'faiz' :
+           return '/media/svg/ConsultantPhotos/Faiz_Mahmood_Khan_Pic.jpg'
   }
 }
 

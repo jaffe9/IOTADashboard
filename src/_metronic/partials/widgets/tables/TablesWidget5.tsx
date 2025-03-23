@@ -72,11 +72,15 @@ const updatePicUrl = (associated_user_id : { username: string}) => {
     case 'vignesh' :
       return '/media/svg/ConsultantPhotos/Vignesh Pic.jpeg'
     case 'waseem' :
-      return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
+       return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
      case 'Venkata Tejesh' :
-      return "/media/svg/ConsultantPhotos/Tejesh Pic.jpeg"
+       return "/media/svg/ConsultantPhotos/Tejesh Pic.jpeg"
     case 'Vignesh' :
-      return '/media/svg/ConsultantPhotos/Vignesh Pic.jpg'
+       return '/media/svg/ConsultantPhotos/Vignesh Pic.jpg'
+    case 'nandha kumar' :
+       return '/media/svg/ConsultantPhotos/Nandha_kumar_Ramamoorty_Pic.jpg'
+    case 'faiz' :
+       return '/media/svg/ConsultantPhotos/Faiz_Mahmood_Khan_Pic.jpg'
   }
 }
 

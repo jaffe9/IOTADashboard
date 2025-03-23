@@ -16,6 +16,7 @@ type tempUserRecord = {
   fullName: string;
   id: number;
   userId: string;
+  
 };
 
 const ListsWidget26 = ({ className }: Props) => {

@@ -39,7 +39,7 @@ const CreateEmployee: FC = () => {
 
   const handleAccountManagerChange = async (accountManagerid : number) => {
     updateData({
-      associated_account_manager: accountManagerid,
+      associatedAccountManager: accountManagerid,
     })    
   }
   const handleChange = async (client_name : string) => {
@@ -69,7 +69,7 @@ const CreateEmployee: FC = () => {
       setTimeout(async () => {
         const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
-        if(data.client_id < 1 || data.associated_account_manager == null || data.uName == null || data.fullName == null  )
+        if(data.client_id < 1 || data.associatedAccountManager == null || data.uName == null || data.fullName == null  )
         {
           alert("Please select all fields")
           setLoading(false)
@@ -89,7 +89,7 @@ const CreateEmployee: FC = () => {
           timeZone : data.timeZone,
           address : data.address,
           clientId : data.client_id,
-          associated_account_manager : data.associated_account_manager,
+          associatedAccountManager : data.associatedAccountManager,
         };
         console.log("Temp employee response:" , tempEmp)
         const apiResponse = await createTempEmployee(tempEmp)

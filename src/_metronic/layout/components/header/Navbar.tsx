@@ -2,12 +2,27 @@ import clsx from 'clsx'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, Search, ThemeModeSwitcher} from '../../../partials'
 import {useLayout} from '../../core'
+import { getAccountManagerId } from '../../../../app/modules/auth/core/_authStore'
 
 const itemClass = 'ms-1 ms-md-4'
 const btnClass =
   'btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px'
 const userAvatarClass = 'symbol-35px'
 const btnIconClass = 'fs-2'
+
+const updatedPicUrl = () => {
+   const loggedUser =  getAccountManagerId();
+
+   switch (loggedUser){
+     case '2' :
+       return  '/media/svg/ConsultantPhotos/MaazAhmad_Pic.jpg'
+     case '1' :
+       return '/media/svg/ConsultantPhotos/Firasat_Pic.jpg'
+     default : 
+       return 'media/avatars/300-3.jpg'
+        
+   }
+} 
 
 const Navbar = () => {
   const {config} = useLayout()
@@ -53,7 +68,7 @@ const Navbar = () => {
           data-kt-menu-attach='parent'
           data-kt-menu-placement='bottom-end'
         >
-          <img src='/media/svg/ConsultantPhotos/Samiullah Pic.jpeg' alt='' />
+          <img src={updatedPicUrl()} alt='' />
         </div>
         <HeaderUserMenu />
       </div>

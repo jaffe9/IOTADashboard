@@ -218,7 +218,7 @@ export type temEmp = {
 "timeZone" : string,
 "address" : string,
 "clientId" : number,
-"associated_account_manager" : number,
+"associatedAccountManager" : number,
 }
 
 export type ListOfTimesheet = {

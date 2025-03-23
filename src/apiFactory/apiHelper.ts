@@ -1058,18 +1058,18 @@ export const createTempEmployee = async (t: temEmp): Promise<{status:number; mes
       website : null,
       emailSettings : null,
       auth : null,
-      communication : null,
+    //  communication : null,
       address : t.address,
       socialNetworks : null,
       employeeJoiningDate : null,
       loginId : null,
       employeeId : null,
       employeeBand : null,
-      isClientFacing : false,
+      isClientFacing : true,
       clientId : t.clientId,
-      isActive : false,
+      isActive : true,
       contract_id : null,
-      associated_account_manager : t.associated_account_manager,
+      associatedAccountManager : t.associatedAccountManager,
 
     }
   ]);
