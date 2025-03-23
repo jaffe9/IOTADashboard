@@ -163,7 +163,7 @@ export function Login() {
       ) : (
         <div className='mb-10 bg-light-info p-8 rounded'>
           <div className='text-info'>
-            Use account <strong>jaffar@innovwayz.com</strong> and password <strong>demo</strong> to
+            Use account <strong>email</strong> and password <strong></strong> to
             continue.
           </div>
         </div>

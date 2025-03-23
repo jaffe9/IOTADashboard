@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, Search, ThemeModeSwitcher} from '../../../partials'
 import {useLayout} from '../../core'
-import { getAccountManagerId } from '../../../../app/modules/auth/core/_authStore'
+import { getLoggedUser, getUserId } from '../../../../app/modules/auth/core/_authStore'
 
 const itemClass = 'ms-1 ms-md-4'
 const btnClass =
@@ -11,15 +11,15 @@ const userAvatarClass = 'symbol-35px'
 const btnIconClass = 'fs-2'
 
 const updatedPicUrl = () => {
-   const loggedUser =  getAccountManagerId();
+   const loggedUser =  getUserId();
 
    switch (loggedUser){
-     case '2' :
+     case '13' :
        return  '/media/svg/ConsultantPhotos/MaazAhmad_Pic.jpg'
-     case '1' :
+     case '12' :
        return '/media/svg/ConsultantPhotos/Firasat_Pic.jpg'
-     default : 
-       return 'media/avatars/300-3.jpg'
+     case '7' :
+       return '/media/svg/ConsultantPhotos/Zakiuddin_Pic.jpg'
         
    }
 } 

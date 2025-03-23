@@ -4,20 +4,20 @@ import {Link} from 'react-router-dom'
 import {useAuth} from '../../../../app/modules/auth'
 import {Languages} from './Languages'
 import {toAbsoluteUrl} from '../../../helpers'
-import { getAccountManagerId } from '../../../../app/modules/auth/core/_authStore'
+import { getLoggedUser, getUserId } from '../../../../app/modules/auth/core/_authStore'
 
 const HeaderUserMenu: FC = () => {
   const {currentUser, logout} = useAuth()
   
   const updatedPicUrl = () => {
-    const loggedUser = getAccountManagerId();
+    const loggedUser = getUserId();
      switch (loggedUser){
-      case '1' :
+      case '12' :
          return '/media/svg/ConsultantPhotos/Firasat_Pic.jpg'
-      case '2' :
+      case '13' :
          return '/media/svg/ConsultantPhotos/MaazAhmad_Pic.jpg'
-      default : 
-         return ''
+      case '7' :
+         return '/media/svg/ConsultantPhotos/Zakiuddin_Pic.jpg'
      }
   }
  
@@ -29,12 +29,12 @@ const HeaderUserMenu: FC = () => {
       <div className='menu-item px-3'>
         <div className='menu-content d-flex align-items-center px-3'>
           <div className='symbol symbol-50px me-5'>
-            <img alt='Logo' src={toAbsoluteUrl('media/avatars/300-3.jpg')} />
+            <img alt='Logo' src={updatedPicUrl()} />
           </div>
 
           <div className='d-flex flex-column'>
             <div className='fw-bolder d-flex align-items-center fs-5'>
-              {currentUser?.first_name} {currentUser?.first_name}
+              {currentUser?.fullName} 
               <span className='badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2'>Pro</span>
             </div>
             <a href='#' className='fw-bold text-muted text-hover-primary fs-7'>

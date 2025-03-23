@@ -75,7 +75,7 @@ const AuthLayout = () => {
 
           {/* begin::Title */}
           <h1 className='text-white fs-2qx fw-bolder text-center mb-7'>
-            Fast, Efficient and Productive
+            Innovwayz Technologies Company
           </h1>
           {/* end::Title */}
 
@@ -83,12 +83,12 @@ const AuthLayout = () => {
           <div className='text-white fs-base text-center'>
             In this kind of post,{' '}
             <a href='#' className='opacity-75-hover text-warning fw-bold me-1'>
-              the blogger
+              
             </a>
             introduces a person they’ve interviewed <br /> and provides some background information
             about
             <a href='#' className='opacity-75-hover text-warning fw-bold me-1'>
-              the interviewee
+              
             </a>
             and their <br /> work following this is a transcript of the interview.
           </div>

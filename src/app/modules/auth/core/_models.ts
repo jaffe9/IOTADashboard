@@ -55,7 +55,7 @@ export interface UserModel {
   email: string
   first_name: string
   last_name: string
-  fullname?: string
+  fullName?: string
   occupation?: string
   companyName?: string
   phone?: string
