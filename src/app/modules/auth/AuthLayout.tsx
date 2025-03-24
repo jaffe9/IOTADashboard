@@ -58,10 +58,10 @@ const AuthLayout = () => {
         style={{backgroundImage: `url(${toAbsoluteUrl('media/misc/auth-bg.png')})`}}
       >
         {/* begin::Content */}
-        <div className='d-flex flex-column flex-center py-15 px-5 px-md-15 w-100'>
+        <div className='d-flex flex-column flex-center  py-15 px-5 px-md-15 w-100'>
           {/* begin::Logo */}
-          <Link to='/' className='mb-12'>
-            <img alt='Logo' src={toAbsoluteUrl('media/logos/custom-1.png')} className='h-75px' />
+          <Link to='/' className='mb-12 mt-15'>
+            <img alt='Logo' src='src/_metronic/assets/fonticon/innovwayzLogo.png' className='h-100px' />
           </Link>
           {/* end::Logo */}
 
@@ -81,16 +81,16 @@ const AuthLayout = () => {
 
           {/* begin::Text */}
           <div className='text-white fs-base text-center'>
-            In this kind of post,{' '}
+            
             <a href='#' className='opacity-75-hover text-warning fw-bold me-1'>
               
             </a>
-            introduces a person they’ve interviewed <br /> and provides some background information
-            about
+             
+            
             <a href='#' className='opacity-75-hover text-warning fw-bold me-1'>
               
             </a>
-            and their <br /> work following this is a transcript of the interview.
+
           </div>
           {/* end::Text */}
         </div>
