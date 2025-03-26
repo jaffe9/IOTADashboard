@@ -1,9 +1,9 @@
-name: Deploy to Ubuntu Server
+name: Deploy to Ubuntu Server (Dev)
 
 on:
   push:
     branches:
-      - dev  # Change if your default branch is different
+      - dev  # Change this to your actual development branch
 
 jobs:
   deploy:
@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          ref: dev  # Ensures it checks out the `dev` branch
 
       - name: Setup SSH
         run: |
@@ -22,9 +24,9 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /root/iwtDashboard/  # Change this to your actual project path
-            git pull origin main
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd /iwtDashboard  # Make sure this path is for `dev`
+            git pull origin dev  # Ensure you're pulling the `dev` branch
             npm install  # Install dependencies if needed
-            pm2 restart app  # Restart your Node.js application (change accordingly)
+            pm2 restart app  # Restart your Node.js application (modify if needed)
           EOF
