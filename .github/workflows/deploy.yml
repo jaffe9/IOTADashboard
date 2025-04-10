@@ -15,17 +15,17 @@ jobs:
         with:
           ref: dev  # Ensures it checks out the `dev` branch
 
-      - name: Setup SSH
+      - name: Setup SSH Key
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+            mkdir -p ~/.ssh
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /iwtDashboard  # Make sure this path is for `dev`
+            cd /iwtDashboard/IOTADashboard  # Make sure this path is for `dev`
             git pull origin dev  # Ensure you're pulling the `dev` branch
             npm install  # Install dependencies if needed
             pm2 restart app  # Restart your Node.js application (modify if needed)

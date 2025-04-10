@@ -6,7 +6,7 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createClaimPage, uploadClaimsToSupabase } from "../../../apiFactory/apiHelper";
+import { apiHelper, createClaimPage,  uploadClaimsToSupabase } from "../../../apiFactory/apiHelper";
 import {
   User,
   ClaimRequest,
@@ -55,7 +55,7 @@ const handleClaimupload = async () => {
     return ;
   }
   try{
-   await uploadClaimsToSupabase(file)
+   await uploadClaimsToSupabase(file) 
    alert('Claim Uploaded')
   }catch(error){
    console.error('Error in Claim Upload:',error)
@@ -122,8 +122,8 @@ const handleClaimupload = async () => {
           }
           else
           {
-            alert("An error occurred, please try again later");
-            setLoading(false);
+              alert("An error occurred, please try again later");
+             setLoading(false);
           }
       }, 1000);
     },

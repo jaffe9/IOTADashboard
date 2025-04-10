@@ -105,6 +105,8 @@ export type Salary = {
     username?: string 
     email?: string
   }
+  leaves?: string
+  overTime?:string
 }
 export type AddTypeSalary = {
   id?: number
@@ -128,6 +130,8 @@ export type AddTypeSalary = {
   payslilpOptionSelected?: payslipOptions
   user_id?: string
   username : string
+  overTime? : string
+  leaves?: string
 }
 
 export type National_id = {

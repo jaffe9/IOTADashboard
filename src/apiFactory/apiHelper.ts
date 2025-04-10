@@ -221,15 +221,15 @@ export const getLeavesLeft = async () => {
    // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
-      url = "leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id";
+      url = "https://zhplktaovpyenmypkjql.supabase.co/rest/v1/leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id&isActive=eq.true";
     }  else if (loggedUser === null ) {
       // null Case
-      url = "leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id";
+      url = "https://zhplktaovpyenmypkjql.supabase.co/rest/v1/leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id&isActive=eq.true";
     }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
      // console.log("This is Account Manager Id: ", accountManagerId);
-      url = `leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id&associated_account_manager=eq.${accountManagerId}`;
+      url = `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id&isActive=eq.true&associated_account_manager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url);
     return response.data;
@@ -782,6 +782,8 @@ export const AddSalary = async ( s:AddTypeSalary ) : Promise<any> => {
         working_days : s. working_days, 
         holidays : s.holidays,
         deductions_total : s.deductions_total, 
+        leaves : s.leaves,
+        oveTime : s.overTime,
     }
   ]);
   
@@ -880,6 +882,8 @@ let data = JSON.stringify([
       working_days : s. working_days, 
       holidays : s.holidays,
       deductions_total : s.deductions_total, 
+      leaves : s.leaves,
+      overTime : s.overTime,
   }
 ]);
 
@@ -942,6 +946,39 @@ axios.request(config)
     console.error("Some Other Error in Updating Leave Record : ", error)
   }
 });
+
+}
+                
+export const updateLeaveRecordStatus = async (id: any) => {
+  let data = JSON.stringify([
+    {
+      isActive : false 
+    }
+  ]);
+  
+  let config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/leaveEntitlment?id=eq.${id}`,
+    headers: { 
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    if (axios.isAxiosError(error)){
+      console.error("Axios Error in update Invoice Status : ", error.response?.data || error.message)
+     }else{
+      console.error("Error in updating InvoiceStatus to true " , error)
+     }
+  });
 
 }
 // End of update Leave Record 

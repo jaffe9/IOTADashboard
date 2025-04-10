@@ -2,7 +2,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import {Dropdown1} from '../../content/dropdown/Dropdown1'
-import { getLeavesLeft, updateLeaveRecord } from '../../../../apiFactory/apiHelper'
+import { getLeavesLeft, updateLeaveRecord, updateLeaveRecordStatus } from '../../../../apiFactory/apiHelper'
 import { numeric } from '@form-validation/bundle/popular'
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios'
@@ -19,6 +19,7 @@ type LeaveBalanceRecord = {
   leave_left_current_year:number;
   year:number;
   user_id: { id : number , username: string , companyName:string , employeeJoiningDate:string , contract_id:{billing_months: number} };
+  isActive:string
 };
 
 const ListsWidget3: React.FC<Props> = ({ className }) => {
@@ -85,7 +86,24 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
       console.error("Internal Server Error :" , error)
      }
     }
-  }
+  }     
+
+  const updateStatus = async (user : LeaveBalanceRecord | null) => {
+    if(!user) return ;
+     try{
+         await updateLeaveRecordStatus(user.id)
+           // Remove Updated Inactive Records 
+        setFilteredRecords((pre:LeaveBalanceRecord[]) => pre.filter((u) => u.id !== user.id));
+         setSelectedUser(null)
+         setShowConfirm(false)
+     }catch(error){
+      if(axios.isAxiosError(error)){
+        console.error("Error in Leave Record status update Listwidget 3 Line 95 : ", error.response?.data || error.message )
+       }else{
+        console.error("Internal Server Error :" , error)
+       }
+     }
+  } 
 
 
 
@@ -234,6 +252,7 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
+        <span><Button  variant="danger" onClick={() => updateStatus(selectedUser)}>Mark inActive</Button></span>
           <Button  variant="secondary"  onClick={handleCloseModel} >Cancel</Button>
           <Button  variant="primary" onClick={() => handleUpdateLeaveRecoreStatus(selectedUser)}>Confirm</Button>
         </Modal.Footer>

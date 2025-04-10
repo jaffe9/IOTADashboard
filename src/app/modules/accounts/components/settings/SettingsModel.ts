@@ -134,6 +134,8 @@ export type IProfileDetailsSalary = {
     username : String 
     email : string
   }
+  leaves : string
+  overTime : string
 }
 
 export type IProfileDetailsTypeSalary = {
@@ -157,6 +159,8 @@ export type IProfileDetailsTypeSalary = {
   deductions_total: string
   user_id: string
   username : string
+  overTime : string
+  leaves : string
 }
 
 
@@ -327,48 +331,52 @@ export const profileDetailsInitValuesInvoice: IProfileDetailsInvoice = {
 export const  profileDetailsSalaryInitialValues: IProfileDetailsSalary = {
   id: 0,
   pay_period: "",
-  pay_date:"",
-  basic_allowance:"", 
+  pay_date: "",
+  basic_allowance: "",
   hr_allowance: "",
   end_of_service_allowance: "",
-  travel_other_allowance:"",
+  travel_other_allowance: "",
   earnings_total: "",
   lop_days: "",
   employee_request: "",
   salary_advance: "",
-  lop_salary_total:"",
+  lop_salary_total: "",
   total_net_salary: "",
   total_net_salary_words: "",
   salary_pay_mode: "",
   working_days: "",
   holidays: "",
   deductions_total: "",
-  user_id:{
-    username : "",
-    email : ""
+  user_id: {
+    username: "",
+    email: ""
   },
+  leaves: "",
+  overTime: ""
 }
 export const  profileDetailsTypeSalaryInitialValues: IProfileDetailsTypeSalary = {
   id: 0,
   pay_period: "",
-  pay_date:"",
-  basic_allowance:"", 
+  pay_date: "",
+  basic_allowance: "",
   hr_allowance: "",
   end_of_service_allowance: "",
-  travel_other_allowance:"",
+  travel_other_allowance: "",
   earnings_total: "",
   lop_days: "",
   employee_request: "",
   salary_advance: "",
-  lop_salary_total:"",
+  lop_salary_total: "",
   total_net_salary: "",
   total_net_salary_words: "",
   salary_pay_mode: "",
   working_days: "",
   holidays: "",
   deductions_total: "",
-  user_id:"",
+  user_id: "",
   username: "",
+  overTime: "",
+  leaves: ""
 }
 
 export const profileDetailsInitValuesNationalId : IProfileDetailsNationalId = {

@@ -11,6 +11,15 @@ import './_metronic/assets/fonticon/fonticon.css'
 import './_metronic/assets/keenicons/duotone/style.css'
 import './_metronic/assets/keenicons/outline/style.css'
 import './_metronic/assets/keenicons/solid/style.css'
+
+//PostHog
+import { PostHogProvider } from 'posthog-js/react'
+console.log(import.meta.env.VITE_PUBLIC_POSTHOG_HOST)
+console.log("Loaded")
+const options = {
+  api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+}
+
 /**
  * TIP: Replace this style import with rtl styles to enable rtl mode
  *
@@ -40,10 +49,11 @@ if (container) {
     <QueryClientProvider client={queryClient}>
       <MetronicI18nProvider>
         <AuthProvider>
+          <PostHogProvider apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY} options={options}>
           <AppRoutes/>
+          </PostHogProvider>
         </AuthProvider>
       </MetronicI18nProvider>
     </QueryClientProvider>
   )
 }
-

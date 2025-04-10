@@ -61,6 +61,7 @@
     "mini-css-extract-plugin": "2.6.1",
     "nouislider": "15.5.1",
     "pino": "^8.20.0",
+    "posthog-js": "^1.235.0",
     "primereact": "^10.9.1",
     "prism-react-renderer": "2.0.5",
     "prism-themes": "1.9.0",

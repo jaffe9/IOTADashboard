@@ -55,6 +55,8 @@ const AddNewSalary: FC = () => {
        working_days : hasMatch.working_days, 
        holidays : hasMatch.holidays,
        deductions_total : hasMatch.deductions_total,
+       leaves : hasMatch.leaves,
+       overTime : hasMatch.overTime,
     });
   };
 
@@ -95,7 +97,9 @@ const AddNewSalary: FC = () => {
           working_days: data.working_days,
           holidays: data.holidays,
           deductions_total: data.deductions_total,
-          username: ""
+          username: "",
+          leaves : data.leaves,
+          overTime : data.overTime,
         };
         
         const apiResponse = await AddSalary(salary)
@@ -464,6 +468,58 @@ const AddNewSalary: FC = () => {
                         <div className="fv-plugins-message-container">
                           <div className="fv-help-block">
                             {formik.errors.working_days}
+                          </div>
+                        </div>
+                      )}
+                    </div> 
+                  </div>
+
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      Employee OverTime 
+                    </label>
+                    
+                    <div className="col-lg-8 fv-row">
+                    <input
+                        type="text"
+                        className="form-control form-control-lg form-control-solid"
+                        placeholder="Enter Over Time Pay Total"
+                       {...formik.getFieldProps("overTime")}
+                        onChange={(value) => {
+                          updateData({ overTime: value.target.value });
+                          formik.setFieldValue("overTime",updatedUserInfo.overTime);
+                        }}
+                      />
+                      {formik.touched.overTime && formik.errors.overTime && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            {formik.errors.overTime}
+                          </div>
+                        </div>
+                      )}
+                    </div> 
+                  </div>
+
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      Employee Leaves 
+                    </label>
+                    
+                    <div className="col-lg-8 fv-row">
+                    <input
+                        type="text"
+                        className="form-control form-control-lg form-control-solid"
+                        placeholder="Enter Leaves Taken By Employee"
+                       {...formik.getFieldProps("leaves")}
+                        onChange={(value) => {
+                          updateData({ leaves: value.target.value });
+                          formik.setFieldValue("leaves",updatedUserInfo.leaves);
+                        }}
+                      />
+                      {formik.touched.leaves && formik.errors.leaves && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            {formik.errors.leaves}
                           </div>
                         </div>
                       )}
