@@ -117,6 +117,16 @@ const GetInvoiceDetails: React.FC<Props> = ({ className }) => {
                 className={`nav-link btn btn-sm ${
                   activeTab === 4 ? 'btn-active btn-active-light-primary active' : 'btn-color-muted'
                 } fw-bold px-4 me-1`}
+                onClick={() => handleTabClick(3)}
+              >
+                 SAB
+              </a>
+            </li>
+            <li className="nav-item">
+            <a
+                className={`nav-link btn btn-sm ${
+                  activeTab === 4 ? 'btn-active btn-active-light-primary active' : 'btn-color-muted'
+                } fw-bold px-4 me-1`}
                 onClick={() => handleTabClick(4)}
               >
                  ARB
@@ -146,6 +156,11 @@ const GetInvoiceDetails: React.FC<Props> = ({ className }) => {
           </div>
           <div
             className={`tab-pane fade ${activeTab === 2 ? 'show active' : ''}`}
+          >
+            {renderTable(filteredRecords , handleInvoiceStatusUpdate , activeTab)}
+          </div>
+          <div
+            className={`tab-pane fade ${activeTab === 3 ? 'show active' : ''}`}
           >
             {renderTable(filteredRecords , handleInvoiceStatusUpdate , activeTab)}
           </div>
