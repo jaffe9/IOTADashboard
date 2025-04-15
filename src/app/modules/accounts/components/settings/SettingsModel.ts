@@ -1,6 +1,7 @@
 import { StickyComponent } from "../../../../../_metronic/assets/ts/components";
 
 export interface IProfileDetails {
+  id : number;
   associatedUserId: number;
   password : string ;
   expenseTypeDesc:string
@@ -269,7 +270,8 @@ export const profileDetailsInitValues: IProfileDetails = {
   associated_account_manager: 0,
   address: "",
   email: "",
-  associatedAccountManager:0,
+  associatedAccountManager: 0,
+  id: 0
 };
 
 export const profileDetailsInitValuesContract: IProfileDetailsContract = {

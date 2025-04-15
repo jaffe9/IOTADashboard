@@ -18,7 +18,7 @@ type invoiceDetails = {
   invoice_value:number;
   invoice_url:string;
   invoice_data:Date;
-  associated_user_id: { username: string , companyName:string , clientId:{ client_short_name:string} };
+  associated_user_id: { username: string , companyName:string , client_id:{ client_short_name:string} };
   invoice_paid_status : boolean;
   invoice_paid_amount : string;
 };
@@ -244,7 +244,7 @@ const renderTable = (records: invoiceDetails[] ,  handleInvoiceStatusUpdate : (i
                   {record.associated_user_id?.username?.toUpperCase()}
                 </a>
                 <span className="text-muted fw-semibold d-block">
-                  {record.associated_user_id?.clientId?.client_short_name}
+                  {record.associated_user_id?.client_id?.client_short_name}
                 </span>
               </td>
               <td className="text-primary fw-bold">{record.external_invoice_no}</td>

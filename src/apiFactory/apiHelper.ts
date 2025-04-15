@@ -146,15 +146,15 @@ export const getContractExpiries = async () => {
      // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
-      url = "contract?select=*,associated_user_id(username,companyName)";
+      url = "contract?select=*,associated_user_id(username,companyName)&order=id";
     } else if (loggedUser === null ) {
       // null Case
-      url = "contract?select=*,associated_user_id(username,companyName)";
+      url = "contract?select=*,associated_user_id(username,companyName)&order=id";
     }  else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
     //  console.log("This is Account Manager Id: ", accountManagerId);
-      url = `contract?select=*,associated_user_id(username,companyName)&associatedAccountManager=eq.${accountManagerId}`;
+      url = `contract?select=*,associated_user_id(username,companyName)&order=id&associatedAccountManager=eq.${accountManagerId}`;
     }
     const response = await axiosInstance.get(url);
     return response.data;
@@ -196,15 +196,15 @@ export const getInvoiceDetails = async () => {
     console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
-      url = "invoice?select=*,associated_user_id(username,companyName,clientId(client_short_name))&invoice_paid_status=eq.false&order=id";
+      url = "invoice?select=*,associated_user_id(username,companyName,client_id(client_short_name))&invoice_paid_status=eq.false&order=id";
     }  else if (loggedUser === null ) {
       // null Case
-      url = "invoice?select=*,associated_user_id(username,companyName,clientId(client_short_name))&invoice_paid_status=eq.false&order=id";
+      url = "invoice?select=*,associated_user_id(username,companyName,client_id(client_short_name))&invoice_paid_status=eq.false&order=id";
     } else {
       // Account Manager case
       const accountManagerId = await getAccountManagerId();
     //  console.log("This is Account Manager Id: ", accountManagerId);
-      url = `invoice?select=*,associated_user_id(username,companyName,clientId(client_short_name))&invoice_paid_status=eq.false&order=id&associated_account_manager=eq.${accountManagerId}`;
+      url = `invoice?select=*,associated_user_id(username,companyName,client_id(client_short_name))&invoice_paid_status=eq.false&order=id&associated_account_manager=eq.${accountManagerId}`;
     }
   const response = await axiosInstance.get(url)
   return response.data;
@@ -458,15 +458,15 @@ export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
  // console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associatedAccountManager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`;
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,fullName,occupation,companyName,client_id,contract_id,associatedAccountManager(accountManagerName),phone,employeeJoiningDate,language,employeeId&isClientFacing=eq.1&order=id`;
   } else if (loggedUser === null ) {
     // null Case
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associatedAccountManager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`;
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,fullName,occupation,companyName,client_id,contract_id,associatedAccountManager(accountManagerName),phone,employeeJoiningDate,language,employeeId&isClientFacing=eq.1&order=id`;
   }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
    // console.log("This is Account Manager Id: ", accountManagerId);
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,clientId,contract_id,associatedAccountManager,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id&associatedAccountManager=eq.${accountManagerId}`;
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,fullName,occupation,companyName,client_id,contract_id,associatedAccountManager(accountManagerName),phone,employeeJoiningDate,language,employeeId&isClientFacing=eq.1&order=id&associatedAccountManager=eq.${accountManagerId}`;
   }
   const d = await axios
     .get(url);
@@ -562,21 +562,21 @@ export const getAccountManager = async (): Promise<UsersQueryResponse> => {
   return d;
 }
 
-export const getPeerEmployees = async (clientId: string): Promise<UsersQueryResponse> => {
+export const getPeerEmployees = async (client_id: string): Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
   //console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}`;
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&client_id=eq.${client_id}`;
   } else if (loggedUser === null ) {
     // null Case
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}`;
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&client_id=eq.${client_id}`;
   }  else {
     // Account Manager case
     const accountManagerId = await getAccountManagerId();
     //console.log("This is Account Manager Id: ", accountManagerId);
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&clientId=eq.${clientId}&associated_account_manager=eq.${accountManagerId}`;
+    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId,contract_id,salary(user_id,*),contract(associated_user_id,*)&isClientFacing=eq.1&order=id&client_id=eq.${client_id}&associated_account_manager=eq.${accountManagerId}`;
   }
   const d = await axios
     .get(url);
@@ -737,6 +737,28 @@ export const getClientDetails = async () : Promise<any> => {
   return d;
 };
 
+export const getContractDetails = async () : Promise<any> => {
+  let url = "";
+  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
+  //console.log("From api Helper:", loggedUser)
+  if (loggedUser === `${admin}`) {
+    // Admin case
+    url = `${GET_USER_CONTRACT_URL}?select=*,associated_user_id(*)&order=id`;
+  } else if (loggedUser === null ) {
+    // null Case
+    url = `${GET_USER_CONTRACT_URL}?select=*,associated_user_id(*)&order=id`;
+  }  else {
+    // Account Manager case
+    const accountManagerId = await getAccountManagerId();
+  //  console.log("This is Account Manager Id: ", accountManagerId);
+    url = `${GET_USER_CONTRACT_URL}?select=*,associated_user_id(*)&order=id&associatedAccountManager=eq.${accountManagerId}`;
+  }
+  const d =  await axios
+    .get(url);
+    console.log(d)
+  return d;
+};
+
 export const getTempUserDetails = async () : Promise<any> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
@@ -783,7 +805,7 @@ export const AddSalary = async ( s:AddTypeSalary ) : Promise<any> => {
         holidays : s.holidays,
         deductions_total : s.deductions_total, 
         leaves : s.leaves,
-        oveTime : s.overTime,
+        overTime : s.overTime,
     }
   ]);
   
@@ -1074,7 +1096,76 @@ try {
 }
 }
 
+// Table to update resources from user table 
+export const updateEmployeeData = async (t: temEmp): Promise<{status:number; message:string}> => {
+  let data = JSON.stringify([
+    {
+      id : t.id,
+      username : t.username,
+      password : "Innovwayz@123",
+      email : t.email,
+      firstName : t.firstName,
+      lastName : t.lastName,
+      fullName : t.fullName,
+      occupation : t.occupation,
+      companyName : t.companyName,
+      phone : t.phone,
+      roles : null,
+      pic : null,
+      language : t.language,
+      timeZone : 'AST',
+      website : null,
+      emailSettings : null,
+      auth : null,
+    //  communication : null,
+      address : t.address,
+      socialNetworks : null,
+      employeeJoiningDate : null,
+      loginId : null,
+      employeeId : null,
+      employeeBand : null,
+      isClientFacing : true,
+      client_id : t.client_id,
+      isActive : true,
+      contract_id : t.contract_id,
+      associatedAccountManager : t.associatedAccountManager,
 
+    }
+  ]);
+  console.log("APIData:" + data);
+  let config = {
+    method: 'PATCH',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/user?id=eq.${t.id}`,
+    headers: {
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': 'application/json'
+    },
+    data: data
+  };
+
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("error in tempEmp:",error.response?.data )
+    }else{
+      console.error("Unexpected error:",error);
+    }
+
+    return { status: 500, message: "Error creating Temperary Employee" };
+  }
+  
+}
+
+//End of table to update user from user table
 // Table creation For temparary user 
 export const createTempEmployee = async (t: temEmp): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
@@ -1103,7 +1194,7 @@ export const createTempEmployee = async (t: temEmp): Promise<{status:number; mes
       employeeId : null,
       employeeBand : null,
       isClientFacing : true,
-      clientId : t.clientId,
+      client_id : t.client_id,
       isActive : true,
       contract_id : null,
       associatedAccountManager : t.associatedAccountManager,

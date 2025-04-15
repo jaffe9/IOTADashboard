@@ -75,7 +75,7 @@ const EmployeeInvoice: FC = () => {
     const previousMonth = new Date();
     previousMonth.setMonth(today.getMonth() - 1);
     updateData({
-      client_id: hasMatch.clientId,
+      client_id: hasMatch.client_id,
      // fName: userName,
       internal_invoice_no: hasMatch.employeeId+"_"+previousMonth
       .toLocaleDateString("en-IN",{

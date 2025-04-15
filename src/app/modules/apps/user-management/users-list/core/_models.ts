@@ -20,6 +20,8 @@ export type User = {
   employeeId?: string
   pic?: string
   associatedAccountManage?:number
+  fullName?:string
+  language?:string[]
 }
 
 export type TempUser = {
@@ -209,6 +211,7 @@ export type ClaimRequest = {
 }
 
 export type temEmp = {
+"id" : number,
 "username" : string,
 "password" : string,
 "email" : string,
@@ -221,8 +224,9 @@ export type temEmp = {
 "language" : string[],
 "timeZone" : string,
 "address" : string,
-"clientId" : number,
+"client_id" : number,
 "associatedAccountManager" : number,
+"contract_id": string,
 }
 
 export type ListOfTimesheet = {

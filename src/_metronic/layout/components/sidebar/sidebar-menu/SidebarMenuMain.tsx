@@ -20,6 +20,7 @@ const SidebarMenuMain = () => {
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Account Manager Section</span>
         </div>
       </div>
+
       <SidebarMenuItemWithSub 
       to={''} 
       icon = 'abstract-26'
@@ -29,8 +30,18 @@ const SidebarMenuMain = () => {
          <SidebarMenuItem to='/Salary' icon='wallet' title='Open Account' fontIcon='bi-layers' />
          <SidebarMenuItem to='/updateSalary' icon='finance-calculator' title='Update Account' fontIcon='bi-layers' />
       </div>
-      </SidebarMenuItemWithSub>
+      </SidebarMenuItemWithSub> 
+
+      <SidebarMenuItemWithSub 
+      to={''} 
+      icon = 'abstract-26'
+      title={'New User'}>
+     
+      <div className='menu-item'> 
       <SidebarMenuItem to='/createTempEmp' icon='profile-user' title='Create New Employee' fontIcon='bi-layers' />
+      <SidebarMenuItem to='/updateTempEmp' icon='profile-user' title='Update  Employee' fontIcon='bi-layers' />
+      </div>
+      </SidebarMenuItemWithSub>
       <div className='menu-item'></div>
       <SidebarMenuItem to='/employeetimesheet' icon='calendar-add' title='Employee Timesheet' fontIcon='bi-layers' />
       <div className='menu-item'>
@@ -122,8 +133,8 @@ const SidebarMenuMain = () => {
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Team</span>
         </div>
       </div>
-
-      {/* <SidebarMenuItemWithSub
+{/* 
+       <SidebarMenuItemWithSub
         to='/apps/chat'
         title='Chat'
         fontIcon='bi-chat-left'
@@ -132,7 +143,18 @@ const SidebarMenuMain = () => {
         <SidebarMenuItem to='/apps/chat/private-chat' title='Private Chat' hasBullet={true} />
         <SidebarMenuItem to='/apps/chat/group-chat' title='Group Chart' hasBullet={true} />
         <SidebarMenuItem to='/apps/chat/drawer-chat' title='Drawer Chart' hasBullet={true} />
-      </SidebarMenuItemWithSub> */}
+      </SidebarMenuItemWithSub>  */}
+
+      <SidebarMenuItemWithSub
+        to='/apps/chat'
+        title='Chat'
+        fontIcon='bi-chat-left'
+        icon='message-text-2'
+      >
+        <SidebarMenuItem to='/apps/chat/private-chat' title='Private Chat' hasBullet={true} />
+        <SidebarMenuItem to='/apps/chat/group-chat' title='Group Chart' hasBullet={true} />
+        <SidebarMenuItem to='/apps/chat/drawer-chat' title='Drawer Chart' hasBullet={true} />
+      </SidebarMenuItemWithSub> 
       <SidebarMenuItem
         to='/apps/user-management/users'
         icon='user'

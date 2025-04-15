@@ -76,7 +76,7 @@ const ContractPage: FC = () => {
     });
     
     updateData({
-      client_id: hasMatch.clientId,
+      client_id: hasMatch.client_id,
       username : username,
     });
   };

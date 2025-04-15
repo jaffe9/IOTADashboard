@@ -17,6 +17,7 @@ import { GetInvoiceDetails } from '../pages/invoiceInfo/invoiceDetails'
 import { TRUE } from 'sass'
 import { UpdateSalary } from '../pages/salaryIncrement/updateSalary'
 import { AddNewSalary } from '../pages/salaryIncrement/Salary'
+import { UpdateEmployee } from '../pages/createEmployee/UpdateEmployee'
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
@@ -40,6 +41,7 @@ const PrivateRoutes = () => {
         <Route path='employeeinvoice' element={<EmployeeInvoiceWrapper/>}/>
         <Route path='contract' element={<ContractPageWrapper/>}/>
         <Route path='createTempEmp' element={<CreateEmployeeWrapper/>}/>
+        <Route path='updateTempEmp' element={<UpdateEmployee/>}/>
         <Route path='getInvoiceDetails' element={<GetInvoiceDetails className={''}/>}/>
         <Route path='updateSalary' element={<UpdateSalary/>}/>
         <Route path='Salary' element={<AddNewSalary/>}/>
