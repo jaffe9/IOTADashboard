@@ -60,8 +60,8 @@ export async function getUserByToken(token: string) {
 const getUsersByLoginId = async (login_id: string): Promise<UserModel> => {
   let url = "";
   let admin = "db273513-e759-4f6a-99b4-8371423a45b8";
-  let user1 = "89d2beb3-a837-44e6-acbb-f1f812d6d5e0";
-  let user2 = "1b77743c-3585-4bc0-8ea0-84f404d59f26";
+  let user1 = "f0bc31e4-12bd-46d1-b2d0-cf2e1b55c972";
+  let user2 = "fc2f8be3-9321-4989-b989-9131e8dfa4d5";
   
 
   switch (login_id) {
