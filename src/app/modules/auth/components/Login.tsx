@@ -8,6 +8,7 @@ import {getUsersByLoginId, login} from '../core/_requests'
 import {toAbsoluteUrl} from '../../../../_metronic/helpers'
 import {useAuth} from '../core/Auth'
 import * as Sentry from "@sentry/react";
+import { userIdToEncore } from '../core/_authStore'
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -72,6 +73,8 @@ export function Login() {
         //const {login_id: user} = await getUsersByLoginId(auth.user.id)
         //console.log("User:" + JSON.stringify(user));
         setCurrentUser(await getUsersByLoginId(auth.user.id))
+         const sendToEncore =  await userIdToEncore()
+          console.log("Transferred Data to Encore :", sendToEncore)
       } catch (error:any) {
         Sentry.reactErrorHandler(error)
         Sentry.captureException(error)
@@ -174,7 +177,7 @@ export function Login() {
         <label className='form-label fs-6 fw-bolder text-gray-900'>Email</label>
         <input
           placeholder='Email'
-          {...formik.getFieldProps('email')}
+        //  {...formik.getFieldProps('email')}
           className={clsx(
             'form-control bg-transparent',
             {'is-invalid': formik.touched.email && formik.errors.email},
@@ -200,7 +203,7 @@ export function Login() {
         <input
           type='password'
           autoComplete='off'
-          {...formik.getFieldProps('password')}
+       //   {...formik.getFieldProps('password')}
           className={clsx(
             'form-control bg-transparent',
             {
