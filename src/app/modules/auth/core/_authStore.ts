@@ -1,6 +1,8 @@
+import axios from "axios";
+import { getAccountManager } from "../../../../apiFactory/apiHelper";
 
 // Setting the valuees  
-export const setAccountManagerId = (id: string) => {
+export const setAccountManagerId = (id: string ) => {
     //accountManagerId = id
     localStorage.setItem('accountManagerId', id);
 };
@@ -25,3 +27,41 @@ export const getLoggedUser = () => {
 export const getUserId = () => {
     return  localStorage.getItem('id')
 }
+
+// passing these values to the backend Server 
+
+
+    export const userIdToEncore = async () => {
+        const loggedUser = getLoggedUser();
+        const getAccountManager = getAccountManagerId();
+        const getId =  getUserId();
+        console.log(loggedUser,getAccountManager,getId);
+        const data = JSON.stringify({
+            loggedUser: loggedUser,
+            accountManagerId: getAccountManager,
+            id: getId,
+        });
+          
+        const config = {
+            method: 'PATCH',
+            maxBodyLength: Infinity,
+            url: "https://staging-iwtapiserver-6x92.encr.app/userCount",
+            headers: { 
+              'Content-Type': 'application/json'
+            },
+            data: data,
+            withCredentials: true , 
+        };
+          
+        try {
+            const response = await axios.request(config);
+            console.log("User count response:", JSON.stringify(response.data));
+            return response.data
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.error("Axios Error in posting loggedUser to backend:", error.response?.data || error.message);
+            } else {
+                console.error("Error in posting loggedUser to backend:", error);
+            }
+        }
+    }

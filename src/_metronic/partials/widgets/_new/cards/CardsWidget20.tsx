@@ -20,7 +20,7 @@ let userCount = apiHelper.getUserCount().then((response: any) => {
     console.log("inside null:" + userCountValue);
     return;
   }
-  userCountValue.innerHTML = response;
+  userCountValue.innerHTML = response.userCounts ?? "API ISSUE";
 });
 
 let pendingOpportunitiesValue = document.getElementById(
@@ -29,7 +29,7 @@ let pendingOpportunitiesValue = document.getElementById(
 let totalOpportunitiesValue = document.getElementById("totalOpportunitiesTag");
 
 let pendingValue = apiHelper.getAllOpportunities().then((response: any) => {
-  const filteredData = response.data.filter(
+  const filteredData = response.opportunitiesDetails.filter(
     (fil: { opportunity_status: number }) => fil.opportunity_status == 2
   );
   if (!pendingOpportunitiesValue) {
@@ -43,7 +43,7 @@ let opportunitiesValue = apiHelper
     if (!totalOpportunitiesValue) {
       return;
     }
-    totalOpportunitiesValue.innerHTML = response.data.length;
+    totalOpportunitiesValue.innerHTML = response.opportunitiesDetails.length;
   });
 }
 // *********************************************** Changes for API value ends here ***********************************************

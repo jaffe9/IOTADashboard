@@ -28,7 +28,7 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
       const today = new Date();
       const twoMonthsFromNow = new Date();
       twoMonthsFromNow.setMonth(today.getMonth() + 2)
-      const filteredAndSortedRecords = records
+      const filteredAndSortedRecords = records.contracts
       .filter((record : ContractExpRecord) =>{
         const expiryDate= new Date(record.contract_end_date);
         return expiryDate <= twoMonthsFromNow && expiryDate > today;
@@ -54,34 +54,40 @@ const MixedWidget8: FC<Props> = ({className, chartColor, chartHeight }) => {
   // To dynamically change logo of clients based on activeTab
 const updatePicUrl = (associated_user_id : { username: string}) => {
   switch (associated_user_id.username){
-     case 'balasubramanian' :
-           return '/media/svg/ConsultantPhotos/Bala Pic.jpeg'
-     case 'baskar' :
-           return '/media/svg/ConsultantPhotos/Baskar Pic.jpg'
-     case 'hala' :
-           return '/media/svg/ConsultantPhotos/Hala Pic.jpeg'
-     case 'rakesh':
-           return '/media/svg/ConsultantPhotos/Rakesh pic.png'
-      case 'sadath' :
-           return '/media/svg/ConsultantPhotos/Sadath Pic.jpeg'
-      case 'samiullah' :
-           return '/media/svg/ConsultantPhotos/Samiullah Pic.jpeg'
-      case 'sandeep' :
-           return '/media/svg/ConsultantPhotos/Sandeep Pic.jpeg'
-      case 'thameem' :
-           return '/media/svg/ConsultantPhotos/Thameem Pic.jpeg'
-      case 'vignesh' :
-           return '/media/svg/ConsultantPhotos/Vignesh Pic.jpeg'
-      case 'waseem' :
-           return '/media/svg/ConsultantPhotos/Wasim Pic.jpeg'
-      case 'Venkata Tejesh' :
-           return "/media/svg/ConsultantPhotos/Tejesh Pic.jpeg"
-      case 'Vignesh' :
-           return '/media/svg/ConsultantPhotos/Vignesh Pic.jpg'
-      case 'nandha kumar' :
-           return '/media/svg/ConsultantPhotos/Nandha_kumar_Ramamoorty_Pic.jpg'
-      case 'faiz' :
-           return '/media/svg/ConsultantPhotos/Faiz_Mahmood_Khan_Pic.jpg'
+ case 'Balasubramanian' :
+        return '/media/svg/ConsultantPhotos/Bala_Pic.jpeg'
+    case 'Baskar Muniyandi' :
+        return '/media/svg/ConsultantPhotos/Baskar_Pic.jpg'
+    case 'Hala Abukhalaf' :
+        return '/media/svg/ConsultantPhotos/Hala_Pic.jpeg'
+    case 'Rakesh Kumar':
+        return '/media/svg/ConsultantPhotos/Rakesh_pic.png'
+    case 'Sadath Khan' :
+        return '/media/svg/ConsultantPhotos/Sadath_Pic.jpeg'
+    case 'Samiullah Kaleemullah' :
+        return '/media/svg/ConsultantPhotos/Samiullah_Pic.jpeg'
+    case 'Sandeep Puppala' :
+        return '/media/svg/ConsultantPhotos/Sandeep_Pic.jpeg'
+    case 'Thameem Ansari' :
+        return '/media/svg/ConsultantPhotos/Thameem_Pic.jpeg'
+    case 'Vignesh Prakesh' :
+        return '/media/svg/ConsultantPhotos/Vignesh_Pic.jpeg'
+    case 'Waseem Khan' :
+        return '/media/svg/ConsultantPhotos/Wasim_Pic.jpeg'
+    case 'Venkata Tejesh' :
+        return "/media/svg/ConsultantPhotos/Tejesh_Pic.jpeg"
+    case 'Nandha Kumar' :
+         return '/media/svg/ConsultantPhotos/Nandha_kumar_Ramamoorty_Pic.jpg'
+    case 'Faiz Mohammed' :
+         return '/media/svg/ConsultantPhotos/Faiz_Mahmood_Khan_Pic.jpg'
+    case 'Vignesh Rajan' :
+         return 'media/svg/ConsultantPhotos/Vignesh_Rajan_Amex.jpg'
+    case 'Ahmed Elsobky' :
+         return 'media/svg/ConsultantPhotos/Ahmed_Elsobkey.jpg'
+    case 'Zakir Hussain' :
+         return 'media/svg/ConsultantPhotos/Zakir_Hussain.jpg'
+    case 'Pradeep Kumar' :
+         return 'media/svg/ConsultantPhotos/Pradeep_Kumar_Pic.jpg'
   }
 }
 

@@ -14,6 +14,7 @@ type Props = {
 
 type tempUserRecord = {
   fullName: string;
+  employeeJoiningDate : string;
   id: number;
   userId: string;
   
@@ -93,7 +94,7 @@ const ListsWidget26 = ({ className }: Props) => {
                 <a href="#" className="text-primary fw-bold fs-6 me-2">
                   {record.fullName?.toUpperCase() || 'NO USERNAME'} {/* Display Full Name */}
                 </a>
-                <span className="text-danger"></span>
+                <span className="text-danger">{record.employeeJoiningDate || "Date Not Found".toUpperCase() }</span>
                 <button
                   type="button"
                   className="btn btn-icon btn-sm h-auto btn-color-gray-500 btn-active-color-primary justify-content-end"

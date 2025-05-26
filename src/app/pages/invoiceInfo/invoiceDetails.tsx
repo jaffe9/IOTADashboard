@@ -33,9 +33,9 @@ const GetInvoiceDetails: React.FC<Props> = ({ className }) => {
     try {
       const records = await getInvoiceDetails()
       // Set records 
-      setClienOrder(records)
+      setClienOrder(records.invDetails)
       // Set filtered records for default client  (ANB, RB, ARB)
-      setFilteredRecords(records.filter((record: invoiceDetails) => record.client_id === 1));
+      setFilteredRecords(records.invDetails.filter((record: invoiceDetails) => record.client_id === 1));
     } catch (error) {
       console.error('Error fetching Invice Details:', error);
     }

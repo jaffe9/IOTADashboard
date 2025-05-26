@@ -166,7 +166,7 @@ const handleClaimupload = async () => {
                     <option value="">Select Employee</option>
                     {allUserInfo.employee.map((data: any, i: number) => (
                       <option key={i} value={data.firstName}>
-                        {data.firstName} 
+                        {data.fullName} 
                       </option>
                     ))}
                   </select>

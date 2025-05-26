@@ -35,12 +35,12 @@ const ChartsWidget1: FC<Props> = ({ className }) => {
         apiHelper.getPaidInvoices(),
       ]);
 
-      const pendingData = pendingResponse?.data
-        ? groupInvoicesByMonth(pendingResponse.data, startDate)
+      const pendingData = pendingResponse?.pendingInv
+        ? groupInvoicesByMonth(pendingResponse.pendingInv, startDate)
         : Array(6).fill(0);
 
-      const paidData = paidResponse?.data
-        ? groupInvoicesByMonth(paidResponse.data, startDate)
+      const paidData = paidResponse?.paidInv
+        ? groupInvoicesByMonth(paidResponse.paidInv, startDate)
         : Array(6).fill(0);
 
       setPendingInvoices(pendingData);

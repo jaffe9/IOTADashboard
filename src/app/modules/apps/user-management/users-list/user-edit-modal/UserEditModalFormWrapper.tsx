@@ -45,7 +45,7 @@ useEffect(() =>
         earnings_total = result.earnings_total
         deductions_total = result.deductions_total
         total_net_salary = result.total_net_salary
-        user_id.username = result.user_id.username
+        user_id.username = result?.empSalInfo.user_id.username
         user_id.email = result.user_id.email
       })
     },[]

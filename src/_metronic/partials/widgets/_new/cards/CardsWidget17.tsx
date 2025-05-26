@@ -231,7 +231,7 @@ function setValues()
     let unpaidClient5Value = 0.0;
 
     // Loop through response data
-    response.data.forEach((item: any) => {
+    response.invoiceValue.forEach((item: any) => {
       const billingValue = parseFloat(item.invoice_value) || 0;
       const isPaid = item.invoice_paid_status;
 

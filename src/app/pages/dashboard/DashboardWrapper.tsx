@@ -30,7 +30,7 @@ async function getOpportunitiesData():Promise<number>
     let output=0
     await apiHelper.getAllOpportunities().then(function (apiData:any)
     {
-      output = apiData.data.length
+      output = apiData.opportunitiesDetails.length
     })
     return output
   }

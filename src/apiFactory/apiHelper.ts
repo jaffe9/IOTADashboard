@@ -16,8 +16,6 @@ import { UserEmployeeIdCell } from "../app/modules/apps/user-management/users-li
 import { getAccountManagerId, getLoggedUser, getUserId } from "../app/modules/auth/core/_authStore.ts";
 import { getLogger } from "react-query/types/core/logger";
 
-const auth = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
-const api = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA'
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
@@ -38,9 +36,6 @@ const GET_USER_CONTRACT_URL = `${API_URL}/contract`;
 const GET_EMPLOYEEONBOARDING_URL = `${API_URL}/employeeOnboarding`;
 const GET_EMPLOYEEINVOICE_URL = `${API_URL}/invoice`;
 const GET_TIMESHEET_URL = `${API_URL}/employeeTimesheet`;
-const DIGITAL_OCEAN_SECRET_KEY = `XbcuQv5Z/NiKom3Q4domcuCjr5yCRXYd/SvkQ/EDLqI`;
-const DIGITAL_OCEAN_ACCESS_KEY = `DO00J84DXXRHLZHJBHJF`;
-const DIGITAL_OCEAN_PERSONAL_ACCESS_TOKEN = `dop_v1_8812d0f4fbefad3d4a7e9317bc8be87ac1a14c22d20e8ad6b7876ea07b7cc80b`;
 
 const admin = "db273513-e759-4f6a-99b4-8371423a45b8";
 
@@ -48,16 +43,7 @@ const admin = "db273513-e759-4f6a-99b4-8371423a45b8";
 const today = new Date();
 const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of previous month
 
-const pay_period = lastMonth.toLocaleDateString("en-IN", {
-  year: "numeric",
-  month: "short",
-}).replace(/\//g, "");
 
-const pay_date = lastMonth.toLocaleDateString("en-IN", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-}).replace(/\//g, "-");
 
 const update_date = lastMonth.toLocaleDateString("en-IN",{
   year: "numeric",
@@ -86,314 +72,189 @@ const axiosInstance = axios.create({
   }
 });
 
-export const getUserCount = async () => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-   // console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "user?select=*&isClientFacing=eq.1";
-    } else if (loggedUser === null ) {
-      // null Case
-      url = "user?select=*&isClientFacing=eq.1";
-    }  else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-    //  console.log("This is Account Manager Id: ", accountManagerId);
-      url = `user?select=*&isClientFacing=eq.1&associatedAccountManager=eq.${accountManagerId}`;
-    }
-
-    const response = await axiosInstance.get(url, { timeout: 1500 });
-    return response.data.length;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return null;
+const axiosEncoreInstance = axios.create({
+  baseURL: 'https://staging-iwtapiserver-6x92.encr.app',
+  headers: {
+    'apikey': `${axios.defaults.headers.common['apikey']}`,
+    'Authorization': `${axios.defaults.headers.common['Authorization']}`
   }
+
+});
+
+export const getUserCount = async () => {
+  try{
+    const response = await axiosEncoreInstance.get("/userCount", { timeout : 3500 } )
+ //   console.log("Response for Count User :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting UserCount :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin UserCount : ", error)
+    }
+  }
+    
+  
 };
 
 // Contract Data
 
 export const getInvoiceTotalValue = async () => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-   // console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "invoice?select=*";
-    } else if (loggedUser === null ) {
-      // null Case
-      url = "invoice?select=*";
-    }  else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-    //  console.log("This is Account Manager Id: ", accountManagerId);
-      url = `invoice?select=*&associatedAccountManager=eq.${accountManagerId}`;
+  try{
+    const response = await axiosEncoreInstance.get("/invoiceValue", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getInvoiceValue  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getInvoiceValue  : ", error)
     }
-    const response = await axiosInstance.get(url);//changed 18 Nov
-    return response;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return null
   }
 };
 //Fetching the Contract Expiries
 export const getContractExpiries = async () => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-     // console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "contract?select=*,associated_user_id(username,companyName)&order=id";
-    } else if (loggedUser === null ) {
-      // null Case
-      url = "contract?select=*,associated_user_id(username,companyName)&order=id";
-    }  else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-    //  console.log("This is Account Manager Id: ", accountManagerId);
-      url = `contract?select=*,associated_user_id(username,companyName)&order=id&associatedAccountManager=eq.${accountManagerId}`;
-    }
-    const response = await axiosInstance.get(url);
+  try{
+    const response = await axiosEncoreInstance.get("/expContract", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
     return response.data;
-    } catch (error) {                                 
-      console.error('Error fetching data:', error);
-      return null
-      }
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getContractExpiries  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getContractExiries  : ", error)
+    }
+  }
 }
 // Fetching the data related to national_id
 export const getNationalIdExp = async () => {
   try{
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-   // console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "nationalIdInfo?select=*,associated_user_id(username,companyName)";
-    }  else if (loggedUser === null ) {
-      // null Case
-      url = "nationalIdInfo?select=*,associated_user_id(username,companyName)";
-    } else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-    //  console.log("This is Account Manager Id: ", accountManagerId);
-      url = `nationalIdInfo?select=*,associated_user_id(username,companyName)&associatedAccountManager=eq.${accountManagerId}`;
-    }
-    const response = await axiosInstance.get(url);
+    const response = await axiosEncoreInstance.get("/expNationalId", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
     return response.data;
-  }catch (error){
-    console.error('Error fetching national_id data:', error);
-    return null
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getNationalIdExp  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getNationalIdExp  : ", error)
+    }
   }
 }
 //Fetch the data related to Invoices
 export const getInvoiceDetails = async () => {
   try{
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "invoice?select=*,associated_user_id(username,companyName,client_id(client_short_name))&invoice_paid_status=eq.false&order=id";
-    }  else if (loggedUser === null ) {
-      // null Case
-      url = "invoice?select=*,associated_user_id(username,companyName,client_id(client_short_name))&invoice_paid_status=eq.false&order=id";
-    } else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-    //  console.log("This is Account Manager Id: ", accountManagerId);
-      url = `invoice?select=*,associated_user_id(username,companyName,client_id(client_short_name))&invoice_paid_status=eq.false&order=id&associated_account_manager=eq.${accountManagerId}`;
-    }
-  const response = await axiosInstance.get(url)
-  return response.data;
+    const response = await axiosEncoreInstance.get("/invDetails", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
+    return response.data;
   }catch(error){
-  console.error("Error fetching Invoices Details",error);
-   return null
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getInvoiceDetails  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getInvoiceDetails  : ", error)
+    }
   }
 }
 // Fetching the data related to national_id
 export const getLeavesLeft = async () => {
   try{
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-   // console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "https://zhplktaovpyenmypkjql.supabase.co/rest/v1/leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id&isActive=eq.true";
-    }  else if (loggedUser === null ) {
-      // null Case
-      url = "https://zhplktaovpyenmypkjql.supabase.co/rest/v1/leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id&isActive=eq.true";
-    }  else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-     // console.log("This is Account Manager Id: ", accountManagerId);
-      url = `https://zhplktaovpyenmypkjql.supabase.co/rest/v1/leaveEntitlment?select=*,user_id(username,companyName,employeeJoiningDate,contract_id(billing_months))&order=id&isActive=eq.true&associated_account_manager=eq.${accountManagerId}`;
-    }
-    const response = await axiosInstance.get(url);
+    const response = await axiosEncoreInstance.get("/leavesLeft", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
     return response.data;
-  }catch (error){
-    console.error('Error fetching Leaves Left for employees:', error);
-    return null
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getLeavesLeftDetails  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getLeavesLeftDetails  : ", error)
+    }
   }
 }
 
 // Opportunities Data
 export const getAllOpportunities = async () => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    //console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "opportunities?select=*,clients(id,*),opportunityStatus(id,*)";
-    }  else if (loggedUser === null ) {
-      // null Case
-      url = "opportunities?select=*,clients(id,*),opportunityStatus(id,*)";
-    } else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-      //console.log("This is Account Manager Id: ", accountManagerId);
-      url = `opportunities?select=*,clients(id,*),opportunityStatus(id,*)&associated_account_manager=eq.${accountManagerId}`;
+  try{
+    const response = await axiosEncoreInstance.get("/allOpportunities", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getAllOpportunitiesDetails  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getAllOpportunitiesDetails  : ", error)
     }
-    const response = await axiosInstance.get(url);
-    return response;
-  } catch (error) {
-    if (axios.isAxiosError(error)){
-     console.log( " Error in fetching data" , error.response?.data || error.message)
-    }
-    console.error('Error fetching data:', error);
-    return null
   }
 };
 
 // Salary Data
 export const getAllSalaries = async () => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    //console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "salary?select=*, user(id,*)";
-    }  else if (loggedUser === null ) {
-      // null Case
-      url = "salary?select=*, user(id,*)";
-    } else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-      //console.log("This is Account Manager Id: ", accountManagerId);
-      url = `salary?select=*, user(id,*)&associated_account_manager=eq.${accountManagerId}`;
+  try{
+    const response = await axiosEncoreInstance.get("/allSalaries", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getAllSalariesDetails  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getAllSalariesDetails  : ", error)
     }
-    const response = await axiosInstance.get(url, { timeout: 1500 });
-    return response;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return null
   }
 };
 
 //Billing Data
 export const getAllBilling = async () => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    //console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "salary?contract=*, user(id,*), client(id,*)";
-    } else if (loggedUser === null ) {
-      // null Case
-      url = "salary?contract=*, user(id,*), client(id,*)";
-    } else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-      //console.log("This is Account Manager Id: ", accountManagerId);
-      url = `salary?contract=*, user(id,*), client(id,*)&associated_account_manager=eq.${accountManagerId}`;
+  try{
+    const response = await axiosEncoreInstance.get("/allBillings", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getAllBillingsDetails  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getAllBillingsDetails  : ", error)
     }
-    const response = await axiosInstance.get(url, { timeout: 1500 });
-    return response;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return null
   }
 };
 
 // API for pending Invoices
 export const getPendingInvoices = async () => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    //console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.false&order=id";
-    } else if (loggedUser === null ) {
-      // null Case
-      url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.false&order=id";
-    } else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-      //console.log("This is Account Manager Id: ", accountManagerId);
-      url = `invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.false&order=id&associatedAccountManager=eq.${accountManagerId}`;
+  try{
+    const response = await axiosEncoreInstance.get("/getPendingInv", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getPending Invoices  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getPending Invoices  : ", error)
     }
-    const response = await axiosInstance.get(url );
-    return response;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return null
   }
 };
 
 // Api for paid invoices
 export const getPaidInvoices = async () => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    //console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.true&order=id";
-    } else if (loggedUser === null ) {
-      // null Case
-      url = "invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.true&order=id";
-    } else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-      //console.log("This is Account Manager Id: ", accountManagerId);
-      url = `invoice?select=*,client_id(client_short_name)&invoice_paid_status=eq.true&order=id&associatedAccountManager=eq.${accountManagerId}`;
+  try{
+    const response = await axiosEncoreInstance.get("/getPaidInv", { timeout : 3500 } )
+  //  console.log("Response for getInvoiceValue  :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getPaid Invoices  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getPaid Invoices  : ", error)
     }
-    const response = await axiosInstance.get(url );
-    return response;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return null
   }
 };
 
-export const getSalaryInfoByEmployee = async (id: string) => {
-  try {
-    let url = "";
-    const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    //console.log("From api Helper:", loggedUser)
-    if (loggedUser === `${admin}`) {
-      // Admin case
-      url = `salary?user_id=eq.${id}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)`;
-    } else if (loggedUser === null ) {
-      // null Case
-      url = `salary?user_id=eq.${id}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)`;
-    }  else {
-      // Account Manager case
-      const accountManagerId = await getAccountManagerId();
-      //console.log("This is Account Manager Id: ", accountManagerId);
-      url = `salary?user_id=eq.${id}&select=id,pay_period,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,user_id(username,email)&associated_account_manager=eq.${accountManagerId}`;
+export const getSalaryInfoByEmployee = async (id: any) => {
+  try{
+    const response = await axiosEncoreInstance.get(`/empSalInfo?id=${id}`, { timeout : 1500 } )
+   console.log("Response for getSalaryInfoByEmployee  :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getSalaryInfoByEmployee   :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getSalaryInfoByEmployee  : ", error)
     }
-    const { data } = await axiosInstance.get(url);
-    return await data[0];
-  }
-  catch (error) {
-    console.error("Error fetching data: ", error);
   }
 };
 
@@ -712,8 +573,6 @@ export const getEmployeesForOnboarding = async (): Promise<EmployeeOnboardingRes
 };
 
 export const getEmpOccupation = async () => {
-  const d = await axios
-     .get(`${GET_OCCUPATION_URL}?select=*`)
 }
 
 export const getClientDetails = async () : Promise<any> => {
@@ -755,7 +614,6 @@ export const getContractDetails = async () : Promise<any> => {
   }
   const d =  await axios
     .get(url);
-    console.log(d)
   return d;
 };
 
@@ -1406,57 +1264,39 @@ export const uploadContractToSupabase = async (file:File) => {
 
 // for Claim
 
+const ENCORE_API = 'https://staging-iwtapiserver-6x92.encr.app';
+
+
+// 🔥 This is your frontend function that will call your Encore backend API
 export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; message:string}> => {
-  let data = JSON.stringify([
-    {
-      expenseType: c.expenseType,
-      expenseDate: c.expenseDate,
-      expenseBy: c.expenseBy,
-      expenseAmount: c.expenseAmount,
-      expenseApprovalStatus:false,
-      expenseApprovedBy:null,
-      expenseApprovedDate:null,
-      expenseApprovedAmount:null,
-      externalTransactionId:null,
-      originalTransactionDate:null,
-      externalTransactionNarration:c.expenseTypeDesc,
-      associatedUserId:c.associatedUserId,
-
-
-    }
-  ]);
-  console.log("APIData:" + data);
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: `${API_URL}/expenses`,
-    headers: {
-      'apikey': `${axios.defaults.headers.common['apikey']}`,
-      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
-      'Content-Type': 'application/json'
-    },
-    data: data
-  };
+  console.log("Sending ClaimRequest to Encore API:", c);
 
   try {
-    const response = await axios.request(config);
-    
+    const response = await axios.post(`${ENCORE_API}/sendExpense`, c, {
+      headers: {
+        'Content-Type': 'application/json',
+        // If your Encore API requires auth token, add here:
+         'Authorization': 'slkjdfoihgiojooe'
+      }
+    });
+
     if (response.status === 201) {
-      return { status: response.status, message: "Success" }; // Return an object
+      console.log("Encore API Response:", response.data);
+      return { status: response.data.status, message: response.data.message };
     } else {
-     return { status: response.status, message: "Failed" }; // Return an object
+      console.error("Encore API failed:", response.statusText);
+      return { status: response.status, message: "Failed" };
     }
   } catch (error) {
     if (axios.isAxiosError(error)){
-      console.error("error:",error.response?.data  || error.message)
-    }else{
-      console.error("Unexpected error:",error);
+      console.error("Encore API Error:", error.response?.data || error.message);
+    } else {
+      console.error("Unexpected error:", error);
     }
 
-    return { status: 500, message: "Error Submitting Claim" };
+    return { status: 500, message: "Error Submitting Claim via Encore API" };
   }
-  
-}
+};
 
 export const uploadClaimsToSupabase = async (file:File) => {
   const Cconfig = {

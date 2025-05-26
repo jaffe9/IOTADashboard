@@ -19,9 +19,9 @@ import { apiHelper } from '../../../../apiFactory/apiHelper'
     var sum = 0
     await apiHelper.getAllSalaries().then(function (apiData)
     {
-      for(var i = 0; i < apiData?.data.length; i++)
+      for(var i = 0; i < apiData?.allSalaryDetails.length; i++)
         {
-          sum = sum + apiData!.data[i].total_net_salary
+          sum = sum + apiData!.allSalaryDetails[i].total_net_salary
         }
         val1 = sum;
         return sum
@@ -35,9 +35,9 @@ import { apiHelper } from '../../../../apiFactory/apiHelper'
       var sum = 0
       await apiHelper.getInvoiceTotalValue().then(function (apiData)
       {
-        for(var i = 0; i < apiData?.data.length; i++)
+        for(var i = 0; i < apiData?.allSalaryDetails.length; i++)
           {
-            sum = sum + apiData!.data[i].billing_value / apiData!.data[i].billing_months
+            sum = sum + apiData!.allSalaryDetails[i].billing_value / apiData!.allSalaryDetails[i].billing_months
           }
           val2 = sum;
           return sum

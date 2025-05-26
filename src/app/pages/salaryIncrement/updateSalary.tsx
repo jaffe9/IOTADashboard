@@ -142,8 +142,8 @@ const UpdateSalary: FC = () => {
                       className="form-select form-select-solid form-select-lg fw-bold"
                    //   {...formik.getFieldProps("username")}
                       
-                      onChange={async (value) => {
-                        await handleUserChange(parseInt(value.target.value));
+                      onChange={async (e) => {
+                        await handleUserChange(parseInt(e.target.value));
                         formik.setFieldValue("user_id.username",updatedUserInfo.user_id.username)
                       }}
                     //  value={initialValues.user_id}
