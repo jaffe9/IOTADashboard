@@ -11,6 +11,7 @@ import './_metronic/assets/fonticon/fonticon.css'
 import './_metronic/assets/keenicons/duotone/style.css'
 import './_metronic/assets/keenicons/outline/style.css'
 import './_metronic/assets/keenicons/solid/style.css'
+import 'animate.css'
 
 //PostHog
 import { PostHogProvider } from 'posthog-js/react'

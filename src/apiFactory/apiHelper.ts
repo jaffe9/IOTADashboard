@@ -1280,7 +1280,7 @@ export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; 
       }
     });
 
-    if (response.status === 201) {
+    if (response.status === 201 || 204) {
       console.log("Encore API Response:", response.data);
       return { status: response.data.status, message: response.data.message };
     } else {

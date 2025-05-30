@@ -5,8 +5,10 @@ import {KTIcon} from '../../../../helpers'
 import {getCSSVariableValue} from '../../../../assets/ts/_utils'
 import {useThemeMode} from '../../../layout/theme-mode/ThemeModeProvider'
 import {apiHelper} from '../../../../../apiFactory/apiHelper'
+import clsx from 'clsx'
 type Props = {
-  className: string
+  classProtected ?:string
+  className?: string
   chartSize?: number
   chartLine?: number
   chartRotate?: number
@@ -14,6 +16,7 @@ type Props = {
 
 const CardsWidget17: FC<Props> = ({
   className,
+  classProtected,
   chartSize = 70,
   chartLine = 11,
   chartRotate = 145,
@@ -45,9 +48,10 @@ const CardsWidget17: FC<Props> = ({
   };
 
   return (
-    
+      
       <div className={`card card-flush ${className}`}>
         <div className='card-header pt-5'>
+          <div className={clsx('card',classProtected)}>
           <div className='card-title d-flex flex-column'>
             <div className='d-flex align-items-center'>
               <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
@@ -119,6 +123,7 @@ const CardsWidget17: FC<Props> = ({
             )}
           </div>
         </div>
+      </div>
       </div>
     
   );
