@@ -8,7 +8,6 @@ type Bubble = {
   dx: number
   dy: number
   color: string
-  collided: boolean
 }
 
 type ProtectedCardProps = {
@@ -18,6 +17,18 @@ type ProtectedCardProps = {
 }
 
 const COLORS = ['#6EC1E4', '#FF6F91', '#FFC75F', '#D65DB1', '#FF9671']
+
+let bubbleIdCounter = 0
+
+const createRandomBubble = (width: number, height: number): Bubble => ({
+  id: bubbleIdCounter++,
+  x: Math.random() * width,
+  y: Math.random() * height,
+  size: 20 + Math.random() * 20,
+  dx: (Math.random() - 0.5) * 0.6,
+  dy: (Math.random() - 0.5) * 0.6,
+  color: COLORS[Math.floor(Math.random() * COLORS.length)],
+})
 
 const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className = '' }) => {
   const [isBlurred, setIsBlurred] = useState(true)
@@ -30,69 +41,64 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
 
   // Initialize bubbles
   useEffect(() => {
-    const initialBubbles: Bubble[] = []
-    for (let i = 0; i < 20; i++) {
-      initialBubbles.push({
-        id: i,
-        x: Math.random() * 300 + 50,
-        y: Math.random() * 200 + 50,
-        size: 20 + Math.random() * 20,
-        dx: (Math.random() - 0.5) * 0.3,
-        dy: (Math.random() - 0.5) * 0.3,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        collided: false,
-      })
-    }
+    const width = containerRef.current?.clientWidth || 400
+    const height = containerRef.current?.clientHeight || 300
+    const initialBubbles = Array.from({ length: 20 }, () => createRandomBubble(width, height))
     setBubbles(initialBubbles)
   }, [])
 
-  // Animate bubbles movement and collision detection
+  // Animate movement + handle collisions with explosion effect
   useEffect(() => {
     let animationFrameId: number
 
     const animate = () => {
-      setBubbles((prevBubbles) => {
-        const width = containerRef.current?.clientWidth || 400
-        const height = containerRef.current?.clientHeight || 300
+      const width = containerRef.current?.clientWidth || 400
+      const height = containerRef.current?.clientHeight || 300
 
-        const newBubbles = prevBubbles.map((bubble) => {
-          let newX = bubble.x + bubble.dx
-          let newY = bubble.y + bubble.dy
-          let newDx = bubble.dx
-          let newDy = bubble.dy
+      setBubbles(prev => {
+        const updated: Bubble[] = []
 
-          // Bounce off edges inside card
-          if (newX < bubble.size / 2) newDx = Math.abs(newDx)
-          if (newX > width - bubble.size / 2) newDx = -Math.abs(newDx)
-          if (newY < bubble.size / 2) newDy = Math.abs(newDy)
-          if (newY > height - bubble.size / 2) newDy = -Math.abs(newDy)
+        const positions = [...prev]
 
-          return { ...bubble, x: newX, y: newY, dx: newDx, dy: newDy, collided: false }
-        })
+        for (let i = 0; i < positions.length; i++) {
+          const b1 = positions[i]
+          let hasCollided = false
 
-        // Collision detection
-        for (let i = 0; i < newBubbles.length; i++) {
-          for (let j = i + 1; j < newBubbles.length; j++) {
-            const b1 = newBubbles[i]
-            const b2 = newBubbles[j]
+          for (let j = i + 1; j < positions.length; j++) {
+            const b2 = positions[j]
             const dist = Math.hypot(b1.x - b2.x, b1.y - b2.y)
             if (dist < (b1.size + b2.size) / 2) {
-              newBubbles[i].collided = true
-              newBubbles[j].collided = true
+              hasCollided = true
+              positions.splice(j, 1) // remove collided b2
+              break
             }
           }
+
+          if (hasCollided) {
+            updated.push(createRandomBubble(width, height))
+            updated.push(createRandomBubble(width, height))
+            continue // skip adding b1 (destroyed)
+          }
+
+          // Move and bounce
+          let newX = b1.x + b1.dx
+          let newY = b1.y + b1.dy
+          let newDx = b1.dx
+          let newDy = b1.dy
+
+          if (newX < b1.size / 2 || newX > width - b1.size / 2) newDx *= -1
+          if (newY < b1.size / 2 || newY > height - b1.size / 2) newDy *= -1
+
+          updated.push({ ...b1, x: newX, y: newY, dx: newDx, dy: newDy })
         }
 
-        return newBubbles.map((bubble) => ({
-          ...bubble,
-          color: bubble.collided ? '#FFFFFF' : bubble.color,
-        }))
+        return updated
       })
 
       animationFrameId = requestAnimationFrame(animate)
     }
 
-    animate()
+    animationFrameId = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(animationFrameId)
   }, [])
 
@@ -104,12 +110,12 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
       timer = setTimeout(() => {
         setIsBlurred(true)
         setAuthenticated(false)
-      }, 30000) // Unlock for 30 seconds
+      }, 30000)
     }
     return () => clearTimeout(timer)
   }, [authenticated])
 
-  // Close prompt if clicking outside prompt
+  // Close prompt when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -144,18 +150,16 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
       <style>{`
         .card-container {
           position: relative;
-          display: inline-block; /* shrink to content */
+          display: inline-block;
           overflow: hidden;
           border-radius: 12px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.2);
           cursor: pointer;
-          user-select: none;
           background: white;
           max-width: 447px;  /* limit max width */
           max-height: 220px; /* limit max height */
           width: 100%;       /* take full width of parent */
           height: 100%;      /* take full height of parent */
-          box-sizing: border-box;
         }
 
         .card-content {
@@ -164,8 +168,6 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
           padding: 1rem;
           transition: filter 0.3s ease;
           filter: ${isBlurred ? 'blur(6px)' : 'none'};
-          height: 100%;
-          overflow: auto; /* allow scroll if content bigger */
         }
 
         .bubble-layer {
@@ -177,20 +179,13 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
           height: 100%;
           overflow: hidden;
           z-index: 2;
-          border-radius: 12px;
         }
 
         .bubble {
           position: absolute;
           border-radius: 50%;
           opacity: 0.9;
-          transition: background-color 0.3s, box-shadow 0.3s;
-          box-shadow: 0 0 15px 5px; /* default glow */
-        }
-
-        .bubble[color="#FFFFFF"] {
-          opacity: 1 !important;
-          box-shadow: 0 0 25px 10px #fff !important; /* stronger white glow */
+          transition: background-color 0.3s;
         }
 
         .password-prompt-overlay {
@@ -211,8 +206,6 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
           padding: 2rem;
           border-radius: 8px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-          width: 280px;
-          max-width: 90vw;
         }
       `}</style>
 
@@ -233,12 +226,8 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
                   width: size,
                   height: size,
                   backgroundColor: color,
-                  boxShadow: color === '#FFFFFF' 
-                    ? '0 0 25px 10px #fff' 
-                    : `0 0 15px 5px ${color}`,
-                  opacity: color === '#FFFFFF' ? 1 : 0.9,
+                  boxShadow: `0 0 15px 5px ${color}`,
                 }}
-                data-color={color}
               />
             ))}
           </div>

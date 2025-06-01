@@ -69,7 +69,7 @@ const DashboardPage: FC = () => (
 
       {/* begin::Col */}
       <div className='col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10'>
-        <ProtectedCard password='mySecret123'>
+        <ProtectedCard password='iwtCard17'>
         <CardsWidget17 className='h-md-50 mb-5 mb-xl-10' />
         </ProtectedCard>
         <ListsWidget26 className='h-lg-50' />
