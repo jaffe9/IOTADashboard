@@ -234,7 +234,7 @@ export const getPaidInvoices = async () => {
   try{
     const response = await axiosEncoreInstance.get("/getPaidInv", { timeout : 3500 } )
   //  console.log("Response for getInvoiceValue  :", response.data)
-    return response.data;
+    return response.data.paidInv;
   }catch(error){
     if(axios.isAxiosError(error)){
        console.log("Error in getting getPaid Invoices  :" , error.response?.data || error.message )

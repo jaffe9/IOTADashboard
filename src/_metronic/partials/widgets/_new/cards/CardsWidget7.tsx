@@ -1,72 +1,109 @@
+import React, { useEffect, useState } from 'react'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts'
+import { getPaidInvoices } from '../../../../../apiFactory/apiHelper'
 
-import clsx from 'clsx'
-import {toAbsoluteUrl} from '../../../../helpers'
 type Props = {
-  className: string
-  description: string
-  icon: boolean
-  stats: number
-  labelColor: string
-  textColor: string
+  className?: string
 }
-const items: Array<{
-  name: string
-  initials?: string
-  src?: string
-  state?: string
-}> = [
-  {name: 'Alan Warden', initials: 'T', state: 'warning'},
-  {name: 'Michael Eberon', src: '/media/svg/ConsultantPhotos/Tejesh_Pic.jpeg'},
-  {name: 'Susan Redwood', initials: 'V', state: 'primary'},
-  {name: 'Melody Macy', src:'/media/svg/ConsultantPhotos/Vignesh_Rajan_Amex.jpg'},
-  {name: 'Perry Matthew', initials: 'B', state: 'danger'},
-  {name: 'Barry Walter', src:'/media/svg/ConsultantPhotos/Faiz_Mahmood_Khan_Pic.jpg'},
-]
 
-const CardsWidget7 = ({className, description, stats, labelColor, textColor}: Props) => (
-  <div className={`card card-flush ${className}`}>
-    <div className='card-header pt-5'>
-      <div className='card-title d-flex flex-column'>
-        <div className='card-title d-flex flex-column'>
-          <span className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'>{stats}</span>
-          <span className='text-gray-500 pt-1 fw-semibold fs-6'>{description}</span>
-        </div>
+type PaidInvoice = {
+  client_id: { client_short_name: string }
+  invoice_paid_amount: number
+  invoice_paid_date: string | null // ISO format date
+}
+
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#00C49F', '#FFBB28']
+
+const CardsWidget7 = ({ className = '' }: Props) => {
+  const [chartData, setChartData] = useState<any[]>([])
+  const [clients, setClients] = useState<string[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const invoices: PaidInvoice[] = await getPaidInvoices()
+        const now = new Date()
+        const recentMonths = Array.from({ length: 3 }, (_, i) => {
+          const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+          return {
+            key: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`, // e.g., "2025-03"
+            label: `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`, // "Mar 2025"
+          }
+        }).reverse()
+
+        const monthMap: Record<string, any> = {}
+        const clientSet = new Set<string>()
+
+        // Initialize empty months
+        recentMonths.forEach((m) => {
+          monthMap[m.key] = { month: m.label }
+        })
+
+        invoices.forEach((inv) => {
+          const paidDate = inv.invoice_paid_date ? new Date(inv.invoice_paid_date) : null
+          if (!paidDate) return
+
+          const monthKey = `${paidDate.getFullYear()}-${String(paidDate.getMonth() + 1).padStart(2, '0')}`
+          const client = inv.client_id?.client_short_name || 'Unknown'
+          const amount = inv.invoice_paid_amount || 0
+
+          if (monthMap[monthKey]) {
+            monthMap[monthKey][client] = (monthMap[monthKey][client] || 0) + amount
+            clientSet.add(client)
+          }
+        })
+
+        setClients(Array.from(clientSet))
+        setChartData(Object.values(monthMap))
+      } catch (err) {
+        console.error('Error loading monthly client data:', err)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  return (
+    <div className={`card card-flush ${className}`}>
+      <div className='card-body pt-4 px-4'>
+        <h6 className='fw-bold text-gray-800 mb-2'>Monthly Paid Amount by Client</h6>
+        {chartData.length === 0 ? (
+          <div className='text-muted fs-7'>No data available for the last 3 months.</div>
+        ) : (
+          <ResponsiveContainer width='100%' height={145}>
+            <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip
+                formatter={(value: number) => `SAR ${value.toLocaleString()}`}
+                labelStyle={{ fontSize: 12 }}
+              />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              {clients.map((client, index) => (
+                <Bar
+                  key={client}
+                  dataKey={client}
+                  stackId="a"
+                  fill={COLORS[index % COLORS.length]}
+                  name={client}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
-    <div className='card-body d-flex flex-column justify-content-end pe-0'>
-      <span className='fs-6 fw-bolder text-gray-800 d-block mb-2'>Top Opportunities</span>
-      <div className='symbol-group symbol-hover flex-nowrap'>
-        {items.map((item, index) => (
-          <div
-            className='symbol symbol-35px symbol-circle'
-            data-bs-toggle='tooltip'
-            title={item.name}
-            key={`cw7-item-${index}`}
-          >
-            {item.src && <img alt='Pic' src={item.src} />}
-            {item.state && item.initials && (
-              <span
-                className={clsx(
-                  'symbol-label fw-bold',
-                  'bg-' + item.state,
-                  'text-inverse-' + item.state
-                )}
-              >
-                {item.initials}
-              </span>
-            )}
-          </div>
-        ))}
+  )
+}
 
-        <a href='#' className='symbol symbol-35px symbol-circle'>
-          <span
-            className={clsx('symbol-label fs-8 fw-bold', 'bg-' + labelColor, 'text-' + textColor)}
-          >
-            +42
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-)
-export {CardsWidget7}
+export { CardsWidget7 }

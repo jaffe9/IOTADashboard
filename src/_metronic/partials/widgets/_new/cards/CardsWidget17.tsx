@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //Total Value Widget
-import {FC, useEffect, useRef, useState} from 'react'
-import {KTIcon} from '../../../../helpers'
-import {getCSSVariableValue} from '../../../../assets/ts/_utils'
-import {useThemeMode} from '../../../layout/theme-mode/ThemeModeProvider'
-import {apiHelper} from '../../../../../apiFactory/apiHelper'
+import { FC, useEffect, useRef, useState } from 'react'
+import { KTIcon } from '../../../../helpers'
+import { getCSSVariableValue } from '../../../../assets/ts/_utils'
+import { useThemeMode } from '../../../layout/theme-mode/ThemeModeProvider'
+import { apiHelper } from '../../../../../apiFactory/apiHelper'
 import clsx from 'clsx'
+
 type Props = {
-  classProtected ?:string
+  classProtected?: string
   className?: string
   chartSize?: number
   chartLine?: number
@@ -21,184 +22,188 @@ const CardsWidget17: FC<Props> = ({
   chartLine = 11,
   chartRotate = 145,
 }) => {
-  const chartRef = useRef<HTMLDivElement | null>(null);
-  const { mode } = useThemeMode();
-  const [showOtherClients, setShowOtherClients] = useState(false);
-  const [showDefault , setShowDefault ] = useState(true)
+  const chartRef = useRef<HTMLDivElement | null>(null)
+  const { mode } = useThemeMode()
+  const [showOtherClients, setShowOtherClients] = useState(false)
+  const [showDefault, setShowDefault] = useState(true)
 
   useEffect(() => {
-    refreshChart();
-    setValues();
+    refreshChart()
+    setValues()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode , showOtherClients]);
+  }, [mode, showOtherClients])
 
-  const refreshChart = () => {
-    if (!chartRef.current) {
-      return;
-    }
+  const refreshChart = async () => {
+    if (!chartRef.current) return
+
+    const response = await apiHelper.getInvoiceTotalValue()
+    let unpaidClient1 = 0,
+      unpaidClient2 = 0,
+      unpaidClient3 = 0,
+      unpaidClient4 = 0,
+      unpaidClient5 = 0
+
+    response.invoiceValue.forEach((item: any) => {
+      const val = parseFloat(item.invoice_value) || 0
+      if (!item.invoice_paid_status) {
+        if (item.client_id === 1) unpaidClient1 += val
+        else if (item.client_id === 2) unpaidClient2 += val
+        else if (item.client_id === 3) unpaidClient3 += val
+        else if (item.client_id === 4) unpaidClient4 += val
+        else if (item.client_id === 5) unpaidClient5 += val
+      }
+    })
+
+    const chartData = [
+      { color: '--bs-success', value: unpaidClient1 },
+      { color: '--bs-primary', value: unpaidClient2 },
+      { color: '--bs-danger', value: unpaidClient3 },
+      { color: '--bs-info', value: unpaidClient4 },
+      { color: '--bs-warning', value: unpaidClient5 },
+    ].filter(d => d.value > 0) // only draw non-zero slices
 
     setTimeout(() => {
-      initChart(chartSize, chartLine, chartRotate);
-    }, 10);
-  };
+      initChart(chartSize, chartLine, chartRotate, chartData)
+    }, 10)
+  }
 
   const toggleShowOtherClients = () => {
-    setShowOtherClients(!showOtherClients);
+    setShowOtherClients(!showOtherClients)
     setShowDefault(!showDefault)
-  };
+  }
 
   return (
-      
-      <div className={`card card-flush ${className}`}>
-        <div className='card-header pt-5'>
-          <div className={clsx('card',classProtected)}>
+    <div className={`card card-flush ${className}`}>
+      <div className='card-header pt-5'>
+        <div className={clsx('card', classProtected)}>
           <div className='card-title d-flex flex-column'>
             <div className='d-flex align-items-center'>
               <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
               <a href='/getInvoiceDetails'>
-              <span id='unpaidTotalValueTag' className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'></span>
+                <span
+                  id='unpaidTotalValueTag'
+                  className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'
+                ></span>
               </a>
               <span className='badge badge-light-success fs-base'>
-                <KTIcon iconName='arrow-up' className='fs-5 text-success ms-n1' />2.2%</span>
+                <KTIcon iconName='arrow-up' className='fs-5 text-success ms-n1' />2.2%
+              </span>
             </div>
             <span className='text-gray-500 pt-1 fw-semibold fs-6'>Pending Invoices</span>
           </div>
         </div>
+      </div>
 
-        <div className='card-body pt-2 pb-4 d-flex flex-wrap align-items-center'>
-          <div className='d-flex flex-center me-5 pt-2'>
-            <div
-              id='kt_card_widget_17_chart'
-              ref={chartRef}
-              style={{ minWidth: chartSize + 'px', minHeight: chartSize + 'px' }}
-              data-kt-size={chartSize}
-              data-kt-line={chartLine}
-              onClick={toggleShowOtherClients}
-            ></div>
-          </div>
-          <div className='d-flex flex-column content-justify-center flex-row-fluid'>
-            { showDefault && (
-          <>
-            {/* Render first three clients */}
-            <div className='d-flex fw-semibold align-items-center'>
-              <div className='bullet w-8px h-3px rounded-2 bg-success me-3'></div>
-              <div id='clientName1' className='text-gray-500 flex-grow-1 me-4'>ANB</div>
-              <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-              <div id='unpaidClient1Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
-            </div>
-
-            <div className='d-flex fw-semibold align-items-center my-3'>
-              <div className='bullet w-8px h-3px rounded-2 bg-primary me-3'></div>
-              <div id='clientName2' className='text-gray-500 flex-grow-1 me-4'>RB</div>
-              <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-              <div id='unpaidClient2Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
-            </div>
-
-            <div className='d-flex fw-semibold align-items-center'>
-              <div className='bullet w-8px h-3px rounded-2 bg-danger me-3'></div>
-              <div id='clientName3' className='text-gray-500 flex-grow-1 me-4'>SAB</div>
-              <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-              <div id='unpaidClient3Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
-            </div>
-          </>
-        )}
-        
-            {/* Conditionally render the remaining clients */}
-            {showOtherClients && (
-              <>
-                <div className='d-flex fw-semibold align-items-center'>
-                  <div className='bullet w-8px h-3px rounded-2 bg-primary me-3'></div>
-                  <div id='clientName5' className='text-gray-500 flex-grow-1 me-4'>AMEX</div>
-                  <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-                  <div id='unpaidClient5Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+      <div className='card-body pt-2 pb-4 d-flex flex-wrap align-items-center'>
+        <div className='d-flex flex-center me-5 pt-2'>
+          <div
+            id='kt_card_widget_17_chart'
+            ref={chartRef}
+            style={{ minWidth: chartSize + 'px', minHeight: chartSize + 'px', cursor: 'pointer' }}
+            data-kt-size={chartSize}
+            data-kt-line={chartLine}
+            onClick={toggleShowOtherClients}
+          ></div>
+        </div>
+        <div className='d-flex flex-column content-justify-center flex-row-fluid'>
+          {showDefault && (
+            <>
+              <div className='d-flex fw-semibold align-items-center'>
+                <div className='bullet w-8px h-3px rounded-2 bg-success me-3'></div>
+                <div id='clientName1' className='text-gray-500 flex-grow-1 me-4'>
+                  ANB
                 </div>
+                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+                <div id='unpaidClient1Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+              </div>
 
-                <div className='d-flex fw-semibold align-items-center'>
-                  <div className='bullet w-8px h-3px rounded-2 bg-success me-3'></div>
-                  <div id='clientName4' className='text-gray-500 flex-grow-1 me-4'>ARB</div>
-                  <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-                  <div id='unpaidClient4Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+              <div className='d-flex fw-semibold align-items-center my-3'>
+                <div className='bullet w-8px h-3px rounded-2 bg-primary me-3'></div>
+                <div id='clientName2' className='text-gray-500 flex-grow-1 me-4'>
+                  RB
                 </div>
-              </>
-            )}
-          </div>
+                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+                <div id='unpaidClient2Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+              </div>
+
+              <div className='d-flex fw-semibold align-items-center'>
+                <div className='bullet w-8px h-3px rounded-2 bg-danger me-3'></div>
+                <div id='clientName3' className='text-gray-500 flex-grow-1 me-4'>
+                  SAB
+                </div>
+                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+                <div id='unpaidClient3Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+              </div>
+            </>
+          )}
+
+          {showOtherClients && (
+            <>
+              <div className='d-flex fw-semibold align-items-center'>
+                <div className='bullet w-8px h-3px rounded-2 bg-info me-3'></div>
+                <div id='clientName4' className='text-gray-500 flex-grow-1 me-4'>
+                  ARB
+                </div>
+                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+                <div id='unpaidClient4Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+              </div>
+
+              <div className='d-flex fw-semibold align-items-center'>
+                <div className='bullet w-8px h-3px rounded-2 bg-warning me-3'></div>
+                <div id='clientName5' className='text-gray-500 flex-grow-1 me-4'>
+                  AMEX
+                </div>
+                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+                <div id='unpaidClient5Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
+              </div>
+            </>
+          )}
         </div>
       </div>
-      </div>
-    
-  );
-};
+    </div>
+  )
+}
 
 const initChart = function (
   chartSize: number = 150,
   chartLine: number = 50,
-  chartRotate: number = 200
+  chartRotate: number = 200,
+  data: { color: string; value: number }[]
 ) {
   const el = document.getElementById('kt_card_widget_17_chart')
-  if (!el) {
-    return
-  }
-  el.innerHTML = ''
+  if (!el) return
 
-  const options = {
-    size: chartSize,
-    lineWidth: chartLine,
-    rotate: chartRotate,
-    //percent:  el.getAttribute('data-kt-percent') ,
-  }
-  // *********************************************** Changes for API value begins here ***********************************************
+  el.innerHTML = ''
   const canvas = document.createElement('canvas')
   const span = document.createElement('span')
-  
-  // *********************************************** Changes for API value ends here ***********************************************
-
-  interface User {
-    id: bigint,
-    startDate: string
-};
-
-  //@ts-ignore
-  if (typeof G_vmlCanvasManager !== 'undefined') {
-    //@ts-ignore
-    G_vmlCanvasManager.initElement(canvas)
-  }
-
   const ctx = canvas.getContext('2d')
-  canvas.width = canvas.height = options.size
-
+  canvas.width = canvas.height = chartSize
   el.appendChild(span)
   el.appendChild(canvas)
 
+  if (!ctx) return
 
-  ctx?.translate(options.size / 2, options.size / 2) // change center
-  ctx?.rotate((-1 / 2 + options.rotate / 180) * Math.PI) // rotate -90 deg
+  ctx.translate(chartSize / 2, chartSize / 2)
+  ctx.rotate((-1 / 2 + chartRotate / 180) * Math.PI)
 
-  //imd = ctx.getImageData(0, 0, 240, 240);
-  const radius = (options.size - options.lineWidth) / 2
+  const radius = (chartSize - chartLine) / 2
+  const totalValue = data.reduce((sum, d) => sum + d.value, 0)
+  let startAngle = 0
 
-  const drawCircle = function (color: string, lineWidth: number, percent: number) {
-    percent = Math.min(Math.max(0, percent || 1), 1)
-    if (!ctx) {
-      return
-    }
-
+  data.forEach(({ color, value }) => {
+    const percent = value / totalValue
+    const endAngle = startAngle + Math.PI * 2 * percent
     ctx.beginPath()
-    ctx.arc(0, 0, radius, 0, Math.PI * 2 * percent, false)
-    ctx.strokeStyle = color
-    ctx.lineCap = 'round' // butt, round or square
-    ctx.lineWidth = lineWidth
+    ctx.arc(0, 0, radius, startAngle, endAngle)
+    ctx.strokeStyle = getCSSVariableValue(color)
+    ctx.lineCap = 'round'
+    ctx.lineWidth = chartLine
     ctx.stroke()
-  }
-
-  // Init 2
-  drawCircle('#E4E6EF', options.lineWidth, 100 / 100)
-  drawCircle(getCSSVariableValue('--bs-primary'), options.lineWidth, 100 / 150)
-  drawCircle(getCSSVariableValue('--bs-success'), options.lineWidth, 100 / 250)
+    startAngle = endAngle
+  })
 }
 
-export {CardsWidget17}
-function setValues()
-  {
+function setValues() {
   let invoiceTotalValue = document.getElementById('invoiceTotalValueTag')
   let clientNameValue1 = document.getElementById('clientName1')
   let clientNameValue2 = document.getElementById('clientName2')
@@ -206,100 +211,79 @@ function setValues()
   let clientNameValue4 = document.getElementById('clientName4')
   let clientNameValue5 = document.getElementById('clientName5')
 
-  
   let client1ValueTag = document.getElementById('client1Value')
   let client2ValueTag = document.getElementById('client2Value')
   let client3ValueTag = document.getElementById('client3Value')
   let client4ValueTag = document.getElementById('client4Value')
   let client5ValueTag = document.getElementById('client5Value')
 
-  let unpaidTotalValueTag = document.getElementById('unpaidTotalValueTag'); // New element for unpaid total
-  let unpaidClient1ValueTag = document.getElementById('unpaidClient1Value'); // New element for unpaid client1
-  let unpaidClient2ValueTag = document.getElementById('unpaidClient2Value');
-  let unpaidClient3ValueTag = document.getElementById('unpaidClient3Value');
-  let unpaidClient4ValueTag = document.getElementById('unpaidClient4Value');
-  let unpaidClient5ValueTag = document.getElementById('unpaidClient5Value');
-  
+  let unpaidTotalValueTag = document.getElementById('unpaidTotalValueTag') // New element for unpaid total
+  let unpaidClient1ValueTag = document.getElementById('unpaidClient1Value') // New element for unpaid client1
+  let unpaidClient2ValueTag = document.getElementById('unpaidClient2Value')
+  let unpaidClient3ValueTag = document.getElementById('unpaidClient3Value')
+  let unpaidClient4ValueTag = document.getElementById('unpaidClient4Value')
+  let unpaidClient5ValueTag = document.getElementById('unpaidClient5Value')
+
   apiHelper.getInvoiceTotalValue().then((response: any) => {
-    let totalInvoiceValue = 0.0;
-    let client1TotalValue = 0.0;
-    let client2TotalValue = 0.0;
-    let client3TotalValue = 0.0;
-    let client4TotalValue = 0.0;
-    let client5TotalValue = 0.0;
+    let totalInvoiceValue = 0.0
+    let client1TotalValue = 0.0
+    let client2TotalValue = 0.0
+    let client3TotalValue = 0.0
+    let client4TotalValue = 0.0
+    let client5TotalValue = 0.0
 
-    let unpaidTotalValue = 0.0;
-    let unpaidClient1Value = 0.0;
-    let unpaidClient2Value = 0.0;
-    let unpaidClient3Value = 0.0;
-    let unpaidClient4Value = 0.0;
-    let unpaidClient5Value = 0.0;
+    let unpaidTotalValue = 0.0
+    let unpaidClient1Value = 0.0
+    let unpaidClient2Value = 0.0
+    let unpaidClient3Value = 0.0
+    let unpaidClient4Value = 0.0
+    let unpaidClient5Value = 0.0
 
-    // Loop through response data
     response.invoiceValue.forEach((item: any) => {
-      const billingValue = parseFloat(item.invoice_value) || 0;
-      const isPaid = item.invoice_paid_status;
+      const billingValue = parseFloat(item.invoice_value) || 0
+      const isPaid = item.invoice_paid_status
 
-      // Calculate total values
-      totalInvoiceValue += billingValue;
+      totalInvoiceValue += billingValue
       if (item.client_id === 1) {
-        client1TotalValue += billingValue;
-        if (!isPaid) unpaidClient1Value += billingValue;
+        client1TotalValue += billingValue
+        if (!isPaid) unpaidClient1Value += billingValue
       } else if (item.client_id === 2) {
-        client2TotalValue += billingValue; 
-        if (!isPaid) unpaidClient2Value += billingValue;
+        client2TotalValue += billingValue
+        if (!isPaid) unpaidClient2Value += billingValue
       } else if (item.client_id === 3) {
-        client3TotalValue += billingValue;
-        if (!isPaid) unpaidClient3Value += billingValue;
+        client3TotalValue += billingValue
+        if (!isPaid) unpaidClient3Value += billingValue
       } else if (item.client_id === 4) {
-        client5TotalValue += billingValue;
-        if (!isPaid) unpaidClient4Value += billingValue;
+        client4TotalValue += billingValue
+        if (!isPaid) unpaidClient4Value += billingValue
       } else if (item.client_id === 5) {
-        client5TotalValue += billingValue;
-        if (!isPaid) unpaidClient5Value += billingValue;
+        client5TotalValue += billingValue
+        if (!isPaid) unpaidClient5Value += billingValue
       }
 
-      if (!isPaid) unpaidTotalValue += billingValue;
-    });
+      if (!isPaid) unpaidTotalValue += billingValue
+    })
 
-    // Format values to 2 decimal places
-    const formatValue = (value: number) =>
-      value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (invoiceTotalValue) invoiceTotalValue.innerText = totalInvoiceValue.toFixed(2)
+    if (clientNameValue1) clientNameValue1.innerText = `ANB`
+    if (clientNameValue2) clientNameValue2.innerText = `RB`
+    if (clientNameValue3) clientNameValue3.innerText = `SAB`
+    if (clientNameValue4) clientNameValue4.innerText = `ARB`
+    if (clientNameValue5) clientNameValue5.innerText = `AMEX`
 
-    // Update DOinvoicents
-    if (invoiceTotalValue) invoiceTotalValue.innerHTML = formatValue(totalInvoiceValue);
-    if (clientNameValue1) clientNameValue1.innerHTML = "ANB";
-    if (client1ValueTag) client1ValueTag.innerHTML = formatValue(client1TotalValue);
+    if (client1ValueTag) client1ValueTag.innerText = client1TotalValue.toFixed(2)
+    if (client2ValueTag) client2ValueTag.innerText = client2TotalValue.toFixed(2)
+    if (client3ValueTag) client3ValueTag.innerText = client3TotalValue.toFixed(2)
+    if (client4ValueTag) client4ValueTag.innerText = client4TotalValue.toFixed(2)
+    if (client5ValueTag) client5ValueTag.innerText = client5TotalValue.toFixed(2)
 
-    if (clientNameValue2) clientNameValue2.innerHTML = "RB";
-    if (client2ValueTag) client2ValueTag.innerHTML = formatValue(client2TotalValue);
+    if (unpaidTotalValueTag) unpaidTotalValueTag.innerText = unpaidTotalValue.toFixed(2)
+    if (unpaidClient1ValueTag) unpaidClient1ValueTag.innerText = unpaidClient1Value.toFixed(2)
+    if (unpaidClient2ValueTag) unpaidClient2ValueTag.innerText = unpaidClient2Value.toFixed(2)
+    if (unpaidClient3ValueTag) unpaidClient3ValueTag.innerText = unpaidClient3Value.toFixed(2)
+    if (unpaidClient4ValueTag) unpaidClient4ValueTag.innerText = unpaidClient4Value.toFixed(2)
+    if (unpaidClient5ValueTag) unpaidClient5ValueTag.innerText = unpaidClient5Value.toFixed(2)
+  })
+}
 
-    if (clientNameValue3) clientNameValue3.innerHTML = "SAB";
-    if (client3ValueTag) client3ValueTag.innerHTML = formatValue(client3TotalValue);
-
-
-    if (clientNameValue4) clientNameValue4.innerHTML = "ARB";
-    if (client4ValueTag) client4ValueTag.innerHTML = formatValue(client4TotalValue);
-
-    if (clientNameValue5) clientNameValue5.innerHTML = "AMEX";
-    if (client5ValueTag) client5ValueTag.innerHTML = formatValue(client5TotalValue);
-
-    // Update unpaid invoice values
-    if (unpaidTotalValueTag) unpaidTotalValueTag.innerHTML = formatValue(unpaidTotalValue);
-    if (clientNameValue1) clientNameValue1.innerHTML = "ANB";
-    if (unpaidClient1ValueTag) unpaidClient1ValueTag.innerHTML = formatValue(unpaidClient1Value);
-
-    if (clientNameValue2) clientNameValue2.innerHTML = "RB";
-    if (unpaidClient2ValueTag) unpaidClient2ValueTag.innerHTML = formatValue(unpaidClient2Value);
-
-    if (clientNameValue3) clientNameValue3.innerHTML = "SAB";
-    if (unpaidClient3ValueTag) unpaidClient3ValueTag.innerHTML = formatValue(unpaidClient3Value);
-    
-    if (clientNameValue4) clientNameValue4.innerHTML = "ARB";
-    if (unpaidClient4ValueTag) unpaidClient4ValueTag.innerHTML = formatValue(unpaidClient4Value);
-    
-    if (clientNameValue5) clientNameValue5.innerHTML = "AMEX";
-    if (unpaidClient5ValueTag) unpaidClient5ValueTag.innerHTML = formatValue(unpaidClient5Value);
-
-  });
-  }
+export { CardsWidget17 }
