@@ -58,11 +58,11 @@ const DashboardPage: FC = () => (
         />
         <CardsWidget7
           className='h-md-50 mb-5 mb-xl-10'
-          description='Opportunities'
-          icon={false}
-          stats={stats}
-          labelColor='dark'
-          textColor='gray-300'
+          // description='Opportunities'
+          // icon={false}
+          // stats={stats}
+          // labelColor='dark'
+          // textColor='gray-300'
         />
       </div>
       {/* end::Col */}
