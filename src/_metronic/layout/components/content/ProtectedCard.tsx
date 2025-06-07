@@ -1,4 +1,7 @@
 import { FC, ReactNode, useEffect, useRef, useState } from 'react'
+import { useThemeMode } from '../../../partials'
+import clsx from 'clsx'
+
 
 type Bubble = {
   id: number
@@ -38,6 +41,8 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
   const [bubbles, setBubbles] = useState<Bubble[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const promptRef = useRef<HTMLDivElement>(null)
+    const { mode } = useThemeMode()
+  const isDark = mode === 'dark'
 
   // Initialize bubbles
   useEffect(() => {
@@ -152,14 +157,15 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
           position: relative;
           display: inline-block;
           overflow: hidden;
-          border-radius: 12px;
+          border-radius: 11px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.2);
           cursor: pointer;
-          background: white;
-          max-width: 447px;  /* limit max width */
-          max-height: 220px; /* limit max height */
+          // background: white;
+          max-width: auto;  /* limit max width */
+          max-height: 221px; /* limit max height */
           width: 100%;       /* take full width of parent */
           height: 100%;      /* take full height of parent */
+          margin-bottom: 5%;
         }
 
         .card-content {
@@ -209,10 +215,15 @@ const ProtectedCard: FC<ProtectedCardProps> = ({ password, children, className =
         }
       `}</style>
 
-      <div className={`card-container ${className}`} ref={containerRef} onClick={handleCardClick}>
+      <div
+        className={clsx('card-container', className)}
+        ref={containerRef}
+        onClick={handleCardClick}
+      >
         <div className="card-content">
           {children}
         </div>
+
 
         {isBlurred && (
           <div className="bubble-layer">

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-//Total Value Widget
 import { FC, useEffect, useRef, useState } from 'react'
 import { KTIcon } from '../../../../helpers'
 import { getCSSVariableValue } from '../../../../assets/ts/_utils'
@@ -25,42 +23,65 @@ const CardsWidget17: FC<Props> = ({
   const chartRef = useRef<HTMLDivElement | null>(null)
   const { mode } = useThemeMode()
   const [showOtherClients, setShowOtherClients] = useState(false)
-  const [showDefault, setShowDefault] = useState(true)
+
+  const [unpaidTotals, setUnpaidTotals] = useState({
+    total: 0,
+    client1: 0,
+    client2: 0,
+    client3: 0,
+    client4: 0,
+    client5: 0,
+  })
 
   useEffect(() => {
-    refreshChart()
-    setValues()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, showOtherClients])
+    fetchAndSetInvoiceData()
+  }, [mode]) // only re-fetch on theme mode change
 
-  const refreshChart = async () => {
-    if (!chartRef.current) return
-
+  const fetchAndSetInvoiceData = async () => {
     const response = await apiHelper.getInvoiceTotalValue()
-    let unpaidClient1 = 0,
-      unpaidClient2 = 0,
-      unpaidClient3 = 0,
-      unpaidClient4 = 0,
-      unpaidClient5 = 0
+
+    let totals = {
+      total: 0,
+      client1: 0,
+      client2: 0,
+      client3: 0,
+      client4: 0,
+      client5: 0,
+    }
 
     response.invoiceValue.forEach((item: any) => {
-      const val = parseFloat(item.invoice_value) || 0
+      const value = parseFloat(item.invoice_value) || 0
       if (!item.invoice_paid_status) {
-        if (item.client_id === 1) unpaidClient1 += val
-        else if (item.client_id === 2) unpaidClient2 += val
-        else if (item.client_id === 3) unpaidClient3 += val
-        else if (item.client_id === 4) unpaidClient4 += val
-        else if (item.client_id === 5) unpaidClient5 += val
+        switch (item.client_id) {
+          case 1:
+            totals.client1 += value
+            break
+          case 2:
+            totals.client2 += value
+            break
+          case 3:
+            totals.client3 += value
+            break
+          case 4:
+            totals.client4 += value
+            break
+          case 5:
+            totals.client5 += value
+            break
+        }
+        totals.total += value
       }
     })
 
+    setUnpaidTotals(totals)
+
     const chartData = [
-      { color: '--bs-success', value: unpaidClient1 },
-      { color: '--bs-primary', value: unpaidClient2 },
-      { color: '--bs-danger', value: unpaidClient3 },
-      { color: '--bs-info', value: unpaidClient4 },
-      { color: '--bs-warning', value: unpaidClient5 },
-    ].filter(d => d.value > 0) // only draw non-zero slices
+      { color: '--bs-success', value: totals.client1 },
+      { color: '--bs-primary', value: totals.client2 },
+      { color: '--bs-danger', value: totals.client3 },
+      { color: '--bs-info', value: totals.client4 },
+      { color: '--bs-warning', value: totals.client5 },
+    ].filter(d => d.value > 0)
 
     setTimeout(() => {
       initChart(chartSize, chartLine, chartRotate, chartData)
@@ -68,25 +89,26 @@ const CardsWidget17: FC<Props> = ({
   }
 
   const toggleShowOtherClients = () => {
-    setShowOtherClients(!showOtherClients)
-    setShowDefault(!showDefault)
+    setShowOtherClients(prev => !prev)
   }
 
+  const format = (val: number) =>
+    val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
   return (
-    <div className={`card card-flush ${className}`}>
+    <div className={`card card-flush ${className}`}> 
       <div className='card-header pt-5'>
         <div className={clsx('card', classProtected)}>
           <div className='card-title d-flex flex-column'>
             <div className='d-flex align-items-center'>
               <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
               <a href='/getInvoiceDetails'>
-                <span
-                  id='unpaidTotalValueTag'
-                  className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'
-                ></span>
+                <span className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'>
+                  {format(unpaidTotals.total)}
+                </span>
               </a>
-              <span className='badge badge-light-success fs-base'>
-                <KTIcon iconName='arrow-up' className='fs-5 text-success ms-n1' />2.2%
+              <span className='badge badge-light fs-base'>
+                <KTIcon iconName='' className='fs-5 text-success ms-n1' />
               </span>
             </div>
             <span className='text-gray-500 pt-1 fw-semibold fs-6'>Pending Invoices</span>
@@ -105,57 +127,18 @@ const CardsWidget17: FC<Props> = ({
             onClick={toggleShowOtherClients}
           ></div>
         </div>
+
         <div className='d-flex flex-column content-justify-center flex-row-fluid'>
-          {showDefault && (
+          {!showOtherClients ? (
             <>
-              <div className='d-flex fw-semibold align-items-center'>
-                <div className='bullet w-8px h-3px rounded-2 bg-success me-3'></div>
-                <div id='clientName1' className='text-gray-500 flex-grow-1 me-4'>
-                  ANB
-                </div>
-                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-                <div id='unpaidClient1Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
-              </div>
-
-              <div className='d-flex fw-semibold align-items-center my-3'>
-                <div className='bullet w-8px h-3px rounded-2 bg-primary me-3'></div>
-                <div id='clientName2' className='text-gray-500 flex-grow-1 me-4'>
-                  RB
-                </div>
-                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-                <div id='unpaidClient2Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
-              </div>
-
-              <div className='d-flex fw-semibold align-items-center'>
-                <div className='bullet w-8px h-3px rounded-2 bg-danger me-3'></div>
-                <div id='clientName3' className='text-gray-500 flex-grow-1 me-4'>
-                  SAB
-                </div>
-                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-                <div id='unpaidClient3Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
-              </div>
+              <ClientRow color="success" name="ANB" value={unpaidTotals.client1} />
+              <ClientRow color="primary" name="RB" value={unpaidTotals.client2} />
+              <ClientRow color="danger" name="SAB" value={unpaidTotals.client3} />
             </>
-          )}
-
-          {showOtherClients && (
+          ) : (
             <>
-              <div className='d-flex fw-semibold align-items-center'>
-                <div className='bullet w-8px h-3px rounded-2 bg-info me-3'></div>
-                <div id='clientName4' className='text-gray-500 flex-grow-1 me-4'>
-                  ARB
-                </div>
-                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-                <div id='unpaidClient4Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
-              </div>
-
-              <div className='d-flex fw-semibold align-items-center'>
-                <div className='bullet w-8px h-3px rounded-2 bg-warning me-3'></div>
-                <div id='clientName5' className='text-gray-500 flex-grow-1 me-4'>
-                  AMEX
-                </div>
-                <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
-                <div id='unpaidClient5Value' className='fw-bolder text-gray-700 text-xxl-end'></div>
-              </div>
+              <ClientRow color="info" name="ARB" value={unpaidTotals.client4} />
+              <ClientRow color="warning" name="AMEX" value={unpaidTotals.client5} />
             </>
           )}
         </div>
@@ -164,12 +147,34 @@ const CardsWidget17: FC<Props> = ({
   )
 }
 
-const initChart = function (
-  chartSize: number = 150,
-  chartLine: number = 50,
-  chartRotate: number = 200,
+const ClientRow = ({
+  color,
+  name,
+  value,
+}: {
+  color: string
+  name: string
+  value: number
+}) => (
+  <div className='d-flex fw-semibold align-items-center my-2'>
+    <div className={`bullet w-8px h-3px rounded-2 bg-${color} me-3`}></div>
+    <div className='text-gray-500 flex-grow-1 me-4'>{name}</div>
+    <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+    <div className='fw-bolder text-gray-700 text-xxl-end'>
+      {value.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}
+    </div>
+  </div>
+)
+
+const initChart = (
+  chartSize: number,
+  chartLine: number,
+  chartRotate: number,
   data: { color: string; value: number }[]
-) {
+) => {
   const el = document.getElementById('kt_card_widget_17_chart')
   if (!el) return
 
@@ -200,89 +205,6 @@ const initChart = function (
     ctx.lineWidth = chartLine
     ctx.stroke()
     startAngle = endAngle
-  })
-}
-
-function setValues() {
-  let invoiceTotalValue = document.getElementById('invoiceTotalValueTag')
-  let clientNameValue1 = document.getElementById('clientName1')
-  let clientNameValue2 = document.getElementById('clientName2')
-  let clientNameValue3 = document.getElementById('clientName3')
-  let clientNameValue4 = document.getElementById('clientName4')
-  let clientNameValue5 = document.getElementById('clientName5')
-
-  let client1ValueTag = document.getElementById('client1Value')
-  let client2ValueTag = document.getElementById('client2Value')
-  let client3ValueTag = document.getElementById('client3Value')
-  let client4ValueTag = document.getElementById('client4Value')
-  let client5ValueTag = document.getElementById('client5Value')
-
-  let unpaidTotalValueTag = document.getElementById('unpaidTotalValueTag') // New element for unpaid total
-  let unpaidClient1ValueTag = document.getElementById('unpaidClient1Value') // New element for unpaid client1
-  let unpaidClient2ValueTag = document.getElementById('unpaidClient2Value')
-  let unpaidClient3ValueTag = document.getElementById('unpaidClient3Value')
-  let unpaidClient4ValueTag = document.getElementById('unpaidClient4Value')
-  let unpaidClient5ValueTag = document.getElementById('unpaidClient5Value')
-
-  apiHelper.getInvoiceTotalValue().then((response: any) => {
-    let totalInvoiceValue = 0.0
-    let client1TotalValue = 0.0
-    let client2TotalValue = 0.0
-    let client3TotalValue = 0.0
-    let client4TotalValue = 0.0
-    let client5TotalValue = 0.0
-
-    let unpaidTotalValue = 0.0
-    let unpaidClient1Value = 0.0
-    let unpaidClient2Value = 0.0
-    let unpaidClient3Value = 0.0
-    let unpaidClient4Value = 0.0
-    let unpaidClient5Value = 0.0
-
-    response.invoiceValue.forEach((item: any) => {
-      const billingValue = parseFloat(item.invoice_value) || 0
-      const isPaid = item.invoice_paid_status
-
-      totalInvoiceValue += billingValue
-      if (item.client_id === 1) {
-        client1TotalValue += billingValue
-        if (!isPaid) unpaidClient1Value += billingValue
-      } else if (item.client_id === 2) {
-        client2TotalValue += billingValue
-        if (!isPaid) unpaidClient2Value += billingValue
-      } else if (item.client_id === 3) {
-        client3TotalValue += billingValue
-        if (!isPaid) unpaidClient3Value += billingValue
-      } else if (item.client_id === 4) {
-        client4TotalValue += billingValue
-        if (!isPaid) unpaidClient4Value += billingValue
-      } else if (item.client_id === 5) {
-        client5TotalValue += billingValue
-        if (!isPaid) unpaidClient5Value += billingValue
-      }
-
-      if (!isPaid) unpaidTotalValue += billingValue
-    })
-
-    if (invoiceTotalValue) invoiceTotalValue.innerText = totalInvoiceValue.toFixed(2)
-    if (clientNameValue1) clientNameValue1.innerText = `ANB`
-    if (clientNameValue2) clientNameValue2.innerText = `RB`
-    if (clientNameValue3) clientNameValue3.innerText = `SAB`
-    if (clientNameValue4) clientNameValue4.innerText = `ARB`
-    if (clientNameValue5) clientNameValue5.innerText = `AMEX`
-
-    if (client1ValueTag) client1ValueTag.innerText = client1TotalValue.toFixed(2)
-    if (client2ValueTag) client2ValueTag.innerText = client2TotalValue.toFixed(2)
-    if (client3ValueTag) client3ValueTag.innerText = client3TotalValue.toFixed(2)
-    if (client4ValueTag) client4ValueTag.innerText = client4TotalValue.toFixed(2)
-    if (client5ValueTag) client5ValueTag.innerText = client5TotalValue.toFixed(2)
-
-    if (unpaidTotalValueTag) unpaidTotalValueTag.innerText = unpaidTotalValue.toFixed(2)
-    if (unpaidClient1ValueTag) unpaidClient1ValueTag.innerText = unpaidClient1Value.toFixed(2)
-    if (unpaidClient2ValueTag) unpaidClient2ValueTag.innerText = unpaidClient2Value.toFixed(2)
-    if (unpaidClient3ValueTag) unpaidClient3ValueTag.innerText = unpaidClient3Value.toFixed(2)
-    if (unpaidClient4ValueTag) unpaidClient4ValueTag.innerText = unpaidClient4Value.toFixed(2)
-    if (unpaidClient5ValueTag) unpaidClient5ValueTag.innerText = unpaidClient5Value.toFixed(2)
   })
 }
 
