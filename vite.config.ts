@@ -11,6 +11,9 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
+    hmr : {
+     overlay : false,
+    },
     port: 8080 // change here
   },
   logLevel:'info'

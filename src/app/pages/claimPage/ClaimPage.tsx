@@ -21,7 +21,7 @@ import {
 var allUserInfo: any = await Promise.all(
   [ apiHelper.getAllClaimEmployees(), apiHelper.getExpenses(), apiHelper.getAccountManager() ]
 ).then(([employee,expense ,manager]) => {
-  return { employee:employee.data, expense:expense.data , manager:manager.data}
+  return { employee, expense , manager:manager.data}
 })
 let updatedUserInfo: IProfileDetails = initialValues;
 const profileDetailsSchema = Yup.object().shape({

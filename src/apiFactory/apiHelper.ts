@@ -313,93 +313,73 @@ export const getContractForAction = async (id: string) => {
 };
 
 
-export const getAllEmployees = async (): Promise<UsersQueryResponse> => {
-  let url = "";
-  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
- // console.log("From api Helper:", loggedUser)
-  if (loggedUser === `${admin}`) {
-    // Admin case
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,fullName,occupation,companyName,client_id,contract_id,associatedAccountManager(accountManagerName),phone,employeeJoiningDate,language,employeeId&isClientFacing=eq.1&order=id`;
-  } else if (loggedUser === null ) {
-    // null Case
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,fullName,occupation,companyName,client_id,contract_id,associatedAccountManager(accountManagerName),phone,employeeJoiningDate,language,employeeId&isClientFacing=eq.1&order=id`;
-  }  else {
-    // Account Manager case
-    const accountManagerId = await getAccountManagerId();
-   // console.log("This is Account Manager Id: ", accountManagerId);
-    url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,fullName,occupation,companyName,client_id,contract_id,associatedAccountManager(accountManagerName),phone,employeeJoiningDate,language,employeeId&isClientFacing=eq.1&order=id&associatedAccountManager=eq.${accountManagerId}`;
+export const getAllEmployees = async () => {
+  try{
+    const response = await axiosEncoreInstance.get('/getAllEmp')
+  //  console.log("Response for getAllEmployee  :", response.data)
+    return response.data.getAllEmp;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getAllEmployee   :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getAllEmployee  : ", error)
+    }
   }
-  const d = await axios
-    .get(url);
-  return d;
 };
 
-export const getAllClaimEmployees = async (): Promise<UsersQueryResponse> => {
-  let url = "";
-  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  //console.log("From api Helper:", loggedUser)
-  if (loggedUser === `${admin}`) {
-    // Admin case
-    url = `${GET_USERS_URL}?select=*&isActive=eq.true&order=id`;
-  }  else if (loggedUser === null ) {
-    // null Case
-    url = `${GET_USERS_URL}?select=*&isActive=eq.true&order=id`;
-  }  else {
-    // Account Manager case
-    const accountManagerId = await getAccountManagerId();
-    //console.log("This is Account Manager Id: ", accountManagerId);
-    url = `${GET_USERS_URL}?select=*&isActive=eq.true&order=id&associatedAccountManager=eq.${accountManagerId}`;
+export const getAllClaimEmployees = async () => {
+   try{
+    const response = await axiosEncoreInstance.get('/getAllClaimEmp')
+   // console.log("Response for getAllClaimEmployee  :", response.data)
+    return response.data.getAllClaimEmp;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getAllClaimEmployee   :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getAllClaimEmployee  : ", error)
+    }
   }
-  const d = await axios
-    .get(url);
-  return d;
 };
 
-export const getEmpForSalaryIncrement = async () : Promise<UsersQueryResponse> => {
-  let url = "";
-  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  //console.log("From api Helper:", loggedUser)
-  if (loggedUser === `${admin}`) {
-    // Admin case
-    url = `${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id`;
-  } else if (loggedUser === null ) {
-    // null Case
-    url = `${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id`;
-  }  else {
-    // Account Manager case
-    const accountManagerId = await getAccountManagerId();
-    //console.log("This is Account Manager Id: ", accountManagerId);
-    url = `${GET_USER_SALARY_URL}?select=id,pay_period,pay_date,basic_allowance,hr_allowance,deductions_total,end_of_service_allowance,travel_other_allowance,earnings_total,lop_days,employee_request,salary_advance,lop_salary_total,total_net_salary,total_net_salary_words,salary_pay_mode,working_days,holidays,isDisabled,user_id(username,email)&order=id&associatedAccountManager=eq.${accountManagerId}`;
+export const getEmpForSalaryIncrement = async () => {
+   try{
+    const response = await axiosEncoreInstance.get('/getEmpForSalInc')
+  //  console.log("Response for getEmpForSalInc  :", response.data)
+    return response.data.getEmpForSalInc;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getEmpForSalInc   :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getEmpForSalInc  : ", error)
+    }
   }
-  const d = await axios
-  .get(url);
-  return d;
 }
-export const getEmpForSalary = async () : Promise<UsersQueryResponse> => {
-  let url = "";
-  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  //console.log("From api Helper:", loggedUser)
-  if (loggedUser === `${admin}`) {
-    // Admin case
-    url = `${GET_USERS_URL}?select*&onSalary=eq.false&order=id`;
-  } else if (loggedUser === null ) {
-    // null Case
-    url = `${GET_USERS_URL}?select*&onSalary=eq.false&order=id`;
-  }  else {
-    // Account Manager case
-    const accountManagerId = await getAccountManagerId();
-    //console.log("This is Account Manager Id: ", accountManagerId);
-    url = `${GET_USERS_URL}?select*&onSalary=eq.false&order=id&associatedAccountManager=eq.${accountManagerId}`;
+export const getEmpForSalary = async () => {
+   try{
+    const response = await axiosEncoreInstance.get('/getEmpForSalary')
+  //  console.log("Response for getExpType  :", response.data)
+    return response.data.getEmpSal;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getEmpSal   :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getEmpSal  : ", error)
+    }
   }
-  const d = await axios
-  .get(url);
-  return d;
 }
 
-export const getExpenses = async (): Promise<UsersQueryResponse> => {
-  const d = await axios
-    .get(`${GET_EXPENSE}?select=*&order=id`);
-  return d;
+export const getExpenses = async () => {
+   try{
+    const response = await axiosEncoreInstance.get('/getExpType')
+    console.log("Response for getEmpSal  :", response.data.getExpType)
+    return response.data.getExpType ;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getExpType   :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getExpType  : ", error)
+    }
+  }
 };
 
 export const getAccountManager = async (): Promise<UsersQueryResponse> => {

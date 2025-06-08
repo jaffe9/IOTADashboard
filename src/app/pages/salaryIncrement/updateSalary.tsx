@@ -13,7 +13,7 @@ const UpdateSalary: FC = () => {
     async function fetchData() {
       try {
         const data = await apiHelper.getEmpForSalaryIncrement();
-        setAllUserInfo(data.data ?? []);
+        setAllUserInfo(data ?? []);
       } catch (error) {
         console.error("Failed to fetch employees", error);
       }
