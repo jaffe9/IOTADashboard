@@ -33,9 +33,15 @@ const CardsWidget17: FC<Props> = ({
     client5: 0,
   })
 
+  const [showAmount, setShowAmount] = useState(false)
+  const [showPasswordInput, setShowPasswordInput] = useState(false)
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
+
   useEffect(() => {
     fetchAndSetInvoiceData()
-  }, [mode]) // only re-fetch on theme mode change
+  }, [mode])
 
   const fetchAndSetInvoiceData = async () => {
     const response = await apiHelper.getInvoiceTotalValue()
@@ -95,24 +101,80 @@ const CardsWidget17: FC<Props> = ({
   const format = (val: number) =>
     val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
+  const correctPassword = 'iwtCard17'
+
+  const handleRevealAmount = () => {
+    if (showAmount) {
+      // Manually hide and clear timeout if eye-slash is clicked
+      if (timeoutId) clearTimeout(timeoutId)
+      setShowAmount(false)
+      return
+    }
+
+    setShowPasswordInput(true)
+    setError('')
+  }
+
+  const handlePasswordSubmit = () => {
+    if (password === correctPassword) {
+      setShowAmount(true)
+      setShowPasswordInput(false)
+      setPassword('')
+      setError('')
+
+      const id = setTimeout(() => {
+        setShowAmount(false)
+      }, 30000)
+
+      setTimeoutId(id)
+    } else {
+      setError('Incorrect password')
+    }
+  }
+
   return (
-    <div className={`card card-flush ${className}`}> 
+    <div className={`card card-flush ${className}`}>
       <div className='card-header pt-5'>
-        <div className={clsx('card', classProtected)}>
-          <div className='card-title d-flex flex-column'>
-            <div className='d-flex align-items-center'>
-              <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+        <div className='card-title d-flex flex-column'>
+          <div className='d-flex align-items-center'>
+            <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
+
+            {showAmount ? (
               <a href='/getInvoiceDetails'>
                 <span className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'>
                   {format(unpaidTotals.total)}
                 </span>
               </a>
-              <span className='badge badge-light fs-base'>
-                <KTIcon iconName='' className='fs-5 text-success ms-n1' />
-              </span>
-            </div>
-            <span className='text-gray-500 pt-1 fw-semibold fs-6'>Pending Invoices</span>
+            ) : (
+              <span className='fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2'> ******* </span>
+            )}
+
+            <span
+              className='cursor-pointer ms-2'
+              onClick={handleRevealAmount}
+              title={showAmount ? 'Hide amount' : 'Reveal with password'}
+            >
+              <KTIcon iconName={showAmount ? 'eye-slash' : 'eye'} className='fs-1 text-primary' />
+            </span>
           </div>
+
+          {showPasswordInput && (
+            <div className='mt-2'>
+              <input
+                type='password'
+                className='form-control form-control-sm w-200px d-inline-block me-2'
+                placeholder='Enter password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button className='btn btn-sm btn-primary' onClick={handlePasswordSubmit}>
+                Submit
+              </button>
+              {error && <div className='text-danger mt-1'>{error}</div>}
+            </div>
+          )}
+
+          <span className='text-gray-500 pt-1 fw-semibold fs-6'>Pending Invoices</span>
         </div>
       </div>
 
@@ -131,14 +193,14 @@ const CardsWidget17: FC<Props> = ({
         <div className='d-flex flex-column content-justify-center flex-row-fluid'>
           {!showOtherClients ? (
             <>
-              <ClientRow color="success" name="ANB" value={unpaidTotals.client1} />
-              <ClientRow color="primary" name="RB" value={unpaidTotals.client2} />
-              <ClientRow color="danger" name="SAB" value={unpaidTotals.client3} />
+              <ClientRow color="success" name="ANB"  value={unpaidTotals.client1} isHidden={!showAmount} />
+              <ClientRow color="primary" name="RB" value={unpaidTotals.client2} isHidden={!showAmount}/>
+              <ClientRow color="danger" name="SAB" value={unpaidTotals.client3} isHidden={!showAmount} />
             </>
           ) : (
             <>
-              <ClientRow color="info" name="ARB" value={unpaidTotals.client4} />
-              <ClientRow color="warning" name="AMEX" value={unpaidTotals.client5} />
+              <ClientRow color="info" name="ARB" value={unpaidTotals.client4} isHidden={!showAmount}/>
+              <ClientRow color="warning" name="AMEX" value={unpaidTotals.client5} isHidden={!showAmount} />
             </>
           )}
         </div>
@@ -151,20 +213,24 @@ const ClientRow = ({
   color,
   name,
   value,
+  isHidden = false
 }: {
   color: string
   name: string
   value: number
+  isHidden? : boolean
 }) => (
   <div className='d-flex fw-semibold align-items-center my-2'>
     <div className={`bullet w-8px h-3px rounded-2 bg-${color} me-3`}></div>
     <div className='text-gray-500 flex-grow-1 me-4'>{name}</div>
     <span className='fs-4 fw-semibold text-gray-500 me-1 align-self-start'>SAR</span>
     <div className='fw-bolder text-gray-700 text-xxl-end'>
-      {value.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}
+       {isHidden
+        ? '********'
+        : value.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
     </div>
   </div>
 )

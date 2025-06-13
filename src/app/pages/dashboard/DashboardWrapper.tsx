@@ -57,7 +57,7 @@ const DashboardPage: FC = () => (
           img={toAbsoluteUrl('media/patterns/vector-1.png')}
         />
         <CardsWidget7
-          className='h-md-50 mb-5 mb-xl-10'
+           className='h-md-50 mb-5 mb-xl-10'
           // description='Opportunities'
           // icon={false}
           // stats={stats}
@@ -69,9 +69,9 @@ const DashboardPage: FC = () => (
 
       {/* begin::Col */}
       <div className='col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10'>
-        <ProtectedCard password='iwtCard17'>
+        {/* <ProtectedCard password='iwtCard17'>  use this to hide the card  */}
         <CardsWidget17 className='h-md-50 mb-5 mb-xl-10' />
-        </ProtectedCard>
+        {/* </ProtectedCard> */}
         <ListsWidget26 className='h-lg-50' />
       </div>
       {/* end::Col */}
