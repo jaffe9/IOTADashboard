@@ -18,7 +18,7 @@ import axios from "axios";
 var allUserInfo:any =  await Promise.all(
   [apiHelper.getAllEmployees(), apiHelper.getAccountManager()]
 ).then(([employee , manager]) => {
-  return {employee : employee.data , manager:manager.data }
+  return {employee , manager }
 })
 let updatedUserInfo: IProfileDetails = initialValues;
 const profileDetailsSchema = Yup.object().shape({

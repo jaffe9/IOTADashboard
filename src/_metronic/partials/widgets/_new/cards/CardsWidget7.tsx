@@ -13,27 +13,28 @@ type PaidInvoice = {
 };
 
 const COLORS = [
-  '#3699FF', // Primary
-  '#FFA800', // Orange
-  '#1BC5BD', // Green
-  '#8950FC', // Violet
-  '#F64E60', // Red
-  '#FFCE56', // Yellow
-  '#50CD89', // Teal
-  '#0BB783', // Aqua
-  '#663259', // Deep Purple
+  '#3699FF',
+  '#FFA800',
+  '#1BC5BD',
+  '#8950FC',
+  '#F64E60',
+  '#FFCE56',
+  '#50CD89',
+  '#0BB783',
+  '#663259',
 ];
 
 const CardsWidget7 = ({ className = '' }: Props) => {
-  const [chartReady, setChartReady] = useState(false);
   const [noData, setNoData] = useState(false);
 
   useEffect(() => {
+    let chart: ApexCharts | null = null;
+
     const fetchData = async () => {
       try {
         const invoices: PaidInvoice[] = await getPaidInvoices();
         const now = new Date();
-        const startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1); // 3 months ago
+        const startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
 
         const totals: Record<string, number> = {};
 
@@ -59,13 +60,8 @@ const CardsWidget7 = ({ className = '' }: Props) => {
           series: data,
           labels: clients,
           colors: COLORS,
-          fill: {
-            colors: COLORS,
-          },
-          chart: {
-            type: 'donut',
-            height: 190,  // modify the chart height here 
-          },
+          fill: { colors: COLORS },
+          chart: { type: 'donut', height: 190 },
           stroke: {
             show: true,
             width: 2,
@@ -73,28 +69,14 @@ const CardsWidget7 = ({ className = '' }: Props) => {
           },
           tooltip: {
             y: {
-              formatter: (value: number) => {
-                return `SAR ${value.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`;
-              },
+              formatter: (value: number) => `SAR ${value.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`,
             },
           },
-          dataLabels: {
-            enabled: true,  // this will show the percentage of particular client 
-            // formatter: (val: number) => {
-            //   return val.toLocaleString('en-US', {
-            //     minimumFractionDigits: 2,
-            //     maximumFractionDigits: 2,
-            //   });
-            // },
-          },
-          plotOptions: {
-            pie: {
-              expandOnClick: false,
-            },
-          },
+          dataLabels: { enabled: true },
+          plotOptions: { pie: { expandOnClick: false } },
           legend: {
             offsetY: -5,
             offsetX: -10,
@@ -113,27 +95,18 @@ const CardsWidget7 = ({ className = '' }: Props) => {
             {
               breakpoint: 480,
               options: {
-                chart: {
-                  width: 200,
-                },
-                legend: {
-                  position: 'bottom',
-                },
+                chart: { width: 200 },
+                legend: { position: 'bottom' },
               },
             },
           ],
         };
 
         const chartElement = document.querySelector('#kt_charts_widget_7_pie_chart');
-        if (!chartElement) return;
-
-        const chart = new ApexCharts(chartElement, options);
-        chart.render();
-        setChartReady(true);
-
-        return () => {
-          chart.destroy();
-        };
+        if (chartElement) {
+          chart = new ApexCharts(chartElement, options);
+          await chart.render();
+        }
       } catch (err) {
         console.error('Error loading pie chart data:', err);
         setNoData(true);
@@ -141,6 +114,12 @@ const CardsWidget7 = ({ className = '' }: Props) => {
     };
 
     fetchData();
+
+    return () => {
+      if (chart) {
+        chart.destroy();
+      }
+    };
   }, []);
 
   return (

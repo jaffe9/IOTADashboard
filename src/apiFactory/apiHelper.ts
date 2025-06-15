@@ -103,7 +103,7 @@ export const getInvoiceTotalValue = async () => {
   try{
     const response = await axiosEncoreInstance.get("/invoiceValue", { timeout : 3500 } )
   //  console.log("Response for getInvoiceValue  :", response.data)
-    return response.data;
+    return response.data.invoiceValue;
   }catch(error){
     if(axios.isAxiosError(error)){
        console.log("Error in getting getInvoiceValue  :" , error.response?.data || error.message )
@@ -371,7 +371,7 @@ export const getEmpForSalary = async () => {
 export const getExpenses = async () => {
    try{
     const response = await axiosEncoreInstance.get('/getExpType')
-    console.log("Response for getEmpSal  :", response.data.getExpType)
+    // console.log("Response for getEmpSal  :", response.data.getExpType)
     return response.data.getExpType ;
   }catch(error){
     if(axios.isAxiosError(error)){
@@ -382,25 +382,18 @@ export const getExpenses = async () => {
   }
 };
 
-export const getAccountManager = async (): Promise<UsersQueryResponse> => {
-  let url = "";
-  const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  //console.log("From api Helper:", loggedUser)
-  if (loggedUser === `${admin}`) {
-    // Admin case
-    url = `${GET_ACCOUNT_MANAGER}?select=*&order=id`;
-  }  else if (loggedUser === null ) {
-    // null Case
-    url = `${GET_ACCOUNT_MANAGER}?select=*&order=id`;
-  }  else {
-    // Account Manager case
-    const id = await  getUserId();
-    //console.log("This is user Id: ", id);
-    url = `${GET_ACCOUNT_MANAGER}?select=*&order=id&userId=eq.${id}`;
+export const getAccountManager = async () => {
+   try{
+    const response = await axiosEncoreInstance.get('/getAllAccMgr')
+    //  console.log("Response for getEmpSal  :", response.data.getAccMgr)
+    return response.data.getAccMgr ;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getExpType   :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin getExpType  : ", error)
+    }
   }
-  const d = await axios
-   .get(url)
-  return d;
 }
 
 export const getPeerEmployees = async (client_id: string): Promise<UsersQueryResponse> => {

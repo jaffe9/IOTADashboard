@@ -55,7 +55,7 @@ const CardsWidget17: FC<Props> = ({
       client5: 0,
     }
 
-    response.invoiceValue.forEach((item: any) => {
+    response.forEach((item: any) => {
       const value = parseFloat(item.invoice_value) || 0
       if (!item.invoice_paid_status) {
         switch (item.client_id) {
@@ -88,10 +88,13 @@ const CardsWidget17: FC<Props> = ({
       { color: '--bs-info', value: totals.client4 },
       { color: '--bs-warning', value: totals.client5 },
     ].filter(d => d.value > 0)
-
-    setTimeout(() => {
+    // console.log("data from apexCharts:", chartData)
+    if ( chartData.length > 0 ){ 
+      setTimeout(() => {
       initChart(chartSize, chartLine, chartRotate, chartData)
-    }, 10)
+      // console.log("chartSize:", chartSize, "chartLine:", chartLine)
+    }, 10)}
+
   }
 
   const toggleShowOtherClients = () => {
@@ -247,7 +250,7 @@ const initChart = (
   el.innerHTML = ''
   const canvas = document.createElement('canvas')
   const span = document.createElement('span')
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d', {willReadFrequently : true }) as CanvasRenderingContext2D // need to define the type for typescript no need of type as CanvaRenderingContext2D if not typescript 
   canvas.width = canvas.height = chartSize
   el.appendChild(span)
   el.appendChild(canvas)

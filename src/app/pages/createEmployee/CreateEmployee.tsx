@@ -24,7 +24,7 @@ import { Value } from "sass";
 var allUserInfo: any = await Promise.all(
   [ apiHelper.getAllEmployees(), apiHelper.getClientDetails(), apiHelper.getAccountManager() ]
 ).then(([employee,clients ,manager]) => {
-  return { employee:employee.data, clients:clients.data , manager:manager.data}
+  return { employee:employee.data, clients:clients.data , manager}
 })
 let updatedUserInfo: IProfileDetails = initialValues;
 

@@ -6,7 +6,7 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createTempEmployee, updateEmployeeData } from "../../../apiFactory/apiHelper";
+import { apiHelper, updateEmployeeData } from "../../../apiFactory/apiHelper";
 import {
   User,
   clients,
@@ -25,7 +25,7 @@ import { Contract } from "../../../_metronic/helpers";
 var allUserInfo: any = await Promise.all(
   [ apiHelper.getAllEmployees(), apiHelper.getClientDetails(), apiHelper.getAccountManager() ,apiHelper.getContractDetails()]
 ).then(([employee,clients ,manager , contracts]) => {
-  return { employee:employee.data, clients:clients.data , manager:manager.data , contracts:contracts.data}
+  return { employee, clients:clients.data , manager , contracts:contracts.data}
 })
 let updatedUserInfo: IProfileDetails = initialValues;
 
