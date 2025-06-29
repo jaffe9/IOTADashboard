@@ -1,0 +1,62 @@
+name: Deploy to Ubuntu Server (Dev)
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ref: dev
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Server (Zero Downtime)
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            set -e
+
+            cd /root/iwtDashboard
+
+            # Remove any leftover temp or backup directories
+            rm -rf IOTADashboard-temp
+            rm -rf IOTADashboard-backup
+
+            # Clone fresh code to temp directory
+            git clone https://github.com/jaffe9/IOTADashboard.git IOTADashboard-temp
+            cd IOTADashboard-temp
+            git checkout dev
+            git pull origin dev
+
+            # Install & build in temp folder
+            npm install
+            npm run build
+
+            # Go back to root path
+            cd /root/iwtDashboard
+
+            # Move current live version to backup
+            if [ -d IOTADashboard ]; then
+              mv IOTADashboard IOTADashboard-backup
+            fi
+
+            # Move new build to live path
+            mv IOTADashboard-temp IOTADashboard
+
+            # Restart PM2 app gracefully
+            pm2 reload appDashboard || pm2 start npm --name appDashboard -- run start
+
+            # Clean up backup (optional)
+            rm -rf IOTADashboard-backup
+          EOF
