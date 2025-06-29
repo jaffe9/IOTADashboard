@@ -1,4 +1,6 @@
-name: Deploy to Ubuntu Server (Dev)
+# .github/workflows/deploy.yml
+
+name: Deploy to Ubuntu Server (Blue-Green Zero Downtime)
 
 on:
   push:
@@ -22,41 +24,37 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Server (Zero Downtime)
+      - name: Deploy with Blue-Green Strategy
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             set -e
-
             cd /root/iwtDashboard
 
-            # Remove any leftover temp or backup directories
-            rm -rf IOTADashboard-temp
-            rm -rf IOTADashboard-backup
+            # Determine next slot
+            if [ "$(readlink IOTADashboard-active)" = "IOTADashboard-blue" ]; then
+              NEXT="IOTADashboard-green"
+            else
+              NEXT="IOTADashboard-blue"
+            fi
 
-            # Clone fresh code to temp directory
-            git clone https://github.com/jaffe9/IOTADashboard.git IOTADashboard-temp
-            cd IOTADashboard-temp
+            # Clean up old build
+            rm -rf $NEXT
+
+            # Clone into next slot
+            git clone https://github.com/jaffe9/IOTADashboard.git $NEXT
+            cd $NEXT
             git checkout dev
             git pull origin dev
 
-            # Install & build in temp folder
             npm install
             npm run build
 
-            # Go back to root path
-            cd /root/iwtDashboard
+            # Point active symlink to new build
+            ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
-            # Move current live version to backup
-            if [ -d IOTADashboard ]; then
-              mv IOTADashboard IOTADashboard-backup
-            fi
+            # Reload Nginx to pick up new build (if needed)
+            sudo nginx -s reload
 
-            # Move new build to live path
-            mv IOTADashboard-temp IOTADashboard
-
-            # Restart PM2 app gracefully
+            # Restart Node app with PM2 cluster mode (zero downtime)
             pm2 reload appDashboard || pm2 start npm --name appDashboard -- run start
-
-            # Clean up backup (optional)
-            rm -rf IOTADashboard-backup
           EOF
