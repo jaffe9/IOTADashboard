@@ -106,6 +106,14 @@ const UpdateSalary: FC = () => {
   const cancelEdit = () => {
     setEditingRowId(null);
   };
+  
+const formatNumber = (val: string | number | undefined) =>
+  val && !isNaN(Number(val))
+    ? Number(val).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : "-";
 
   return (
     <div className="card mb-12">
@@ -114,13 +122,24 @@ const UpdateSalary: FC = () => {
         <table className="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>Employee Name</th>
-              <th>Pay Period</th>
-              <th>Pay Date</th>
+              <th>Name</th>
+              <th>Pay_Period</th>
+              <th>Pay_Date</th>
               <th>Basic Allowance</th>
               <th>HR Allowance</th>
-              <th>End of Service Allowance</th>
-              <th>Travel & Other Allowance</th>
+              {/* <th>End of Service Allowance</th> */}
+              <th>Travel Allowance</th>
+              <th>Salary Advance</th>
+              <th>OverTime</th>
+              <th>Employee_Request</th>
+              <th>Working Days</th>
+              <th>Holidays</th>
+              <th>Leaves</th>
+              <th>Loss_Of_Pay</th>
+              <th>Earnings_Total</th>
+              <th>Deductions</th>
+              <th>Net_Salary</th>
+              <th>Net_Salary_Words</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -155,7 +174,7 @@ const UpdateSalary: FC = () => {
                           formik.setFieldValue(
                             "pay_date",
                             dates[0]
-                              ? dates[0].toLocaleDateString("en-GB").replace(/\//g, "-")
+                              ? dates[0].toLocaleDateString("en").replace(/\//g, "-")
                               : ""
                           );
                         }}
@@ -180,7 +199,7 @@ const UpdateSalary: FC = () => {
                         onChange={formik.handleChange}
                       />
                     </td>
-                    <td>
+                    {/* <td>
                       <input
                         type="text"
                         name="end_of_service_allowance"
@@ -188,13 +207,112 @@ const UpdateSalary: FC = () => {
                         value={formik.values.end_of_service_allowance}
                         onChange={formik.handleChange}
                       />
-                    </td>
+                    </td> */}
                     <td>
                       <input
                         type="text"
                         name="travel_other_allowance"
                         className="form-control"
                         value={formik.values.travel_other_allowance}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name="salary_advance"
+                        className="form-control"
+                        value={formik.values.salary_advance}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name="overTime"
+                        className="form-control"
+                        value={formik.values.overTime}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name="employee_request"
+                        className="form-control"
+                        value={formik.values.employee_request}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                      <td>
+                      <input
+                        type="text"
+                        name="working_days"
+                        className="form-control"
+                        value={formik.values.working_days}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                      <td>
+                      <input
+                        type="text"
+                        name="holidays"
+                        className="form-control"
+                        value={formik.values.holidays}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                      <td>
+                      <input
+                        type="text"
+                        name="leaves"
+                        className="form-control"
+                        value={formik.values.leaves}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                      <td>
+                      <input
+                        type="text"
+                        name="lop_salary_total"
+                        className="form-control"
+                        value={formik.values.lop_salary_total}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                      <td>
+                      <input
+                        type="text"
+                        name="earnings_total"
+                        className="form-control"
+                        value={formik.values.earnings_total}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                      <td>
+                      <input
+                        type="text"
+                        name="deductions_total"
+                        className="form-control"
+                        value={formik.values.deductions_total}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                      <td>
+                      <input
+                        type="text"
+                        name="total_net_salary"
+                        className="form-control"
+                        value={formik.values.total_net_salary}
+                        onChange={formik.handleChange}
+                      />
+                    </td>
+                      <td>
+                      <input
+                        type="text"
+                        name="total_net_salary_words"
+                        className="form-control"
+                        value={formik.values.total_net_salary_words}
                         onChange={formik.handleChange}
                       />
                     </td>
@@ -214,10 +332,21 @@ const UpdateSalary: FC = () => {
                     <td>{emp.user_id?.username || "N/A"}</td>
                     <td>{emp.pay_period || "-"}</td>
                     <td>{emp.pay_date || "-"}</td>
-                    <td>{emp.basic_allowance || "-"}</td>
-                    <td>{emp.hr_allowance || "-"}</td>
-                    <td>{emp.end_of_service_allowance || "-"}</td>
-                    <td>{emp.travel_other_allowance || "-"}</td>
+                    <td>{formatNumber(emp.basic_allowance)}</td>
+                    <td>{formatNumber(emp.hr_allowance)}</td>
+                    {/* <td>{emp.end_of_service_allowance || "-"}</td> */}
+                    <td>{formatNumber(emp.travel_other_allowance)}</td>
+                    <td>{formatNumber(emp.salary_advance)}</td>
+                    <td>{formatNumber(emp.overTime)}</td>
+                    <td>{emp.employee_request || "-"}</td>
+                    <td>{emp.working_days || "-"}</td>
+                    <td>{emp.holidays || "-"}</td>
+                    <td>{emp.leaves || "-"}</td>
+                    <td>{formatNumber(emp.lop_salary_total)}</td>
+                    <td>{formatNumber(emp.earnings_total)}</td>
+                    <td>{formatNumber(emp.deductions_total)}</td>
+                    <td>{formatNumber(emp.total_net_salary)}</td>
+                    <td>{emp.total_net_salary_words || "-"}</td>
                     <td>
                       <button
                         type="button"

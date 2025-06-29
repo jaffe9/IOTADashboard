@@ -16,8 +16,8 @@ import axios from "axios";
 
 
 
-var allUserInfo: any = await apiHelper.getEmpForSalary().then(async (data) => {
-  return data.data;
+var allUserInfo: any = await apiHelper.getEmpForSalary().then(async (sal) => {
+  return sal;
 });
 
 let updatedUserInfo: IProfileDetailsTypeSalary = initialValues;
