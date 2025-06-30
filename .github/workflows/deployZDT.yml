@@ -46,7 +46,7 @@ jobs:
             npm install
             npm run build
 
-            pm2 startOrReload ecosystem.config.js --only $APP_NAME
+            pm2 startOrReload ecosystem.config.cjs --only $APP_NAME
 
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
