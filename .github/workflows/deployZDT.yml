@@ -1,6 +1,4 @@
-# .github/workflows/deploy.yml
-
-name: Deploy to Ubuntu Server (Blue-Green Zero Downtime)
+name: Deploy to Ubuntu Server (Blue-Green)
 
 on:
   push:
@@ -12,49 +10,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v3
         with:
           ref: dev
 
-      - name: Setup SSH Key
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Deploy with Blue-Green Strategy
+      - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             set -e
             cd /root/iwtDashboard
 
-            # Determine next slot
             if [ "$(readlink IOTADashboard-active)" = "IOTADashboard-blue" ]; then
               NEXT="IOTADashboard-green"
+              NEXT_PORT=8081
+              APP_NAME="appDashboard-green"
             else
               NEXT="IOTADashboard-blue"
+              NEXT_PORT=8080
+              APP_NAME="appDashboard-blue"
             fi
 
-            # Clean up old build
             rm -rf $NEXT
-
-            # Clone into next slot
             git clone https://github.com/jaffe9/IOTADashboard.git $NEXT
             cd $NEXT
             git checkout dev
             git pull origin dev
-
             npm install
             npm run build
 
-            # Point active symlink to new build
+            pm2 startOrReload ecosystem.config.js --only $APP_NAME
+
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
-            # Reload Nginx to pick up new build (if needed)
-            sudo nginx -s reload
-
-            # Restart Node app with PM2 cluster mode (zero downtime)
-            pm2 reload appDashboard || pm2 start npm --name appDashboard -- run start
+            /root/switch_backend.sh
           EOF
