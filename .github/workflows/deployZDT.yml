@@ -50,5 +50,5 @@ jobs:
 
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
-            /usr/local/bin/switch_backend.sh
+            /usr/local/bin/switch_backend_port.sh
           EOF
