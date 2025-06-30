@@ -127,7 +127,7 @@ const formatNumber = (val: string | number | undefined) =>
               <th>Pay_Date</th>
               <th>Basic Allowance</th>
               <th>HR Allowance</th>
-              {/* <th>End of Service Allowance</th> The final deployment should work inshallah */}
+              {/* <th>End of Service Allowance</th> */}
               <th>Travel Allowance</th>
               <th>Salary Advance</th>
               <th>OverTime</th>
