@@ -24,11 +24,10 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << "EOF"
             set -e
             cd /root/iwtDashboard
 
-            # ✅ Use full symlink path comparison-safe method
             CURRENT_ACTIVE=\$(basename "\$(readlink IOTADashboard-active)")
             if [ "\$CURRENT_ACTIVE" = "IOTADashboard-blue" ]; then
               NEXT="IOTADashboard-green"
@@ -47,8 +46,12 @@ jobs:
             git pull origin dev
             npm install
 
-            # ✅ Update .env PORT value to match NEXT_PORT
-            sed -i "s/^PORT=.*/PORT=\$NEXT_PORT/" .env
+            # ✅ Update or create .env PORT value to match NEXT_PORT
+            if [ -f .env ]; then
+              sed -i "s/^PORT=.*/PORT=\$NEXT_PORT/" .env
+            else
+              echo "PORT=\$NEXT_PORT" > .env
+            fi
 
             npm run build
 
