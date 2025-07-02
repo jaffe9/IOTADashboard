@@ -24,12 +24,11 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << "EOF"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             set -e
             cd /root/iwtDashboard
 
-            CURRENT_ACTIVE=\$(basename "\$(readlink IOTADashboard-active)")
-            if [ "\$CURRENT_ACTIVE" = "IOTADashboard-blue" ]; then
+            if [ "$(readlink IOTADashboard-active)" = "IOTADashboard-blue" ]; then
               NEXT="IOTADashboard-green"
               NEXT_PORT=8081
               APP_NAME="appDashboard-green"
@@ -39,26 +38,22 @@ jobs:
               APP_NAME="appDashboard-blue"
             fi
 
-            rm -rf \$NEXT
-            git clone https://github.com/jaffe9/IOTADashboard.git \$NEXT
-            cd \$NEXT
+            rm -rf $NEXT
+            git clone https://github.com/jaffe9/IOTADashboard.git $NEXT
+            cd $NEXT
             git checkout dev
             git pull origin dev
             npm install
 
-            # ✅ Update or create .env PORT value to match NEXT_PORT
-            if [ -f .env ]; then
-              sed -i "s/^PORT=.*/PORT=\$NEXT_PORT/" .env
-            else
-              echo "PORT=\$NEXT_PORT" > .env
-            fi
+            # ✅ Update .env PORT value
+            [ -f .env ] && sed -i "s/^PORT=.*/PORT=$NEXT_PORT/" .env || echo "PORT=$NEXT_PORT" > .env
 
             npm run build
 
-            pm2 startOrReload ecosystem.config.cjs --only \$APP_NAME
-            pm2 restart \$APP_NAME
+            pm2 startOrReload ecosystem.config.cjs --only $APP_NAME
+            pm2 restart $APP_NAME
 
-            ln -sfn /root/iwtDashboard/\$NEXT /root/iwtDashboard/IOTADashboard-active
+            ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
             /usr/local/bin/switch_backend_port.sh
           EOF
