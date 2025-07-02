@@ -44,6 +44,10 @@ jobs:
             git checkout dev
             git pull origin dev
             npm install
+
+            # ✅ Update .env PORT value to match NEXT_PORT
+            sed -i "s/^PORT=.*/PORT=$NEXT_PORT/" .env
+
             npm run build
 
             pm2 startOrReload ecosystem.config.cjs --only $APP_NAME
