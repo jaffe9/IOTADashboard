@@ -28,7 +28,9 @@ jobs:
             set -e
             cd /root/iwtDashboard
 
-            if [ "$(readlink IOTADashboard-active)" = "IOTADashboard-blue" ]; then
+            # ✅ Use full symlink path comparison-safe method
+            CURRENT_ACTIVE=\$(basename "\$(readlink IOTADashboard-active)")
+            if [ "\$CURRENT_ACTIVE" = "IOTADashboard-blue" ]; then
               NEXT="IOTADashboard-green"
               NEXT_PORT=8081
               APP_NAME="appDashboard-green"
@@ -38,22 +40,22 @@ jobs:
               APP_NAME="appDashboard-blue"
             fi
 
-            rm -rf $NEXT
-            git clone https://github.com/jaffe9/IOTADashboard.git $NEXT
-            cd $NEXT
+            rm -rf \$NEXT
+            git clone https://github.com/jaffe9/IOTADashboard.git \$NEXT
+            cd \$NEXT
             git checkout dev
             git pull origin dev
             npm install
 
             # ✅ Update .env PORT value to match NEXT_PORT
-            sed -i "s/^PORT=.*/PORT=$NEXT_PORT/" .env
+            sed -i "s/^PORT=.*/PORT=\$NEXT_PORT/" .env
 
             npm run build
 
-            pm2 startOrReload ecosystem.config.cjs --only $APP_NAME
-            pm2 restart $APP_NAME
+            pm2 startOrReload ecosystem.config.cjs --only \$APP_NAME
+            pm2 restart \$APP_NAME
 
-            ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
+            ln -sfn /root/iwtDashboard/\$NEXT /root/iwtDashboard/IOTADashboard-active
 
             /usr/local/bin/switch_backend_port.sh
           EOF
