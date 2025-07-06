@@ -1168,7 +1168,7 @@ export const uploadInvoiceToSupabase = async (file: File): Promise<string | null
       shortenResponse.status === 200 &&
       shortenResponse.data?.secureShortURL
     ) {
-      return shortenResponse.data.secureShortURL; // ✅ This will go into invoice_url
+      return shortenResponse.data.secureShortURL; //  This will go into invoice_url
     } else {
       throw new Error("Short URL generation failed");
     }
@@ -1385,7 +1385,7 @@ export const uploadFileToSupabase = async (file:File): Promise< string | null> =
       shortenResponse.status === 200 &&
       shortenResponse.data?.secureShortURL
     ) {
-      return shortenResponse.data.secureShortURL; // ✅ This will go into invoice_url
+      return shortenResponse.data.secureShortURL; //  This will go into timesheetFileLocation
     } else {
       throw new Error("Short URL generation failed");
     }
