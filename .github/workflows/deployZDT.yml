@@ -39,7 +39,7 @@ jobs:
               APP_NAME="appDashboard-blue"
             fi
 
-            # Remove old green/blue and clone new
+            # Remove old and clone new
             rm -rf $NEXT
             git clone https://github.com/jaffe9/IOTADashboard.git $NEXT
             cd $NEXT
@@ -47,16 +47,27 @@ jobs:
             git pull origin dev
             npm install
 
-            # Set the correct port in .env
-            [ -f .env ] && sed -i "s/^PORT=.*/PORT=$NEXT_PORT/" .env || echo "PORT=$NEXT_PORT" > .env
+            # Update .env file with the correct PORT
+            echo "PORT=$NEXT_PORT" > .env
 
-            # Start the correct app
-            pm2 startOrReload ecosystem.config.cjs --only $APP_NAME
-            pm2 logs $APP_NAME --lines 50
+            # ✅ Clear old PM2 process if any (avoids stale state)
+            pm2 delete $APP_NAME || true
 
-            # Update symlink
+            # ✅ Start using updated .env + ecosystem file
+            pm2 start ecosystem.config.cjs --only $APP_NAME
+
+            # ✅ Wait for app to be up (adjust if needed)
+            sleep 5
+
+            # ✅ Health check (optional, can also curl localhost:$NEXT_PORT)
+            if ! netstat -tulpn | grep ":$NEXT_PORT" > /dev/null; then
+              echo "App failed to start on port $NEXT_PORT"
+              exit 1
+            fi
+
+            # ✅ Switch symlink
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
-            # Trigger port switch in nginx
+            # ✅ Reload nginx or switch active backend
             /usr/local/bin/switch_backend_port.sh
           EOF

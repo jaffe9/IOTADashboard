@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
+import dotenv from 'dotenv'
 
-// https://vitejs.dev/config/
+// Load environment variables from .env file
+dotenv.config()
+
 export default defineConfig({
   plugins: [react()],
   base: "",
@@ -11,10 +14,10 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    hmr : {
-     overlay : false,
+    port: parseInt(process.env.PORT || '8080'), // ✅ Use dynamic port from .env or fallback
+    hmr: {
+      overlay: false,
     },
-    port: 8080 // change here
   },
-  logLevel:'info'
+  logLevel: 'info',
 })
