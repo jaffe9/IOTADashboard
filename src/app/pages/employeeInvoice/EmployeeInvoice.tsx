@@ -90,50 +90,62 @@ const EmployeeInvoice: FC = () => {
   const [loading, setLoading] = useState(false);
   const formik = useFormik<IProfileDetailsInvoice>({
     initialValues,
-    onSubmit: () => {
-      setLoading(true);
-      setTimeout( async () => {
-        const updatedData = Object.assign(data, updatedUserInfo);
-        setData(updatedData);
-        console.log(updatedData);
-        if(   data.client_id.length < 1 || data.invoice_date.length < 1)
-        {
+onSubmit: async () => {
+  setLoading(true);
+  setTimeout(async () => {
+    try {
+      const updatedData = Object.assign(data, updatedUserInfo);
+      setData(updatedData);
 
-          alert("Please select all fields")
-          setLoading(false)
-          return
+      if (data.client_id.length < 1 || data.invoice_date.length < 1) {
+        alert("Please select all fields");
+        setLoading(false);
+        return;
+      }
+
+      let invoiceUrl: string | null = null;
+
+      if (file) {
+        invoiceUrl = await uploadInvoiceToSupabase(file);
+        if (!invoiceUrl) {
+          alert("Invoice upload failed");
+          setLoading(false);
+          return;
         }
-        let invoiceRequest : InvoiceRequest = {
-          contract_id: data.contract_id,
-          client_id: data.client_id,
-          internal_invoice_no: data.internal_invoice_no,
-          external_invoice_no: data.external_invoice_no,
-          invoice_date: data.invoice_date,
-          invoice_value: data.invoice_value,
-          invoice_paid_status: data.invoice_paid_status,
-          invoice_url: data.invoice_url,
-          invoice_paid_date: data.invoice_paid_date,
-          invoice_paid_amount: data.invoice_paid_amount,
-          status: 0,
-          associated_user_id:data.associated_user_id,
-          associatedAccountManager:data.associatedAccountManager,
-        };
+      }
 
-        console.log("Invoice data :", invoiceRequest)
-        var apiResponse = await createEmployeeInvoice(invoiceRequest)
+      const invoiceRequest: InvoiceRequest = {
+        contract_id: data.contract_id,
+        client_id: data.client_id,
+        internal_invoice_no: data.internal_invoice_no,
+        external_invoice_no: data.external_invoice_no,
+        invoice_date: data.invoice_date,
+        invoice_value: data.invoice_value,
+        invoice_paid_status: data.invoice_paid_status,
+        invoice_url: invoiceUrl, // ✅ signed URL added here
+        invoice_paid_date: data.invoice_paid_date,
+        invoice_paid_amount: data.invoice_paid_amount,
+        status: 0,
+        associated_user_id: data.associated_user_id,
+        associatedAccountManager: data.associatedAccountManager,
+      };
 
-        if (apiResponse.status === 201)
-          {
-            alert("Invoice Submitted Successfully");
-            setLoading(false);
-          }
-          else
-          {
-            alert("An error occurred, please try again later");
-            setLoading(false);
-          }
-      }, 1000);
-    },
+      console.log("Invoice data:", invoiceRequest);
+      const apiResponse = await createEmployeeInvoice(invoiceRequest);
+
+      if (apiResponse.status === 201) {
+        alert("Invoice Submitted Successfully");
+      } else {
+        alert("An error occurred, please try again later");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  }, 1000);
+},
   });
 
   return (
@@ -402,7 +414,7 @@ const EmployeeInvoice: FC = () => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={handleInvoiceUpload}
+                    // onClick={handleInvoiceUpload}
                   >
                     {!loading && "Save Changes"}
                     {loading && (

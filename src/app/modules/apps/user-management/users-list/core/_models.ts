@@ -181,7 +181,7 @@ export type InvoiceRequest = {
    "invoice_date":string,
    "invoice_value":string,
    "invoice_paid_status":boolean,
-   "invoice_url":string,
+   "invoice_url":string | null,
    "invoice_paid_date":string,
    "invoice_paid_amount":string,
    "associatedAccountManager":number,

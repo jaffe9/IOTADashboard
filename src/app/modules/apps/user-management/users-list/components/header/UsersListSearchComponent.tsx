@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import {useEffect, useState} from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import {initialQueryState, KTIcon, useDebounce} from '../../../../../../../_metronic/helpers'
 import {useQueryRequest} from '../../core/QueryRequestProvider'
+import { useQueryResponseData } from '../../core/QueryResponseProvider'
 
 const UsersListSearchComponent = () => {
   const {updateState} = useQueryRequest()
@@ -22,6 +23,16 @@ const UsersListSearchComponent = () => {
     [debouncedSearchTerm] // Only call effect if debounced search term changes
     // More details about useDebounce: https://usehooks.com/useDebounce/
   )
+const users = useQueryResponseData()
+ console.log("this is from User table:", users) 
+ const SearchUser = users.filter( user => {
+  user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  user.lastName?.toLowerCase().includes(searchTerm.toLowerCase())  ||
+  user.employeeId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  user.companyName?.toLowerCase().includes(searchTerm.toLowerCase())
+ })
+  
 
   return (
     <div className='card-title'>

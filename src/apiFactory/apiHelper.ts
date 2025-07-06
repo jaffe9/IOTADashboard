@@ -36,7 +36,7 @@ const GET_USER_CONTRACT_URL = `${API_URL}/contract`;
 const GET_EMPLOYEEONBOARDING_URL = `${API_URL}/employeeOnboarding`;
 const GET_EMPLOYEEINVOICE_URL = `${API_URL}/invoice`;
 const GET_TIMESHEET_URL = `${API_URL}/employeeTimesheet`;
-
+const CREATE_SHORT_URL = 'https://faas-blr1-8177d592.doserverless.co/api/v1/web/fn-d76aa7c6-640f-43cf-8b26-09613462a4ac/axios/createShortUrl'
 const admin = "db273513-e759-4f6a-99b4-8371423a45b8";
 
 // date format for Form //
@@ -45,12 +45,10 @@ const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Last da
 
 
 
-const update_date = lastMonth.toLocaleDateString("en-IN",{
-  year: "numeric",
-  month: "short",
-}).replace(/\//g, "_");
+const update_date = `${lastMonth.toLocaleString("en-IN",{month : "short"})}_${lastMonth.getFullYear()}`
 
-
+const iPayPrd = `${lastMonth.toLocaleString("en-IN",{month : "long"})}_${lastMonth.getFullYear()}`
+// console.log("This is date check :", iPayPrd);
 
 const getYear = today.toLocaleString("en-IN",{
      year : "numeric"
@@ -1080,9 +1078,10 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
       invoice_value: i.invoice_value,
       associatedAccountManager: i.associatedAccountManager,
       invoice_paid_status: false,
-      invoice_url: null,
+      invoice_url: i.invoice_url,
       invoice_paid_date:null,
       invoice_paid_amount:null,
+      invoicePeriod : iPayPrd,
     }
   ]);
   console.log("APIData:" + data);
@@ -1117,35 +1116,67 @@ export const createEmployeeInvoice = async (i: InvoiceRequest): Promise<{status:
   }
   
 }
+export const uploadInvoiceToSupabase = async (file: File): Promise<string | null> => {
+  const filePath = `iwt_invoice_file/${setYear}/${update_date}/${file.name}`;
 
-export const uploadInvoiceToSupabase = async (file:File) => {
-  const Iconfig = {
-    method : "POST",
-    maxBodyLength : Infinity,
-    url :  `${STORAGE_URL}/object/iwt_invoice_file/${setYear}/${update_date}/${file.name}`,
-    headers : {
-      "Authorization" : `${axios.defaults.headers.common['Authorization']}`,
-      "Content-Type"  : file.type
+  const uploadConfig = {
+    method: 'POST',
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
     },
-    data : file
+    data: file,
   };
 
-  try{
-    const response = await axios(Iconfig);
-    console.log('Iconfig response :',response)
+  try {
+    // Step 1: Upload to Supabase
+    const uploadResponse = await axios(uploadConfig);
+    if (uploadResponse.status !== 200) throw new Error("Upload failed");
 
-    if (response.status === 200){
-      //Extract the file path 
-      const fileKey = response.data.file;
-      const publicUrl = `${STORAGE_URL}/object/iwt_invoice_file/Dec_2024/${fileKey}`;
-      return publicUrl;
-    }else{
-      throw new Error('File Upload Failed')
+    // Step 2: Generate Signed URL (1 year)
+    const signedUrlResponse = await axios.post(
+      `${STORAGE_URL}/object/sign/${filePath}`,
+      { expiresIn: 60 * 60 * 24 * 365 * 20 },
+      {
+        headers: {
+          'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (
+      signedUrlResponse.status !== 200 ||
+      !signedUrlResponse.data?.signedURL
+    ) {
+      throw new Error("Failed to generate signed URL");
     }
-   }catch (error) {
-    console.error('Error in Tconfig',error)
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+
+    // Step 3: Shorten the Signed URL
+    const shortenResponse = await axios.get(
+      `${CREATE_SHORT_URL}`,
+      {
+        params: { url: fullSignedUrl },
+      }
+    );
+
+    if (
+      shortenResponse.status === 200 &&
+      shortenResponse.data?.secureShortURL
+    ) {
+      return shortenResponse.data.secureShortURL; // ✅ This will go into invoice_url
+    } else {
+      throw new Error("Short URL generation failed");
+    }
+  } catch (error) {
+    console.error('Error uploading, signing, or shortening invoice URL:', error);
+    return null;
   }
-}
+};
 
 // End of Invoice
 
