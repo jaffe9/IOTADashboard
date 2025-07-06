@@ -39,7 +39,7 @@ jobs:
               APP_NAME="appDashboard-blue"
             fi
 
-            # Remove old and clone new
+            # Clean and clone fresh
             rm -rf $NEXT
             git clone https://github.com/jaffe9/IOTADashboard.git $NEXT
             cd $NEXT
@@ -47,27 +47,30 @@ jobs:
             git pull origin dev
             npm install
 
-            # ✅ Safely update only the PORT in .env
-            [ -f .env ] && grep -q "^PORT=" .env && sed -i "s/^PORT=.*/PORT=$NEXT_PORT/" .env || echo "PORT=$NEXT_PORT" >> .env
+            # ✅ Update only PORT line in .env file without affecting others
+            awk -v PORT="$NEXT_PORT" 'BEGIN {updated=0} 
+              /^PORT=/ {$0="PORT="PORT; updated=1} 
+              {print} 
+              END {if (!updated) print "PORT="PORT}' .env > .env.tmp && mv .env.tmp .env
 
-            # Clear old PM2 process
+            # ✅ Delete previous process if it exists
             pm2 delete $APP_NAME || true
 
-            # Start app
+            # ✅ Start app
             pm2 start ecosystem.config.cjs --only $APP_NAME
 
-            # Wait briefly
+            # ✅ Wait a few seconds to ensure it's up
             sleep 5
 
-            # Health check
+            # ✅ Ensure app started successfully
             if ! netstat -tulpn | grep ":$NEXT_PORT" > /dev/null; then
-              echo "App failed to start on port $NEXT_PORT"
+              echo "❌ App failed to start on port $NEXT_PORT"
               exit 1
             fi
 
-            # Update symlink
+            # ✅ Update symlink to point to the new deployment
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
-            # Reload Nginx
+            # ✅ Switch backend port in nginx
             /usr/local/bin/switch_backend_port.sh
           EOF
