@@ -47,27 +47,27 @@ jobs:
             git pull origin dev
             npm install
 
-            # Update .env file with the correct PORT
-            echo "PORT=$NEXT_PORT" > .env
+            # ✅ Safely update only the PORT in .env
+            [ -f .env ] && grep -q "^PORT=" .env && sed -i "s/^PORT=.*/PORT=$NEXT_PORT/" .env || echo "PORT=$NEXT_PORT" >> .env
 
-            # ✅ Clear old PM2 process if any (avoids stale state)
+            # Clear old PM2 process
             pm2 delete $APP_NAME || true
 
-            # ✅ Start using updated .env + ecosystem file
+            # Start app
             pm2 start ecosystem.config.cjs --only $APP_NAME
 
-            # ✅ Wait for app to be up (adjust if needed)
+            # Wait briefly
             sleep 5
 
-            # ✅ Health check (optional, can also curl localhost:$NEXT_PORT)
+            # Health check
             if ! netstat -tulpn | grep ":$NEXT_PORT" > /dev/null; then
               echo "App failed to start on port $NEXT_PORT"
               exit 1
             fi
 
-            # ✅ Switch symlink
+            # Update symlink
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
-            # ✅ Reload nginx or switch active backend
+            # Reload Nginx
             /usr/local/bin/switch_backend_port.sh
           EOF
