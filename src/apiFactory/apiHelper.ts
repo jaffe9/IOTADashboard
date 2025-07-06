@@ -1333,36 +1333,66 @@ export const uploadClaimsToSupabase = async (file:File) => {
 /// End of claim
 
 //  Start of Timesheet
-export const uploadFileToSupabase = async (file:File) => {
-     const Tconfig = {
-      method : "POST",
-      maxBodyLength : Infinity,
-      url : `${STORAGE_URL}/object/iwt_timesheets/${setYear}/${update_date}/${file.name}`,
-      headers : {
-        'Authorization' :`${axios.defaults.headers.common['Authorization']}`,
-        'Content-Type': file.type,
-      },
-      data : file,
-     };
+export const uploadFileToSupabase = async (file:File): Promise< string | null> => {
+    const filePath = `iwt_timesheets/${setYear}/${update_date}/${file.name}`;
 
-     try{
-      const response = await axios(Tconfig);
-      console.log('uploade response',response)
+  const TuploadConfig = {
+    method: 'POST',
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
+    },
+    data: file,
+  };
 
-      if (response.status === 200){
-        //Extract the file path 
-        const fileKey = response.data.file;
-        const publicUrl = `${STORAGE_URL}/object/iwt_timesheets/${setYear}/${update_date}/${fileKey}`; // hase a folder
-        return publicUrl;
-      }else{
-        throw new Error('Timesheet Upload Failed')
+  try {
+    // Step 1: Upload to Supabase
+    const uploadResponse = await axios(TuploadConfig);
+    if (uploadResponse.status !== 200) throw new Error("Upload failed");
+
+    // Step 2: Generate Signed URL (20 year)
+    const signedUrlResponse = await axios.post(
+      `${STORAGE_URL}/object/sign/${filePath}`,
+      { expiresIn: 60 * 60 * 24 * 365 * 20 },
+      {
+        headers: {
+          'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json',
+        },
       }
-     }catch (error) {
-      if (axios.isAxiosError(error)){
-        console.log('This is the error in upload doc to time sheet :' , error.response?.data )
-      }else 
-      console.error('Error in Tconfig',error)
+    );
+
+    if (
+      signedUrlResponse.status !== 200 ||
+      !signedUrlResponse.data?.signedURL
+    ) {
+      throw new Error("Failed to generate signed URL");
     }
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+
+    // Step 3: Shorten the Signed URL
+    const shortenResponse = await axios.get(
+      `${CREATE_SHORT_URL}`,
+      {
+        params: { url: fullSignedUrl },
+      }
+    );
+
+    if (
+      shortenResponse.status === 200 &&
+      shortenResponse.data?.secureShortURL
+    ) {
+      return shortenResponse.data.secureShortURL; // ✅ This will go into invoice_url
+    } else {
+      throw new Error("Short URL generation failed");
+    }
+  } catch (error) {
+    console.error('Error uploading, signing, or shortening invoice URL:', error);
+    return null;
+  }
 }
 
 
@@ -1382,7 +1412,7 @@ export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<{sta
       approvedBy:null,
       approvedDate:null,
       sentToFinance:false,
-      timesheetFileLocation:null,
+      timesheetFileLocation:t.timesheetFileLocation,
       createdBy: t.createdBy
     }
   ]);

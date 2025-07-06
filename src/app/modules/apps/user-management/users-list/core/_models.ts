@@ -153,7 +153,7 @@ export type UsersQueryResponse = Response<Array<User>>
 export type EmployeeOnboardingResponse = Response<Array<EmployeeOnboarding>>
 
 export type TimesheetRequest = {
-  timesheetFileLocation: any
+  "timesheetFileLocation": string | null,
   sentToFinance: any
   approvedDate: any
   approvedBy: any

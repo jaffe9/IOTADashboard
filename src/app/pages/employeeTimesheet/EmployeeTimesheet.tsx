@@ -6,7 +6,7 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
-import { apiHelper, createEmployeeTimesheet, uploadFileToSupabase } from "../../../apiFactory/apiHelper";
+import { apiHelper, createEmployeeTimesheet, uploadFileToSupabase, uploadInvoiceToSupabase } from "../../../apiFactory/apiHelper";
 import {
   User,
   TimesheetRequest, 
@@ -99,6 +99,18 @@ const EmployeeTimesheet: FC = () => {
           setLoading(false)
           return
         }
+
+        let timesheetFileLocation : string | null = null;
+
+          if (file) {
+            timesheetFileLocation = await uploadInvoiceToSupabase(file);
+            if (!timesheetFileLocation) {
+              alert("Invoice upload failed");
+              setLoading(false);
+              return;
+            }
+          }
+
         const timeSheetRequest : TimesheetRequest = {
           employeeId: data.sEmployee,
           employeeName: data.fName,
@@ -111,7 +123,7 @@ const EmployeeTimesheet: FC = () => {
           leaveDates: data.leavesStr,
           createdBy: data.associatedAccountManager,
           status: 0,
-          timesheetFileLocation:"",
+          timesheetFileLocation:timesheetFileLocation,
           sentToFinance: "",
           approvedDate: undefined,
           approvedBy: undefined,
@@ -378,7 +390,7 @@ const EmployeeTimesheet: FC = () => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={handleFileUpload}
+                    // onClick={handleFileUpload}
                     
                   >
                     {!loading && "Save Changes"}
