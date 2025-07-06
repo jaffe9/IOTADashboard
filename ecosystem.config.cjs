@@ -3,17 +3,22 @@ module.exports = {
     {
       name: "appDashboard-blue",
       script: "npm",
-      args: "run dev -- --port 8080 --host 0.0.0.0",
-      cwd: "/root/iwtDashboard/IOTADashboard-blue"
+      args: "run dev",
+      env: {
+        PORT: 8080
+      }
     },
     {
       name: "appDashboard-green",
       script: "npm",
-      args: "run dev -- --port 8081 --host 0.0.0.0",
-      cwd: "/root/iwtDashboard/IOTADashboard-green"
+      args: "run dev",
+      env: {
+        PORT: 8081
+      }
     }
   ]
 };
+
 
 
 

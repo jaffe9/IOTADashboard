@@ -28,6 +28,7 @@ jobs:
             set -e
             cd /root/iwtDashboard
 
+            # Determine which slot to use
             if [ "$(readlink IOTADashboard-active)" = "IOTADashboard-blue" ]; then
               NEXT="IOTADashboard-green"
               NEXT_PORT=8081
@@ -38,6 +39,7 @@ jobs:
               APP_NAME="appDashboard-blue"
             fi
 
+            # Remove old green/blue and clone new
             rm -rf $NEXT
             git clone https://github.com/jaffe9/IOTADashboard.git $NEXT
             cd $NEXT
@@ -45,15 +47,16 @@ jobs:
             git pull origin dev
             npm install
 
-            # ✅ Update .env PORT value
+            # Set the correct port in .env
             [ -f .env ] && sed -i "s/^PORT=.*/PORT=$NEXT_PORT/" .env || echo "PORT=$NEXT_PORT" > .env
 
-            npm run build
-
+            # Start the correct app
             pm2 startOrReload ecosystem.config.cjs --only $APP_NAME
-            pm2 restart $APP_NAME
+            pm2 logs $APP_NAME --lines 50
 
+            # Update symlink
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
+            # Trigger port switch in nginx
             /usr/local/bin/switch_backend_port.sh
           EOF
