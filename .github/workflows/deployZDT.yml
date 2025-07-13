@@ -28,17 +28,21 @@ jobs:
             set -e
             cd /root/iwtDashboard
 
-            # Determine which slot to use
-            if [ "$(readlink IOTADashboard-active)" = "IOTADashboard-blue" ]; then
+            # Determine which slot to use based on current nginx backend
+            CURRENT_BACKEND_PORT=$(grep -o '[0-9]\{4\}' /etc/nginx/upstreams/active_backend.conf)
+            
+            if [ "$CURRENT_BACKEND_PORT" = "8080" ]; then
               NEXT="IOTADashboard-green"
               NEXT_PORT=8081
               APP_NAME="appDashboard-green"
               CURRENT_APP="appDashboard-blue"
+              echo "🔄 Current backend: 8080 (blue) -> Deploying to: 8081 (green)"
             else
               NEXT="IOTADashboard-blue"
               NEXT_PORT=8080
               APP_NAME="appDashboard-blue"
               CURRENT_APP="appDashboard-green"
+              echo "🔄 Current backend: 8081 (green) -> Deploying to: 8080 (blue)"
             fi
 
             echo "🚀 Deploying to $NEXT (port $NEXT_PORT)"
@@ -97,7 +101,9 @@ jobs:
             echo "✅ App is responding on port $NEXT_PORT"
 
             # Update symlink to point to the new deployment
+            echo "🔗 Updating symlink to point to $NEXT..."
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
+            echo "✅ Symlink now points to: $(readlink /root/iwtDashboard/IOTADashboard-active)"
 
             # Switch backend port in nginx (this script now includes health checks)
             echo "🔄 Switching nginx to port $NEXT_PORT..."
