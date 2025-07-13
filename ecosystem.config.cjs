@@ -2,8 +2,8 @@ module.exports = {
   apps: [
     {
       name: "appDashboard-blue",
-      script: "npm",
-      args: "start",  // Changed from "run dev" to "start"
+      script: "npx",
+      args: "serve -s dist -l 8080",  // Serve built files, not Vite dev server
       cwd: "/root/iwtDashboard/IOTADashboard-blue",
       env_file: ".env",
       watch: false,
@@ -12,8 +12,8 @@ module.exports = {
     },
     {
       name: "appDashboard-green",
-      script: "npm",
-      args: "start",  // Changed from "run dev" to "start"
+      script: "npx",
+      args: "serve -s dist -l 8081",  // Serve built files, not Vite dev server
       cwd: "/root/iwtDashboard/IOTADashboard-green",
       env_file: ".env",
       watch: false,
