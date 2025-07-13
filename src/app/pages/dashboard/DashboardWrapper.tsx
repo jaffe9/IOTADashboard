@@ -52,7 +52,7 @@ const DashboardPage: FC = () => (
       <div className='col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10'>
         <CardsWidget20
           className='h-md-50 mb-5 mb-xl-10'
-          description='Active Consultants Lets check the deployment will it work ?'
+          description='Active Consultants'
           color='#F1416C'
           img={toAbsoluteUrl('media/patterns/vector-1.png')}
         />
