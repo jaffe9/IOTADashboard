@@ -2,9 +2,10 @@ module.exports = {
   apps: [
     {
       name: "appDashboard-blue",
-      script: "npx",
-      args: "serve -s dist -l 8080",  // Serve built files, not Vite dev server
+      script: "npm",
+      args: "run dev",
       cwd: "/root/iwtDashboard/IOTADashboard-blue",
+      // Remove hardcoded PORT - let it read from .env
       env_file: ".env",
       watch: false,
       max_restarts: 3,
@@ -12,9 +13,10 @@ module.exports = {
     },
     {
       name: "appDashboard-green",
-      script: "npx",
-      args: "serve -s dist -l 8081",  // Serve built files, not Vite dev server
+      script: "npm",
+      args: "run dev", 
       cwd: "/root/iwtDashboard/IOTADashboard-green",
+      // Remove hardcoded PORT - let it read from .env
       env_file: ".env",
       watch: false,
       max_restarts: 3,
@@ -22,6 +24,7 @@ module.exports = {
     }
   ]
 };
+
 
 
 
