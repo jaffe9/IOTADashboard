@@ -8,7 +8,7 @@ const UpdateSalary: FC = () => {
   const [allUserInfo, setAllUserInfo] = useState<Salary[]>([]);
   const [editingRowId, setEditingRowId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-
+  console.log(allUserInfo)
   useEffect(() => {
     async function fetchData() {
       try {
@@ -330,23 +330,23 @@ const formatNumber = (val: string | number | undefined) =>
                 ) : (
                   <tr key={emp.id}>
                     <td>{emp.user_id?.username || "N/A"}</td>
-                    <td>{emp.pay_period || "-"}</td>
-                    <td>{emp.pay_date || "-"}</td>
+                    <td>{emp.pay_period}</td>
+                    <td>{emp.pay_date}</td>
                     <td>{formatNumber(emp.basic_allowance)}</td>
                     <td>{formatNumber(emp.hr_allowance)}</td>
-                    {/* <td>{emp.end_of_service_allowance || "-"}</td> */}
+                    {/* <td>{emp.end_of_service_allowance}</td> */}
                     <td>{formatNumber(emp.travel_other_allowance)}</td>
                     <td>{formatNumber(emp.salary_advance)}</td>
                     <td>{formatNumber(emp.overTime)}</td>
-                    <td>{emp.employee_request || "-"}</td>
-                    <td>{emp.working_days || "-"}</td>
-                    <td>{emp.holidays || "-"}</td>
-                    <td>{emp.leaves || "-"}</td>
+                    <td>{emp.employee_request}</td>
+                    <td>{emp.working_days}</td>
+                    <td>{emp.holidays}</td>
+                    <td>{emp.leaves}</td>
                     <td>{formatNumber(emp.lop_salary_total)}</td>
                     <td>{formatNumber(emp.earnings_total)}</td>
                     <td>{formatNumber(emp.deductions_total)}</td>
                     <td>{formatNumber(emp.total_net_salary)}</td>
-                    <td>{emp.total_net_salary_words || "-"}</td>
+                    <td>{emp.total_net_salary_words}</td>
                     <td>
                       <button
                         type="button"

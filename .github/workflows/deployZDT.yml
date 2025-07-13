@@ -33,11 +33,15 @@ jobs:
               NEXT="IOTADashboard-green"
               NEXT_PORT=8081
               APP_NAME="appDashboard-green"
+              CURRENT_APP="appDashboard-blue"
             else
               NEXT="IOTADashboard-blue"
               NEXT_PORT=8080
               APP_NAME="appDashboard-blue"
+              CURRENT_APP="appDashboard-green"
             fi
+
+            echo "🚀 Deploying to $NEXT (port $NEXT_PORT)"
 
             # Clean and clone fresh
             rm -rf $NEXT
@@ -47,30 +51,63 @@ jobs:
             git pull origin dev
             npm install
 
-            # ✅ Update only PORT line in .env file without affecting others
-            awk -v PORT="$NEXT_PORT" 'BEGIN {updated=0} 
-              /^PORT=/ {$0="PORT="PORT; updated=1} 
-              {print} 
-              END {if (!updated) print "PORT="PORT}' .env > .env.tmp && mv .env.tmp .env
+            # Create/update .env file with correct PORT
+            echo "PORT=$NEXT_PORT" > .env
+            echo "NODE_ENV=production" >> .env
+            # Add any other environment variables your app needs
 
-            # ✅ Delete previous process if it exists
+            # Stop and delete previous process if it exists
+            echo "🛑 Stopping previous $APP_NAME process..."
             pm2 delete $APP_NAME || true
 
-            # ✅ Start app
+            # Start new app
+            echo "🚀 Starting $APP_NAME on port $NEXT_PORT..."
             pm2 start ecosystem.config.cjs --only $APP_NAME
 
-            # ✅ Wait a few seconds to ensure it's up
-            sleep 5
+            # Wait for app to start
+            echo "⏳ Waiting for app to start..."
+            sleep 10
 
-            # ✅ Ensure app started successfully
-            if ! netstat -tulpn | grep ":$NEXT_PORT" > /dev/null; then
-              echo "❌ App failed to start on port $NEXT_PORT"
+            # Verify app is running and responding
+            MAX_ATTEMPTS=30
+            ATTEMPT=1
+            while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+              if netstat -tulpn | grep ":$NEXT_PORT" > /dev/null; then
+                echo "✅ Port $NEXT_PORT is listening"
+                break
+              fi
+              echo "⏳ Waiting for port $NEXT_PORT to be ready (attempt $ATTEMPT/$MAX_ATTEMPTS)"
+              sleep 2
+              ((ATTEMPT++))
+            done
+
+            if [ $ATTEMPT -gt $MAX_ATTEMPTS ]; then
+              echo "❌ App failed to start on port $NEXT_PORT after $MAX_ATTEMPTS attempts"
+              pm2 logs $APP_NAME --lines 50
               exit 1
             fi
 
-            # ✅ Update symlink to point to the new deployment
+            # Test if app is responding
+            if ! curl -f -s -o /dev/null --max-time 10 http://localhost:$NEXT_PORT/; then
+              echo "❌ App is not responding on port $NEXT_PORT"
+              pm2 logs $APP_NAME --lines 50
+              exit 1
+            fi
+
+            echo "✅ App is responding on port $NEXT_PORT"
+
+            # Update symlink to point to the new deployment
             ln -sfn /root/iwtDashboard/$NEXT /root/iwtDashboard/IOTADashboard-active
 
-            # ✅ Switch backend port in nginx
+            # Switch backend port in nginx (this script now includes health checks)
+            echo "🔄 Switching nginx to port $NEXT_PORT..."
             /usr/local/bin/switch_backend_port.sh
+
+            # Clean up - stop old app after successful switch
+            echo "🧹 Cleaning up old deployment..."
+            pm2 delete $CURRENT_APP || true
+
+            echo "🎉 Blue-green deployment completed successfully!"
+            echo "📊 Current PM2 status:"
+            pm2 list
           EOF

@@ -4,17 +4,23 @@ module.exports = {
       name: "appDashboard-blue",
       script: "npm",
       args: "run dev",
-      env: {
-        PORT: 8080
-      }
+      cwd: "/root/iwtDashboard/IOTADashboard-blue",
+      // Remove hardcoded PORT - let it read from .env
+      env_file: ".env",
+      watch: false,
+      max_restarts: 3,
+      restart_delay: 1000
     },
     {
       name: "appDashboard-green",
       script: "npm",
-      args: "run dev",
-      env: {
-        PORT: 8081
-      }
+      args: "run dev", 
+      cwd: "/root/iwtDashboard/IOTADashboard-green",
+      // Remove hardcoded PORT - let it read from .env
+      env_file: ".env",
+      watch: false,
+      max_restarts: 3,
+      restart_delay: 1000
     }
   ]
 };
