@@ -205,6 +205,7 @@ const renderTable = (records: invoiceDetails[] ,  handleInvoiceStatusUpdate : (i
    
   return (
     <div className="table-responsive">
+      {records.length > 0 ? (
       <table className="table table-row-dashed table-row-gray-200  align-middle gs-0 gy-4 border border-y border-white">
         <thead className="text-gray-900 fw-bold mb-1 fs-4">
           <tr className='border border-grey border-2'>
@@ -217,7 +218,7 @@ const renderTable = (records: invoiceDetails[] ,  handleInvoiceStatusUpdate : (i
             <th className="px-px min-w-100px"> Url</th>
           </tr>
         </thead>
-        <tbody className='border border-grey border-2'>
+          <tbody className='border border-grey border-2'>
           {records.map((record, index) => (
             <tr key={index}>
               <td>
@@ -268,7 +269,12 @@ const renderTable = (records: invoiceDetails[] ,  handleInvoiceStatusUpdate : (i
             </tr>
           ))}
         </tbody>
-      </table>
+         </table>
+        ) : (
+           <p className="text-gray-900 fw-bold text-hover-danger mb-1 fs-6 text-center">No Pendig Invoices, All Received ! </p>
+        )}
+       
+     
     </div>
   );
 };

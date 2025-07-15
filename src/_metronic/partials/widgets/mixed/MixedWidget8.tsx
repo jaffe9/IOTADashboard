@@ -140,7 +140,7 @@ const updatePicUrl = (associated_user_id : { username: string}) => {
       <div className='tab-content'>
         <div className='tab-pane fade show active' id='kt_table_widget_5_tab_1'>
           <div className='table-responsive'>
-            <table className='table table-row-dashed table-row-gray-200 align-middle gs-0 gy-4'>
+            {expiringContract.length > 0 ? (<table className='table table-row-dashed table-row-gray-200 align-middle gs-0 gy-4'>
               <thead>
                 <tr className='border-0'>
                   <th className='p-0 w-50px'></th>
@@ -220,7 +220,8 @@ const updatePicUrl = (associated_user_id : { username: string}) => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table>) : ( <p className="text-gray-900 fw-bold text-hover-danger mb-1 fs-6 text-center">No Upcomming Contract Expiries ! </p>)}
+            
           </div>
         </div>
       </div>
