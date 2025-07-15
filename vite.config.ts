@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import dotenv from 'dotenv'
-import path from 'path' //changed here
 
 // Load environment variables from .env file
 dotenv.config()
@@ -19,17 +18,6 @@ export default defineConfig({
     hmr: {
       overlay: false,
     },
-    //changes start here =============================
-    fs: {
-      
-      allow: [
-        process.cwd(), 
-        path.resolve(process.cwd(), '..'), 
-        path.resolve(process.cwd(), '../..'), 
-        '/root/iwtDashboard' 
-      ]
-    }
-    // end here =======================================
   },
   logLevel: 'info',
 })
