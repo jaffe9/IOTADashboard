@@ -57,7 +57,24 @@ jobs:
 
             # Create/update .env file with correct PORT
             echo "PORT=$NEXT_PORT" > .env
-            echo "NODE_ENV=production" >> .env
+            # echo "NODE_ENV=production" >> .env
+            echo "NODE_ENV=development" >> .env
+            echo "VITE_APP_BASE_LAYOUT_CONFIG_KEY='metronic-react-demo1-8150" >> .env
+            echo "VITE_APP_API_URL=https://preview.keenthemes.com/metronic8/laravel/api" >> .env
+            echo "VITE_APP_VERSION=v8.2.4" >> .env
+            echo "VITE_APP_THEME_NAME=Metornic" >> .env
+            echo "VITE_APP_THEME_DEMO=demo1" >> .env
+            echo "VITE_APP_BOOTSTRAP_DOCS_LINK=https://getbootstrap.com/docs/5.0" >> .env
+            echo "VITE_APP_SASS_PATH=src/_metronic/assets/sass/core/components" >> .env
+            echo "VITE_APP_SASS_VARIABLES_PATH=src/_metronic/assets/sass/core/components/_variables.scss" >> .env
+            echo "VITE_APP_PURCHASE_URL=https://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469" >> .env
+            echo "VITE_APP_PREVIEW_URL=https://preview.keenthemes.com/metronic8/react/demo1/" >> .env
+            echo "VITE_APP_PREVIEW_REACT_URL=https://preview.keenthemes.com/metronic8/react" >> .env
+            echo "VITE_APP_PREVIEW_DOCS_URL=https://preview.keenthemes.com/metronic8/react/docs" >> .env
+            echo "VITE_APP_THEME_API_URL=https://preview.keenthemes.com/theme-api/api" >> .env
+            echo "VITE_PUBLIC_POSTHOG_KEY=phc_p5iOzCTGrxNdfjlQditba1ECZaTIZkmOk1cd0V06PCy" >> .env
+            echo "VITE_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com" >> .env 
+
             # Add any other environment variables your app needs
 
             # Stop and delete previous process if it exists
