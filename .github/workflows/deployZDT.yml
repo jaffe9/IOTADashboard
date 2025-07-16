@@ -59,7 +59,7 @@ jobs:
             echo "PORT=$NEXT_PORT" > .env
             ## echo "NODE_ENV=production" >> .env
             ## echo "NODE_ENV=development" >> .env
-            echo "VITE_APP_BASE_LAYOUT_CONFIG_KEY='metronic-react-demo1-8150'" >> .env
+            echo "VITE_APP_BASE_LAYOUT_CONFIG_KEY=metronic-react-demo1-8150" >> .env
             echo "VITE_APP_API_URL=https://preview.keenthemes.com/metronic8/laravel/api" >> .env
             echo "VITE_APP_VERSION=v8.2.4" >> .env
             echo "VITE_APP_THEME_NAME=Metornic" >> .env
