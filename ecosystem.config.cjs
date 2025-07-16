@@ -6,7 +6,7 @@ module.exports = {
       args: "run dev",
       cwd: "/root/iwtDashboard/IOTADashboard-blue",
       // Remove hardcoded PORT - let it read from .env
-      env_file: ".env",
+      // env_file: ".env",
       watch: false,
       max_restarts: 3,
       restart_delay: 1000
@@ -17,7 +17,7 @@ module.exports = {
       args: "run dev", 
       cwd: "/root/iwtDashboard/IOTADashboard-green",
       // Remove hardcoded PORT - let it read from .env
-      env_file: ".env",
+      // env_file: ".env",
       watch: false,
       max_restarts: 3,
       restart_delay: 1000
