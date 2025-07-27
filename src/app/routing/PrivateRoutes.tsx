@@ -3,24 +3,13 @@ import {Route, Routes, Navigate} from 'react-router-dom'
 import {MasterLayout} from '../../_metronic/layout/MasterLayout'
 import TopBarProgress from 'react-topbar-progress-indicator'
 import {DashboardWrapper} from '../pages/dashboard/DashboardWrapper'
-import {MenuTestPage} from '../pages/MenuTestPage'
 import {getCSSVariableValue} from '../../_metronic/assets/ts/_utils'
 import {WithChildren} from '../../_metronic/helpers'
 import BuilderPageWrapper from '../pages/layout-builder/BuilderPageWrapper'
 import OpportunityPage from '../modules/apps/opportunity/OpportunityPage'
-import ClaimPageWrapper from '../pages/claimPage/ClaimPageWrapper'
-import EmployeeTimesheetWrapper from '../pages/employeeTimesheet/EmployeeTimesheetWrapper'
-import EmployeeInvoiceWrapper from '../pages/employeeInvoice/EmployeeInvoiceWrapper'
-import ContractPageWrapper from '../pages/contractPage/ContractPageWrapper'
-import CreateEmployeeWrapper from '../pages/createEmployee/CreateEmployeeWrapper'
-import { GetInvoiceDetails } from '../pages/invoiceInfo/invoiceDetails'
-import { TRUE } from 'sass'
-import { UpdateSalary } from '../pages/salaryIncrement/updateSalary'
-import { AddNewSalary } from '../pages/salaryIncrement/Salary'
-import { UpdateEmployee } from '../pages/createEmployee/UpdateEmployee'
-import ExpenseManager from '../pages/claimPage/ExpenseManager'
 
 const PrivateRoutes = () => {
+  // Existing lazy loaded components
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
   const WizardsPage = lazy(() => import('../modules/wizards/WizardsPage'))
   const AccountPage = lazy(() => import('../modules/accounts/AccountPage'))
@@ -28,6 +17,18 @@ const PrivateRoutes = () => {
   const ChatPage = lazy(() => import('../modules/apps/chat/ChatPage'))
   const UsersPage = lazy(() => import('../modules/apps/user-management/UsersPage'))
   
+  // New lazy loaded components
+  const ClaimPageWrapper = lazy(() => import('../pages/claimPage/ClaimPageWrapper'))
+  const MenuTestPage = lazy(() => import('../pages/MenuTestPage').then(module => ({ default: module.MenuTestPage })))
+  const EmployeeTimesheetWrapper = lazy(() => import('../pages/employeeTimesheet/EmployeeTimesheetWrapper'))
+  const EmployeeInvoiceWrapper = lazy(() => import('../pages/employeeInvoice/EmployeeInvoiceWrapper'))
+  const ContractPageWrapper = lazy(() => import('../pages/contractPage/ContractPageWrapper'))
+  const CreateEmployeeWrapper = lazy(() => import('../pages/createEmployee/CreateEmployeeWrapper'))
+  const UpdateEmployee = lazy(() => import('../pages/createEmployee/UpdateEmployee').then(module => ({ default: module.UpdateEmployee })))
+  const GetInvoiceDetails = lazy(() => import('../pages/invoiceInfo/invoiceDetails').then(module => ({ default: module.GetInvoiceDetails })))
+  const UpdateSalary = lazy(() => import('../pages/salaryIncrement/updateSalary').then(module => ({ default: module.UpdateSalary })))
+  const AddNewSalary = lazy(() => import('../pages/salaryIncrement/Salary').then(module => ({ default: module.AddNewSalary })))
+  const ExpenseManager = lazy(() => import('../pages/claimPage/ExpenseManager'))
   return (
     <Routes>
       <Route element={<MasterLayout />}>
@@ -36,18 +37,98 @@ const PrivateRoutes = () => {
         {/* Pages */}
         <Route path='dashboard' element={<DashboardWrapper />} />
         <Route path='builder' element={<BuilderPageWrapper />} />
-        <Route path='claim' element={<ClaimPageWrapper />} />
-        <Route path='menu-test' element={<MenuTestPage />} />
-        <Route path='employeetimesheet' element={<EmployeeTimesheetWrapper/>}/>
-        <Route path='employeeinvoice' element={<EmployeeInvoiceWrapper/>}/>
-        <Route path='contract' element={<ContractPageWrapper/>}/>
-        <Route path='createTempEmp' element={<CreateEmployeeWrapper/>}/>
-        <Route path='updateTempEmp' element={<UpdateEmployee/>}/>
-        <Route path='getInvoiceDetails' element={<GetInvoiceDetails className={''}/>}/>
-        <Route path='updateSalary' element={<UpdateSalary/>}/>
-        <Route path='Salary' element={<AddNewSalary/>}/>
-        <Route path='/dashboard/expenses' element={<ExpenseManager/>}/>
-        {/* Lazy Modules */}
+        
+        {/* Updated routes with lazy loading */}
+        <Route
+          path='claim'
+          element={
+            <SuspensedView>
+              <ClaimPageWrapper />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='menu-test'
+          element={
+            <SuspensedView>
+              <MenuTestPage />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='employeetimesheet'
+          element={
+            <SuspensedView>
+              <EmployeeTimesheetWrapper />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='employeeinvoice'
+          element={
+            <SuspensedView>
+              <EmployeeInvoiceWrapper />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='contract'
+          element={
+            <SuspensedView>
+              <ContractPageWrapper />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='createTempEmp'
+          element={
+            <SuspensedView>
+              <CreateEmployeeWrapper />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='updateTempEmp'
+          element={
+            <SuspensedView>
+              <UpdateEmployee />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='getInvoiceDetails'
+          element={
+            <SuspensedView>
+              <GetInvoiceDetails className={''} />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='updateSalary'
+          element={
+            <SuspensedView>
+              <UpdateSalary />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='Salary'
+          element={
+            <SuspensedView>
+              <AddNewSalary />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='/dashboard/expenses'
+          element={
+            <SuspensedView>
+              <ExpenseManager />
+            </SuspensedView>
+          }
+        />
+        
+        {/* Existing Lazy Modules */}
         <Route
           path='crafted/pages/profile/*'
           element={
