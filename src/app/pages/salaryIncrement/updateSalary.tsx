@@ -3,12 +3,22 @@ import { useFormik } from "formik";
 import Flatpickr from "react-flatpickr";
 import { Salary } from "../../modules/apps/user-management/users-list/core/_models";
 import { apiHelper, updateSalaryIncrement } from "../../../apiFactory/apiHelper";
+import { KTIcon, useDebounce } from "../../../_metronic/helpers";
+import { MenuComponent } from "../../../_metronic/assets/ts/components";
 
 const UpdateSalary: FC = () => {
   const [allUserInfo, setAllUserInfo] = useState<Salary[]>([]);
+  const [filtered, setFiltered] = useState<Salary[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
   const [editingRowId, setEditingRowId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  console.log(allUserInfo)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+  
+  // Debounce search term
+  const debouncedSearchTerm = useDebounce(searchTerm, 150);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -20,6 +30,40 @@ const UpdateSalary: FC = () => {
     }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [debouncedSearchTerm, statusFilter, allUserInfo]);
+
+  useEffect(() => {
+    MenuComponent.reinitialization()
+  }, []);
+
+  const applyFilters = () => {
+    let result = [...allUserInfo];
+
+    if (debouncedSearchTerm && debouncedSearchTerm.trim()) {
+      const term = debouncedSearchTerm.toLowerCase();
+      result = result.filter(emp =>
+        (emp.user_id?.username && emp.user_id.username.toLowerCase().includes(term)) ||
+        (emp.pay_period && emp.pay_period.toLowerCase().includes(term)) ||
+        (emp.total_net_salary_words && emp.total_net_salary_words.toLowerCase().includes(term))
+      );
+    }
+
+    if (statusFilter) {
+      // Add your status filtering logic here based on your data structure
+      // Example: result = result.filter(emp => emp.status === statusFilter);
+    }
+
+    setFiltered(result);
+  };
+
+  const resetFilters = () => {
+    setStatusFilter('');
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
 
   const toNumberStrict = (val: any): number => {
     if (val === "" || val === undefined || val === null) return 0;
@@ -107,265 +151,414 @@ const UpdateSalary: FC = () => {
     setEditingRowId(null);
   };
   
-const formatNumber = (val: string | number | undefined) =>
-  val && !isNaN(Number(val))
-    ? Number(val).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })
-    : "-";
+  const formatNumber = (val: string | number | undefined) =>
+    val && !isNaN(Number(val))
+      ? Number(val).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      : "-";
+
+  const currentData = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  // Create empty rows to maintain consistent table height
+  const emptyRowsCount = itemsPerPage - currentData.length;
+  const emptyRows = Array(emptyRowsCount).fill(null);
 
   return (
-    <div className="card mb-12">
-      <div className="card-body">
-        <h3 className="fw-bolder mb-4">Update Salary</h3>
-        <table className="table table-bordered table-hover">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Pay_Period</th>
-              <th>Pay_Date</th>
-              <th>Basic Allowance</th>
-              <th>HR Allowance</th>
-              {/* <th>End of Service Allowance</th> */}
-              <th>Travel Allowance</th>
-              <th>Salary Advance</th>
-              <th>OverTime</th>
-              <th>Employee_Request</th>
-              <th>Working Days</th>
-              <th>Holidays</th>
-              <th>Leaves</th>
-              <th>Loss_Of_Pay</th>
-              <th>Earnings_Total</th>
-              <th>Deductions</th>
-              <th>Net_Salary</th>
-              <th>Net_Salary_Words</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allUserInfo.length ? (
-              allUserInfo.map((emp) =>
-                editingRowId === emp.id ? (
-                  <tr key={emp.id} style={{ backgroundColor: "#f0f3f5" }}>
-                    <td>{emp.user_id?.username || "N/A"}</td>
-                    <td>
-                      <Flatpickr
-                        className="form-control"
-                        value={formik.values.pay_period}
-                        onChange={(dates) => {
-                          formik.setFieldValue(
-                            "pay_period",
-                            dates[0]
-                              ? dates[0].toLocaleString("en", {
-                                  year: "numeric",
-                                  month: "short",
-                                })
-                              : ""
-                          );
-                        }}
-                      />
-                    </td>
-                    <td>
-                      <Flatpickr
-                        className="form-control"
-                        value={formik.values.pay_date}
-                        onChange={(dates) => {
-                          formik.setFieldValue(
-                            "pay_date",
-                            dates[0]
-                              ? dates[0].toLocaleDateString("en").replace(/\//g, "-")
-                              : ""
-                          );
-                        }}
-                        options={{ mode: "single", dateFormat: "d-m-Y" }}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="basic_allowance"
-                        className="form-control"
-                        value={formik.values.basic_allowance}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="hr_allowance"
-                        className="form-control"
-                        value={formik.values.hr_allowance}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
-                    {/* <td>
-                      <input
-                        type="text"
-                        name="end_of_service_allowance"
-                        className="form-control"
-                        value={formik.values.end_of_service_allowance}
-                        onChange={formik.handleChange}
-                      />
-                    </td> */}
-                    <td>
-                      <input
-                        type="text"
-                        name="travel_other_allowance"
-                        className="form-control"
-                        value={formik.values.travel_other_allowance}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="salary_advance"
-                        className="form-control"
-                        value={formik.values.salary_advance}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="overTime"
-                        className="form-control"
-                        value={formik.values.overTime}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="employee_request"
-                        className="form-control"
-                        value={formik.values.employee_request}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
+    <div className="card">
+      {/* Card Header */}
+      <div className="card-header border-0 pt-5">
+        <h3 className="card-title align-items-start flex-column">
+          <span className="card-label fw-bold fs-3 mb-1">Update Salary</span>
+          <span className="text-muted mt-1 fw-semibold fs-7">Manage employee salary information</span>
+        </h3>
+        <div className="card-toolbar">
+          <div className="d-flex gap-3 align-items-center">
+                        {/* Search Component */}
+            <div className="card-title">
+              <div className="d-flex align-items-center position-relative my-1">
+                <KTIcon iconName="magnifier" className="fs-1 position-absolute ms-6" />
+                <input
+                  type="text"
+                  data-kt-salary-table-filter="search"
+                  className="form-control form-control-solid w-450px ps-14"
+                  placeholder="Search employees"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Filter Button */}
+            <button
+              type="button"
+              className="btn btn-light-primary me-3"
+              data-kt-menu-trigger="click"
+              data-kt-menu-placement="bottom-end"
+            >
+              <KTIcon iconName="filter" className="fs-2" />
+              Filter
+            </button>
+            
+            {/* Filter SubMenu */}
+            <div className="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true">
+              {/* Header */}
+              <div className="px-7 py-5">
+                <div className="fs-5 text-gray-900 fw-bolder">Filter Options</div>
+              </div>
+              
+              {/* Separator */}
+              <div className="separator border-gray-200"></div>
+              
+              {/* Content */}
+              <div className="px-7 py-5" data-kt-salary-table-filter="form">
+                {/* Status Filter */}
+                <div className="mb-10">
+                  <label className="form-label fs-6 fw-bold">Status:</label>
+                  <select
+                    className="form-select form-select-solid fw-bolder"
+                    data-kt-select2="true"
+                    data-placeholder="Select status"
+                    data-allow-clear="true"
+                    data-kt-salary-table-filter="status"
+                    data-hide-search="true"
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    value={statusFilter}
+                  >
+                    <option value=""></option>
+                    <option value="processed">Processed</option>
+                    <option value="pending">Pending</option>
+                    <option value="draft">Draft</option>
+                  </select>
+                </div>
+                
+                {/* Actions */}
+                <div className="d-flex justify-content-end">
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="btn btn-light btn-active-light-primary fw-bold me-2 px-6"
+                    data-kt-menu-dismiss="true"
+                    data-kt-salary-table-filter="reset"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(1)}
+                    className="btn btn-primary fw-bold px-6"
+                    data-kt-menu-dismiss="true"
+                    data-kt-salary-table-filter="filter"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Card Body */}
+      <div className="card-body py-3">
+        <div className="table-responsive" style={{minHeight: '500px'}}>
+          {filtered.length > 0 ? (
+            <table className="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-4 border border-y border-white">
+              <thead className="text-gray-900 fw-bold mb-1 fs-4">
+                <tr className="border border-grey border-2">
+                  <th className="px-3 min-w-120px">Name</th>
+                  <th className="px-3 min-w-100px">Pay Period</th>
+                  <th className="px-3 min-w-100px">Pay Date</th>
+                  <th className="px-3 min-w-100px">Basic Allowance</th>
+                  <th className="px-3 min-w-100px">HR Allowance</th>
+                  <th className="px-3 min-w-100px">Travel Allowance</th>
+                  <th className="px-3 min-w-100px">Salary Advance</th>
+                  <th className="px-3 min-w-80px">OverTime</th>
+                  <th className="px-3 min-w-100px">Employee Request</th>
+                  <th className="px-3 min-w-80px">Working Days</th>
+                  <th className="px-3 min-w-80px">Holidays</th>
+                  <th className="px-3 min-w-80px">Leaves</th>
+                  <th className="px-3 min-w-100px">Loss Of Pay</th>
+                  <th className="px-3 min-w-100px">Earnings Total</th>
+                  <th className="px-3 min-w-100px">Deductions</th>
+                  <th className="px-3 min-w-100px">Net Salary</th>
+                  <th className="px-3 min-w-150px">Net Salary Words</th>
+                  <th className="px-3 min-w-120px">Action</th>
+                </tr>
+              </thead>
+              <tbody className="border border-grey border-2">
+                {currentData.map(emp =>
+                  editingRowId === emp.id ? (
+                    <tr key={emp.id} className="bg-light-primary">
+                      <td><span className="text-gray-900 fw-bold">{emp.user_id?.username || "N/A"}</span></td>
                       <td>
-                      <input
-                        type="text"
-                        name="working_days"
-                        className="form-control"
-                        value={formik.values.working_days}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
+                        <Flatpickr
+                          className="form-control form-control-sm"
+                          value={formik.values.pay_period}
+                          onChange={(dates) => {
+                            formik.setFieldValue(
+                              "pay_period",
+                              dates[0]
+                                ? dates[0].toLocaleString("en", {
+                                    year: "numeric",
+                                    month: "short",
+                                  })
+                                : ""
+                            );
+                          }}
+                        />
+                      </td>
                       <td>
-                      <input
-                        type="text"
-                        name="holidays"
-                        className="form-control"
-                        value={formik.values.holidays}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
+                        <Flatpickr
+                          className="form-control form-control-sm"
+                          value={formik.values.pay_date}
+                          onChange={(dates) => {
+                            formik.setFieldValue(
+                              "pay_date",
+                              dates[0]
+                                ? dates[0].toLocaleDateString("en").replace(/\//g, "-")
+                                : ""
+                            );
+                          }}
+                          options={{ mode: "single", dateFormat: "d-m-Y" }}
+                        />
+                      </td>
                       <td>
-                      <input
-                        type="text"
-                        name="leaves"
-                        className="form-control"
-                        value={formik.values.leaves}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
+                        <input
+                          type="text"
+                          name="basic_allowance"
+                          className="form-control form-control-sm"
+                          value={formik.values.basic_allowance}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
                       <td>
-                      <input
-                        type="text"
-                        name="lop_salary_total"
-                        className="form-control"
-                        value={formik.values.lop_salary_total}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
+                        <input
+                          type="text"
+                          name="hr_allowance"
+                          className="form-control form-control-sm"
+                          value={formik.values.hr_allowance}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
                       <td>
-                      <input
-                        type="text"
-                        name="earnings_total"
-                        className="form-control"
-                        value={formik.values.earnings_total}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
+                        <input
+                          type="text"
+                          name="travel_other_allowance"
+                          className="form-control form-control-sm"
+                          value={formik.values.travel_other_allowance}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
                       <td>
-                      <input
-                        type="text"
-                        name="deductions_total"
-                        className="form-control"
-                        value={formik.values.deductions_total}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
+                        <input
+                          type="text"
+                          name="salary_advance"
+                          className="form-control form-control-sm"
+                          value={formik.values.salary_advance}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
                       <td>
-                      <input
-                        type="text"
-                        name="total_net_salary"
-                        className="form-control"
-                        value={formik.values.total_net_salary}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
+                        <input
+                          type="text"
+                          name="overTime"
+                          className="form-control form-control-sm"
+                          value={formik.values.overTime}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
                       <td>
-                      <input
-                        type="text"
-                        name="total_net_salary_words"
-                        className="form-control"
-                        value={formik.values.total_net_salary_words}
-                        onChange={formik.handleChange}
-                      />
-                    </td>
-                    <td>
-                      <form onSubmit={formik.handleSubmit}>
-                        <button type="submit" className="btn btn-success btn-sm me-2" disabled={loading}>
-                          {loading ? "Saving..." : "Save"}
+                        <input
+                          type="text"
+                          name="employee_request"
+                          className="form-control form-control-sm"
+                          value={formik.values.employee_request}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="working_days"
+                          className="form-control form-control-sm"
+                          value={formik.values.working_days}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="holidays"
+                          className="form-control form-control-sm"
+                          value={formik.values.holidays}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="leaves"
+                          className="form-control form-control-sm"
+                          value={formik.values.leaves}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="lop_salary_total"
+                          className="form-control form-control-sm"
+                          value={formik.values.lop_salary_total}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="earnings_total"
+                          className="form-control form-control-sm"
+                          value={formik.values.earnings_total}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="deductions_total"
+                          className="form-control form-control-sm"
+                          value={formik.values.deductions_total}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="total_net_salary"
+                          className="form-control form-control-sm"
+                          value={formik.values.total_net_salary}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="total_net_salary_words"
+                          className="form-control form-control-sm"
+                          value={formik.values.total_net_salary_words}
+                          onChange={formik.handleChange}
+                        />
+                      </td>
+                      <td>
+                        <form onSubmit={formik.handleSubmit}>
+                          <div className="d-flex gap-1">
+                            <button 
+                              type="submit" 
+                              className="badge badge-success" 
+                              disabled={loading}
+                              style={{border: 'none', cursor: 'pointer'}}
+                            >
+                              <strong>{loading ? "Saving..." : "Save"}</strong>
+                            </button>
+                            <button 
+                              type="button" 
+                              className="badge badge-secondary" 
+                              onClick={cancelEdit}
+                              style={{border: 'none', cursor: 'pointer'}}
+                            >
+                              <strong>Cancel</strong>
+                            </button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={emp.id}>
+                      <td>
+                        <a href="#" className="text-gray-900 fw-bold text-hover-primary mb-1 fs-6">
+                          {emp.user_id?.username || "N/A"}
+                        </a>
+                      </td>
+                      <td><span className="text-primary fw-bold">{emp.pay_period}</span></td>
+                      <td><span className="text-gray-900 fw-semibold">{emp.pay_date}</span></td>
+                      <td><span className="text-danger fw-bold">{formatNumber(emp.basic_allowance)}</span></td>
+                      <td><span className="text-danger fw-bold">{formatNumber(emp.hr_allowance)}</span></td>
+                      <td><span className="text-danger fw-bold">{formatNumber(emp.travel_other_allowance)}</span></td>
+                      <td><span className="text-warning fw-bold">{formatNumber(emp.salary_advance)}</span></td>
+                      <td><span className="text-success fw-bold">{formatNumber(emp.overTime)}</span></td>
+                      <td><span className="text-muted fw-semibold">{emp.employee_request || "-"}</span></td>
+                      <td><span className="text-gray-900 fw-semibold">{emp.working_days}</span></td>
+                      <td><span className="text-gray-900 fw-semibold">{emp.holidays}</span></td>
+                      <td><span className="text-gray-900 fw-semibold">{emp.leaves}</span></td>
+                      <td><span className="text-danger fw-bold">{formatNumber(emp.lop_salary_total)}</span></td>
+                      <td><span className="text-success fw-bold">{formatNumber(emp.earnings_total)}</span></td>
+                      <td><span className="text-danger fw-bold">{formatNumber(emp.deductions_total)}</span></td>
+                      <td><span className="text-success fw-bold">{formatNumber(emp.total_net_salary)}</span></td>
+                      <td>
+                        <span className="text-muted fw-semibold d-block" style={{
+                          display: 'inline-block',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '150px'
+                        }} title={emp.total_net_salary_words}>
+                          {emp.total_net_salary_words}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="badge badge-primary"
+                          onClick={() => startEditing(normalizeSalary(emp))}
+                          style={{border: 'none', cursor: 'pointer'}}
+                        >
+                          <strong>Edit</strong>
                         </button>
-                        <button type="button" className="btn btn-secondary btn-sm" onClick={cancelEdit}>
-                          Cancel
-                        </button>
-                      </form>
-                    </td>
+                      </td>
+                    </tr>
+                  )
+                )}
+                
+                {/* Empty rows to maintain consistent table height */}
+                {emptyRows.map((_, index) => (
+                  <tr key={`empty-${index}`} style={{height: '45px'}}>
+                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
                   </tr>
-                ) : (
-                  <tr key={emp.id}>
-                    <td>{emp.user_id?.username || "N/A"}</td>
-                    <td>{emp.pay_period}</td>
-                    <td>{emp.pay_date}</td>
-                    <td>{formatNumber(emp.basic_allowance)}</td>
-                    <td>{formatNumber(emp.hr_allowance)}</td>
-                    {/* <td>{emp.end_of_service_allowance}</td> */}
-                    <td>{formatNumber(emp.travel_other_allowance)}</td>
-                    <td>{formatNumber(emp.salary_advance)}</td>
-                    <td>{formatNumber(emp.overTime)}</td>
-                    <td>{emp.employee_request}</td>
-                    <td>{emp.working_days}</td>
-                    <td>{emp.holidays}</td>
-                    <td>{emp.leaves}</td>
-                    <td>{formatNumber(emp.lop_salary_total)}</td>
-                    <td>{formatNumber(emp.earnings_total)}</td>
-                    <td>{formatNumber(emp.deductions_total)}</td>
-                    <td>{formatNumber(emp.total_net_salary)}</td>
-                    <td>{emp.total_net_salary_words}</td>
-                    <td>
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm"
-                        onClick={() => startEditing(normalizeSalary(emp))}
-                      >
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                )
-              )
-            ) : (
-              <tr>
-                <td colSpan={8}>Loading employees...</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-gray-900 fw-bold text-hover-danger mb-1 fs-6 text-center">
+              No employees found matching your criteria!
+            </p>
+          )}
+        </div>
+
+        {/* Pagination */}
+        <div className="d-flex justify-content-between align-items-center mt-4">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+            className="btn btn-sm btn-light-primary"
+          >
+            Previous
+          </button>
+          <span className="text-gray-700 fw-semibold">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(p => p + 1)}
+            className="btn btn-sm btn-light-primary"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

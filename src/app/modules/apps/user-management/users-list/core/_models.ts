@@ -210,6 +210,30 @@ export type ClaimRequest = {
   "expenseBy": string
 }
 
+  export type Expense = {
+  id: number;
+  expenseType: {
+    expenseTypeDesc : string
+  };
+  expenseDate: string;
+  expenseBy: string;
+  expenseAmount: number;
+  expenseApprovalStatus: boolean;
+  expenseApprovedBy: {
+    accountManagerName:string
+  };
+  expenseApprovedDate: string;
+  expenseApprovedAmount: number;
+  externalTransactionId: string;
+  originalTransactionDate: string;
+  externalTransactionNarration: string;
+  associatedUserId: {
+     fullName : string
+  };
+  fileLocation: string;
+  isReconsile: boolean;
+}
+
 export type temEmp = {
 "id" : number,
 "username" : string,

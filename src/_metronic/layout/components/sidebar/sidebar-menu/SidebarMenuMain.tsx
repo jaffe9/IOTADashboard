@@ -58,6 +58,19 @@ const SidebarMenuMain = () => {
       </div>
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
+          <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Expenses</span>
+        </div>
+      </div>
+      <SidebarMenuItemWithSub
+        to={''}
+        title={'Expense'}
+        fontIcon='tag'
+        icon='cheque'
+      >
+        <SidebarMenuItem to='/dashboard/expenses' title='View Expenses' hasBullet={true} />
+      </SidebarMenuItemWithSub> 
+      <div className='menu-item'>
+        <div className='menu-content pt-8 pb-2'>
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Sales</span>
         </div>
       </div>

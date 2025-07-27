@@ -339,6 +339,20 @@ export const getAllClaimEmployees = async () => {
   }
 };
 
+export const getAllExpenses = async () => {
+  try{
+    const response = await axiosInstance.get("/expenses?select=*,associatedUserId(fullName),expenseApprovedBy(accountManagerName),expenseType(expenseTypeDesc)", { timeout : 3500 } )
+  console.log("Response for Count User :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting all Expenses :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiiin Expenses : ", error)
+    }
+  }
+}
+
 export const getEmpForSalaryIncrement = async () => {
    try{
     const response = await axiosEncoreInstance.get('/getEmpForSalInc')
@@ -1331,6 +1345,48 @@ export const uploadClaimsToSupabase = async (file:File) => {
     console.log(Cconfig.url)
 }
 /// End of claim
+/// Update Claim start here 
+export const updateExpense = async (expense: any): Promise<any> => {
+  const data = JSON.stringify([{
+    expenseDate: expense.expenseDate,
+    expenseBy: expense.expenseBy,
+    expenseAmount: expense.expenseAmount,
+    expenseApprovedDate: expense.expenseApprovedDate,
+    expenseApprovedAmount: expense.expenseApprovedAmount,
+    externalTransactionId: expense.externalTransactionId,
+    originalTransactionDate: expense.originalTransactionDate,
+    externalTransactionNarration: expense.externalTransactionNarration,
+    fileLocation: expense.fileLocation,
+    isReconsile: expense.isReconsile
+  }]);
+
+  const config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/expenses?id=eq.${expense.id}`,
+    headers: {
+      'apikey': axios.defaults.headers.common['apikey'],
+      'Content-Type': 'application/json',
+      'Authorization': axios.defaults.headers.common['Authorization']
+    },
+    data
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response.status === 204
+      ? { status: 204, message: "Success" }
+      : { status: response.status, message: "Failed" };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error updating expense:", error.response?.data || error.message);
+    } else {
+      console.error("Unexpected error:", error);
+    }
+    return { status: 500, message: "Failed to update expense" };
+  }
+};
+/// End of update claims 
 
 //  Start of Timesheet
 export const uploadFileToSupabase = async (file:File): Promise< string | null> => {

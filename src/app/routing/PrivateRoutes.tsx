@@ -18,6 +18,7 @@ import { TRUE } from 'sass'
 import { UpdateSalary } from '../pages/salaryIncrement/updateSalary'
 import { AddNewSalary } from '../pages/salaryIncrement/Salary'
 import { UpdateEmployee } from '../pages/createEmployee/UpdateEmployee'
+import ExpenseManager from '../pages/claimPage/ExpenseManager'
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
@@ -45,6 +46,7 @@ const PrivateRoutes = () => {
         <Route path='getInvoiceDetails' element={<GetInvoiceDetails className={''}/>}/>
         <Route path='updateSalary' element={<UpdateSalary/>}/>
         <Route path='Salary' element={<AddNewSalary/>}/>
+        <Route path='/dashboard/expenses' element={<ExpenseManager/>}/>
         {/* Lazy Modules */}
         <Route
           path='crafted/pages/profile/*'
