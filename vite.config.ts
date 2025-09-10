@@ -18,6 +18,9 @@ export default defineConfig({
     hmr: {
       overlay: false,
     },
+     watch: {
+      ignored: ['**/.git/**', '**/node_modules/**']
+    }
   },
   logLevel: 'info',
 })
