@@ -15,9 +15,9 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: parseInt(process.env.PORT || '8080'), // ✅ Use dynamic port from .env or fallback
-    hmr: {
-      overlay: false,
-    },
+    // hmr: {
+    //   overlay: false,
+    // },
   },
   logLevel: 'info',
 })
