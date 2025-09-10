@@ -55,10 +55,13 @@ jobs:
             git pull origin dev
             npm install
 
+            # Build the application for production
+            echo "🏗️ Building application..."
+            npm run build
+
             # Create/update .env file with correct PORT
             echo "PORT=$NEXT_PORT" > .env
-            ## echo "NODE_ENV=production" >> .env
-            ## echo "NODE_ENV=development" >> .env
+            echo "NODE_ENV=production" >> .env
             echo "VITE_APP_BASE_LAYOUT_CONFIG_KEY=metronic-react-demo1-8150" >> .env
             echo "VITE_APP_API_URL=https://preview.keenthemes.com/metronic8/laravel/api" >> .env
             echo "VITE_APP_VERSION=v8.2.4" >> .env
@@ -75,13 +78,11 @@ jobs:
             echo "VITE_PUBLIC_POSTHOG_KEY=phc_p5iOzCTGrxNdfjlQditba1ECZaTIZkmOk1cd0V06PCy" >> .env
             echo "VITE_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com" >> .env 
 
-            # Add any other environment variables your app needs
-
             # Stop and delete previous process if it exists
             echo "🛑 Stopping previous $APP_NAME process..."
             pm2 delete $APP_NAME || true
 
-            # Start new app
+            # Start new app with preview mode (serves built files)
             echo "🚀 Starting $APP_NAME on port $NEXT_PORT..."
             pm2 start ecosystem.config.cjs --only $APP_NAME
 
