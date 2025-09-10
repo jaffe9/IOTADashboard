@@ -7,7 +7,7 @@ dotenv.config()
 
 export default defineConfig({
   plugins: [react()],
-  base: "",
+  base: "/",
   build: {
     chunkSizeWarningLimit: 3000,
     target: "esnext",
@@ -18,9 +18,6 @@ export default defineConfig({
     hmr: {
       overlay: false,
     },
-     watch: {
-      ignored: ['**/.git/**', '**/node_modules/**']
-    }
   },
   logLevel: 'info',
 })
