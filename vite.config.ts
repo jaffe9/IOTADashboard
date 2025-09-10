@@ -7,7 +7,7 @@ dotenv.config()
 
 export default defineConfig({
   plugins: [react()],
-  base: "/",
+  base: "",
   build: {
     chunkSizeWarningLimit: 3000,
     target: "esnext",
