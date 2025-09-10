@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: dev
 
@@ -54,6 +54,7 @@ jobs:
             git checkout dev
             git pull origin dev
             npm install
+            npm run build
 
             # Create/update .env file with correct PORT
             echo "PORT=$NEXT_PORT" > .env

@@ -18,9 +18,6 @@ export default defineConfig({
     hmr: {
       overlay: false,
     },
-     fs: {
-      strict: false // Allow serving files outside the project root
-    }
   },
   logLevel: 'info',
 })

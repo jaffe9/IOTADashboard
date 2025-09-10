@@ -88,6 +88,18 @@ const updatePicUrl = (associated_user_id : { username: string}) => {
          return 'media/svg/ConsultantPhotos/Zakir_Hussain.jpg'
     case 'Pradeep Kumar' :
          return 'media/svg/ConsultantPhotos/Pradeep_Kumar_Pic.jpg'
+    case 'Amal Al Waheed':
+         return 'media/svg/ConsultantPhotos/Amal_Al_Waheed.jpeg'
+    case 'Venkateshwara Reddy Y':
+         return 'media/svg/ConsultantPhotos/VenkateshwaraYReddy.jpeg'
+    case 'Yasmine Khaldi':
+         return 'media/svg/ConsultantPhotos/Yasmine_Khaldi.jpg'
+    case 'Syeda Zeba' :
+         return 'public/media/svg/ConsultantPhotos/Syeda_Zeba.jpeg'
+    case 'Marwa Shalot' :
+         return 'media/svg/ConsultantPhotos/Marwa Pic.jpg'
+    case 'John Seleb' :
+         return 'media/svg/ConsultantPhotos/John Pic.jpeg'
   }
 }
 
