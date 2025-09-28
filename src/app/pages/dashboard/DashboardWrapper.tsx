@@ -25,6 +25,7 @@ import { createRoot } from 'react-dom/client'
 import { Opportunities } from '../../modules/widgets/components/Opportunities'
 import { apiHelper } from '../../../apiFactory/apiHelper'
 import ProtectedCard from '../../../_metronic/layout/components/content/ProtectedCard'
+import { TablesWidget14 } from '../../../_metronic/partials/widgets/tables/TablesWidget14'
 
 async function getOpportunitiesData():Promise<number>
   {
@@ -88,6 +89,7 @@ const DashboardPage: FC = () => (
     <div className='row gx-5 gx-xl-10'>
       {/* begin::Col */}
       <div className='col-xxl-6 mb-5 mb-xl-10'>
+        < TablesWidget14 className={''} />
         {/* <app-new-charts-widget8 cssclassName="h-xl-100" chartHeight="275px" [chartHeightNumber]="275"></app-new-charts-widget8> */}
       </div>
       {/* end::Col */}

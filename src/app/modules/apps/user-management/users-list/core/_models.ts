@@ -274,6 +274,18 @@ export type ListOfTimesheet = {
   "timesheetFileLocation": string
 }
 
+export type Proposal = {
+  id: number;
+  clientId: number;
+  resourceName: string;
+  billingAnnually: number;
+  billingMonths: string;
+  version: number;
+  status: string;
+  url: any;
+  designation: string;
+}
+
 export const initialUser: User = {
   employeeId: 'avatars/300-6.jpg',
   occupation: 'Art Director',

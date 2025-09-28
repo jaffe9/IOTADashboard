@@ -7,6 +7,7 @@ import {getCSSVariableValue} from '../../_metronic/assets/ts/_utils'
 import {WithChildren} from '../../_metronic/helpers'
 import BuilderPageWrapper from '../pages/layout-builder/BuilderPageWrapper'
 import OpportunityPage from '../modules/apps/opportunity/OpportunityPage'
+import { CreateProposal } from '../pages/proposalPage/createProposal'
 
 const PrivateRoutes = () => {
   // Existing lazy loaded components
@@ -116,6 +117,14 @@ const PrivateRoutes = () => {
           element={
             <SuspensedView>
               <AddNewSalary />
+            </SuspensedView>
+          }
+        />
+                <Route
+          path='createProposal'
+          element={
+            <SuspensedView>
+              <CreateProposal />
             </SuspensedView>
           }
         />

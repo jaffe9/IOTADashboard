@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 import { resourceLimits } from "worker_threads";
-import { AddTypeSalary, ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { AddTypeSalary, ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, Proposal, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { UserModel } from "../../src/app/modules/auth/core/_models.ts";
@@ -152,6 +152,20 @@ export const getInvoiceDetails = async () => {
     }
   }
 }
+// Fetch all proposals
+export const getProposals = async () => {
+  try{
+     const response = await axiosInstance.get('/proposals')
+    //  console.log("this is the response from getProposals :", response.data)
+     return response.data
+  }catch(error){
+    if(axios.isAxiosError(error)){
+      console.error("Error in getting getProposals : ",error.response?.data || error.message )
+    }else{
+      console.error("Error in fetching getProposals : ", error)
+    }
+  }
+} 
 // Fetching the data related to national_id
 export const getLeavesLeft = async () => {
   try{
@@ -884,6 +898,39 @@ export const updateInvoiceStatus =  async (id : any , invoice_paid_amount : any 
 } 
 // end of Update paid status
 
+// Update Proposal Status
+export const updateProposalStatus =  async (id : any , newStatus : any ) => {
+  let data = JSON.stringify([
+    {
+      status : newStatus
+    }
+  ]);
+  
+  let config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/proposals?id=eq.${id}`,
+    headers: { 
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    if (axios.isAxiosError(error)){
+      console.error("Axios Error in update Proposal Status line 927 : ", error.response?.data || error.message)
+     }else{
+      console.error("Error in updating Proposal Status to true " , error)
+     }
+  });
+} 
+// End of Proposal Status  
 // Api update tempUser Status to false 
 export const updateUserId =  async (id : any ) => {
   const config = {
@@ -1193,6 +1240,115 @@ export const uploadInvoiceToSupabase = async (file: File): Promise<string | null
 };
 
 // End of Invoice
+
+// Start of Proposal
+export const createProposal = async (p: Proposal): Promise<{status:number; message:string}> => {
+  let data = JSON.stringify([
+    {
+      clientId: p.clientId,
+      resourceName: p.resourceName,
+      billingAnnually: p.billingAnnually,
+      billingMonths: p.billingMonths,
+      version: p.version,
+      status: p.status,
+      url: p.url,
+      designation: p.designation
+    }
+  ]);
+  console.log("APIData:" + data);
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/proposals`,
+    headers: {
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': 'application/json'
+    },
+    data: data
+  };
+
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("error:",error.response?.data  || error.message)
+    }else{
+      console.error("Unexpected error:",error);
+    }
+
+    return { status: 500, message: "Error creating invoice" };
+  }
+  
+}
+export const uploadProposalToSupabase = async (file: File): Promise<string | null> => {
+  const filePath = `iwt_proposals/${setYear}/${file.name}`;
+
+  const uploadConfig = {
+    method: 'POST',
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
+    },
+    data: file,
+  };
+
+  try {
+    // Step 1: Upload to Supabase
+    const uploadResponse = await axios(uploadConfig);
+    if (uploadResponse.status !== 200) throw new Error("Upload failed");
+
+    // Step 2: Generate Signed URL (1 year)
+    const signedUrlResponse = await axios.post(
+      `${STORAGE_URL}/object/sign/${filePath}`,
+      { expiresIn: 60 * 60 * 24 * 365 * 20 },
+      {
+        headers: {
+          'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (
+      signedUrlResponse.status !== 200 ||
+      !signedUrlResponse.data?.signedURL
+    ) {
+      throw new Error("Failed to generate signed URL");
+    }
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+
+    // Step 3: Shorten the Signed URL
+    const shortenResponse = await axios.get(
+      `${CREATE_SHORT_URL}`,
+      {
+        params: { url: fullSignedUrl },
+      }
+    );
+
+    if (
+      shortenResponse.status === 200 &&
+      shortenResponse.data?.secureShortURL
+    ) {
+      return shortenResponse.data.secureShortURL; //  This will go into invoice_url
+    } else {
+      throw new Error("Short URL generation failed");
+    }
+  } catch (error) {
+    console.error('Error uploading, signing, or shortening invoice URL:', error);
+    return null;
+  }
+}; 
+// End of Proposal 
 
 // Start of Contract
 

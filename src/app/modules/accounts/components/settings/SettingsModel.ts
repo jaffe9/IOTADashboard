@@ -164,6 +164,17 @@ export type IProfileDetailsTypeSalary = {
   leaves : string
 }
 
+export type IProfileDetailsProposals = {
+ id: number;
+  clientId: number;
+  resourceName: string;
+  billingAnnually: number;
+  billingMonths: string;
+  version: number;
+  status: string;
+  url: string;
+  designation: string;
+}
 
 export interface IUpdateEmail {
   newEmail: string;
@@ -379,6 +390,18 @@ export const  profileDetailsTypeSalaryInitialValues: IProfileDetailsTypeSalary =
   username: "",
   overTime: "",
   leaves: ""
+}
+
+export const profileDetailsProposals : IProfileDetailsProposals = {
+  id:0,
+  clientId: 0,
+  resourceName: "",
+  billingAnnually: 0,
+  billingMonths: "",
+  version: 0,
+  status: "",
+  url: "",
+  designation: ""
 }
 
 export const profileDetailsInitValuesNationalId : IProfileDetailsNationalId = {
