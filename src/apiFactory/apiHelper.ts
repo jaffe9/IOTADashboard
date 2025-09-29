@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 import { resourceLimits } from "worker_threads";
-import { AddTypeSalary, ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, Proposal, Salary, temEmp, User, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { AddTypeSalary, ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, PastUser, Proposal, Salary, temEmp, User, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { UserModel } from "../../src/app/modules/auth/core/_models.ts";
@@ -1364,7 +1364,7 @@ export const uploadProposalToSupabase = async (file: File): Promise<string | nul
 }; 
 // End of Proposal 
 // Start of PastEmployee table
-export const createPastEmployee = async (i:User): Promise<{status:number; message:string}> => {
+export const createPastEmployee = async (i:PastUser): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
     {
               associatedUserId : i.associatedUserId,

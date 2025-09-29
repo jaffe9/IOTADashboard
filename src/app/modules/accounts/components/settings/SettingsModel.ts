@@ -46,12 +46,17 @@ export interface IProfileDetails {
   }
   loadDefault: boolean;
   associatedAccountManager : number;
+}
+
+export interface IProfilePastEmployees{
+  associatedUserId : number
+  client_id : number
+  fullName : string
   employeeJoiningDate : string;
   employeeExitDate : string;
   clearanceLetter : any;
   noDueLetter : any;
 }
-
 export interface IProfileDetailsInvoice {
   associated_user_id: any;
   invoice_paid_amount: string;
@@ -287,10 +292,6 @@ export const profileDetailsInitValues: IProfileDetails = {
   email: "",
   associatedAccountManager: 0,
   id: 0,
-  employeeJoiningDate: "",
-  employeeExitDate: "",
-  clearanceLetter: "",
-  noDueLetter: ""
 };
 
 export const profileDetailsInitValuesContract: IProfileDetailsContract = {
@@ -410,6 +411,16 @@ export const profileDetailsProposals : IProfileDetailsProposals = {
   status: "",
   url: "",
   designation: ""
+}
+
+export const profileDetailsPastEmployees : IProfilePastEmployees = {
+  client_id: 0,
+  fullName: "",
+  employeeJoiningDate: "",
+  employeeExitDate: "",
+  clearanceLetter: "",
+  noDueLetter: "",
+  associatedUserId: 0
 }
 
 export const profileDetailsInitValuesNationalId : IProfileDetailsNationalId = {

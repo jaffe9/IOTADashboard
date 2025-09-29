@@ -1,25 +1,25 @@
 import { useState } from "react";
 import { apiHelper, createPastEmployee, uploadClearanceToSupabase, uploadNoDueToSupabase } from "../../../apiFactory/apiHelper";
 import {
-  IProfileDetails,
-  profileDetailsInitValues as initialValues,
+  IProfilePastEmployees,
+  profileDetailsPastEmployees as initialValues,
 } from "../../modules/accounts/components/settings/SettingsModel";
 import { useFormik } from "formik";
-import { User } from "../../modules/apps/user-management/users-list/core/_models";
+import { PastUser, User } from "../../modules/apps/user-management/users-list/core/_models";
 
 var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
   return data;
 });
 console.log("this is form create employee : " ,allUserInfo)
-let updatedPastEmployee: IProfileDetails = initialValues;
+let updatedPastEmployee: IProfilePastEmployees = initialValues;
 
 const CreatePastEmployee: React.FC = () => {
-  const [data, setData] = useState<IProfileDetails>(updatedPastEmployee);
+  const [data, setData] = useState<IProfilePastEmployees>(updatedPastEmployee);
   const [file, setFile] = useState(null);
   const [clearanceFile, setClearanceFile] = useState<File | null>(null);
   const [noDueFile, setNoDueFile] = useState<File | null>(null); 
 
-  const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
+  const updateData = (fieldsToUpdate: Partial<IProfilePastEmployees>): void => {
     const updatedData = Object.assign(updatedPastEmployee, fieldsToUpdate);
     setData(updatedData);
   };
@@ -58,7 +58,7 @@ const CreatePastEmployee: React.FC = () => {
     }
   };
 
-  const formik = useFormik<IProfileDetails>({
+  const formik = useFormik<IProfilePastEmployees>({
     initialValues,
     onSubmit: async () => {
       setLoading(true);
@@ -94,7 +94,7 @@ const CreatePastEmployee: React.FC = () => {
             }
         }
 
-        const pastEmployee: User = {
+        const pastEmployee: PastUser = {
             associatedUserId: data.associatedUserId,
             fullName: data.fullName,
             employeeJoiningDate: data.employeeJoiningDate,

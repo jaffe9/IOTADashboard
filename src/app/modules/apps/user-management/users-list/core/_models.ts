@@ -8,7 +8,6 @@ export enum payslipOptions { download = "download", email = "email" }
 export type User = {
   associated_user_id?: any
   contract_id?: string
-  client_id?: number,
   id?: number
   username?: string
   email?: string
@@ -18,15 +17,22 @@ export type User = {
   companyName?: string
   phone?: string
   employeeJoiningDate?: string
-  employeeExitDate?:string
-  clearanceLetter? : any;
-  noDueLetter ?: any;
   employeeId?: string
   pic?: string
   associatedAccountManage?:number
   fullName?:string
   language?:string[]
-  associatedUserId?:number
+
+}
+
+export type PastUser = {
+    associatedUserId?:number;
+    fullName?:string;
+    employeeJoiningDate? : string;
+    employeeExitDate?: string;
+    clearanceLetter ?: any
+    client_id ?:number;
+    noDueLetter ?:any
 }
 
 export type TempUser = {
