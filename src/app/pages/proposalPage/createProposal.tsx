@@ -35,7 +35,7 @@ const CreateProposal: FC = () => {
     }
     const handleUpload = async() =>{
       if(!file){
-        alert("Please Select Invoice")
+        alert("Please Select Proposal")
         return ;
       }
       try{

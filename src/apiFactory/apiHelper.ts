@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios";
 import { resourceLimits } from "worker_threads";
-import { AddTypeSalary, ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, Proposal, Salary, temEmp, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
+import { AddTypeSalary, ClaimRequest, ContractRequest, EmployeeOnboardingResponse, InvoiceRequest, National_id, Proposal, Salary, temEmp, User, UsersQueryResponse } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { UserModel } from "../../src/app/modules/auth/core/_models.ts";
@@ -81,7 +81,7 @@ const axiosEncoreInstance = axios.create({
 
 export const getUserCount = async () => {
   try{
-    const response = await axiosEncoreInstance.get("/userCount", { timeout : 3500 } )
+    const response = await axiosEncoreInstance.get("/userCount")
  //   console.log("Response for Count User :", response.data)
     return response.data;
   }catch(error){
@@ -163,6 +163,20 @@ export const getProposals = async () => {
       console.error("Error in getting getProposals : ",error.response?.data || error.message )
     }else{
       console.error("Error in fetching getProposals : ", error)
+    }
+  }
+} 
+// Fetch Past Employees 
+export const getPastEmplouees = async () => {
+  try{
+     const response = await axiosInstance.get('/pastEmployees')
+    //  console.log("this is the response from getProposals :", response.data)
+     return response.data
+  }catch(error){
+    if(axios.isAxiosError(error)){
+      console.error("Error in getting pastEmployee : ",error.response?.data || error.message )
+    }else{
+      console.error("Error in fetching pastEmployee : ", error)
     }
   }
 } 
@@ -328,7 +342,7 @@ export const getContractForAction = async (id: string) => {
 export const getAllEmployees = async () => {
   try{
     const response = await axiosEncoreInstance.get('/getAllEmp')
-  //  console.log("Response for getAllEmployee  :", response.data)
+   console.log("Response for getAllEmployee  :", response.data)
     return response.data.getAllEmp;
   }catch(error){
     if(axios.isAxiosError(error)){
@@ -337,7 +351,7 @@ export const getAllEmployees = async () => {
       console.log("Error in getiiin getAllEmployee  : ", error)
     }
   }
-};
+};getAllEmployees()
 
 export const getAllClaimEmployees = async () => {
    try{
@@ -1349,7 +1363,178 @@ export const uploadProposalToSupabase = async (file: File): Promise<string | nul
   }
 }; 
 // End of Proposal 
+// Start of PastEmployee table
+export const createPastEmployee = async (i:User): Promise<{status:number; message:string}> => {
+  let data = JSON.stringify([
+    {
+              associatedUserId : i.associatedUserId,
+              fullName : i.fullName,
+              employeeJoiningDate : i.employeeJoiningDate,
+              employeeExitDate : i.employeeExitDate,
+              clearanceLetter : i.clearanceLetter,
+              client_id : i.client_id,
+              noDueLetter : i.noDueLetter,
+    }
+  ]);
+  console.log("APIData:" + data);
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/pastEmployees`,
+    headers: {
+      'apikey': `${axios.defaults.headers.common['apikey']}`,
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': 'application/json'
+    },
+    data: data
+  };
 
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("error:",error.response?.data  || error.message)
+    }else{
+      console.error("Unexpected error:",error);
+    }
+
+    return { status: 500, message: "Error creating invoice" };
+  }
+  
+} 
+// End of PastEmployee table 
+//Upload Cearance Letter 
+export const uploadClearanceToSupabase = async (file: File): Promise<string | null> => {
+  const filePath = `iwt_clearanceLetters/${setYear}/${file.name}`;
+
+  const uploadConfig = {
+    method: 'POST',
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
+    },
+    data: file,
+  };
+
+  try {
+    // Step 1: Upload to Supabase
+    const uploadResponse = await axios(uploadConfig);
+    if (uploadResponse.status !== 200) throw new Error("Upload failed");
+
+    // Step 2: Generate Signed URL (1 year)
+    const signedUrlResponse = await axios.post(
+      `${STORAGE_URL}/object/sign/${filePath}`,
+      { expiresIn: 60 * 60 * 24 * 365 * 20 },
+      {
+        headers: {
+          'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (
+      signedUrlResponse.status !== 200 ||
+      !signedUrlResponse.data?.signedURL
+    ) {
+      throw new Error("Failed to generate signed URL");
+    }
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+
+    // Step 3: Shorten the Signed URL
+    const shortenResponse = await axios.get(
+      `${CREATE_SHORT_URL}`,
+      {
+        params: { url: fullSignedUrl },
+      }
+    );
+
+    if (
+      shortenResponse.status === 200 &&
+      shortenResponse.data?.secureShortURL
+    ) {
+      return shortenResponse.data.secureShortURL; //  This will go into invoice_url
+    } else {
+      throw new Error("Short URL generation failed");
+    }
+  } catch (error) {
+    console.error('Error uploading, signing, or shortening invoice URL:', error);
+    return null;
+  }
+}; 
+//End of Upload Clearance Letter
+// Start of no due letter
+export const uploadNoDueToSupabase = async (file: File): Promise<string | null> => {
+  const filePath = `iwt_clearanceLetters/${setYear}/${file.name}`;
+
+  const uploadConfig = {
+    method: 'POST',
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
+    },
+    data: file,
+  };
+
+  try {
+    // Step 1: Upload to Supabase
+    const uploadResponse = await axios(uploadConfig);
+    if (uploadResponse.status !== 200) throw new Error("Upload failed");
+
+    // Step 2: Generate Signed URL (1 year)
+    const signedUrlResponse = await axios.post(
+      `${STORAGE_URL}/object/sign/${filePath}`,
+      { expiresIn: 60 * 60 * 24 * 365 * 20 },
+      {
+        headers: {
+          'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (
+      signedUrlResponse.status !== 200 ||
+      !signedUrlResponse.data?.signedURL
+    ) {
+      throw new Error("Failed to generate signed URL");
+    }
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+
+    // Step 3: Shorten the Signed URL
+    const shortenResponse = await axios.get(
+      `${CREATE_SHORT_URL}`,
+      {
+        params: { url: fullSignedUrl },
+      }
+    );
+
+    if (
+      shortenResponse.status === 200 &&
+      shortenResponse.data?.secureShortURL
+    ) {
+      return shortenResponse.data.secureShortURL; //  This will go into invoice_url
+    } else {
+      throw new Error("Short URL generation failed");
+    }
+  } catch (error) {
+    console.error('Error uploading, signing, or shortening invoice URL:', error);
+    return null;
+  }
+}; 
+//End of No due 
 // Start of Contract
 
 export const createContractPage = async (c: ContractRequest): Promise<{status:number; message:string}> => {

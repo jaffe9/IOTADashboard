@@ -8,6 +8,8 @@ import {WithChildren} from '../../_metronic/helpers'
 import BuilderPageWrapper from '../pages/layout-builder/BuilderPageWrapper'
 import OpportunityPage from '../modules/apps/opportunity/OpportunityPage'
 import { CreateProposal } from '../pages/proposalPage/createProposal'
+import { CreatePastEmployee } from '../pages/createEmployee/createPastEmployee'
+import { TablesWidget15 } from '../../_metronic/partials/widgets/tables/TablesWidget15'
 
 const PrivateRoutes = () => {
   // Existing lazy loaded components
@@ -120,11 +122,27 @@ const PrivateRoutes = () => {
             </SuspensedView>
           }
         />
-                <Route
+        <Route
           path='createProposal'
           element={
             <SuspensedView>
               <CreateProposal />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='createPastEmployee'
+          element={
+            <SuspensedView>
+              <CreatePastEmployee />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='pastEmpDetails'
+          element={
+            <SuspensedView>
+              <TablesWidget15 className='card-xxl-stretch mb-5 mb-xl-8'/>
             </SuspensedView>
           }
         />

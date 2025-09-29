@@ -46,6 +46,10 @@ export interface IProfileDetails {
   }
   loadDefault: boolean;
   associatedAccountManager : number;
+  employeeJoiningDate : string;
+  employeeExitDate : string;
+  clearanceLetter : any;
+  noDueLetter : any;
 }
 
 export interface IProfileDetailsInvoice {
@@ -282,7 +286,11 @@ export const profileDetailsInitValues: IProfileDetails = {
   address: "",
   email: "",
   associatedAccountManager: 0,
-  id: 0
+  id: 0,
+  employeeJoiningDate: "",
+  employeeExitDate: "",
+  clearanceLetter: "",
+  noDueLetter: ""
 };
 
 export const profileDetailsInitValuesContract: IProfileDetailsContract = {
