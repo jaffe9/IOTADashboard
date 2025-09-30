@@ -177,7 +177,7 @@ const SidebarMenuMain = () => {
        <SidebarMenuItem
         to='/pastEmpDetails'
         icon='user'
-        title='Past Users'
+        title='Past Employees'
         fontIcon='bi-layers'
       />
 

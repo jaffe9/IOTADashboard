@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { KTIcon, useDebounce } from "../../../helpers";
-import { getPastEmplouees } from "../../../../apiFactory/apiHelper";
+import { getPastEmplouees, updateClearanceLetterInDB, updateExitDateInDB, updateNoDueInDB, updatePastEmployeeStatus, uploadClearanceToSupabase, uploadNoDueToSupabase } from "../../../../apiFactory/apiHelper";
 
 type Props = {
     className : string
@@ -14,6 +14,7 @@ type PastEmployeeDetails = {
   employeeExitDate: string;
   clearanceLetter: string;
   noDueLetter: string;
+  status : string
 };
 
 const TablesWidget15: React.FC<Props> = ({ className }) => {
@@ -74,6 +75,79 @@ const TablesWidget15: React.FC<Props> = ({ className }) => {
     setCurrentPage(1);
     applyFilters();
   };
+const toggleStatus = async (id : number , currentStatus : string) => {
+   const newStatus = currentStatus === "OnNotice" ? "Exited" : "OnNotice" 
+   setPastEmployeeOrder((prev) =>
+      prev.map((employee) =>
+        employee.id === id ? { ...employee, status: newStatus } : employee
+      )
+    );
+    // Call API or backend to save this status change
+    try {
+        await updatePastEmployeeStatus(id , newStatus) 
+    }catch(error){
+        console.error("Error Occured while updating the status of past employee:",error)
+    }
+  }
+const handleDateUpdate = async (id: number, newDate: string) => {
+  if (newDate) {
+    setPastEmployeeOrder((prev) =>
+      prev.map((employee) =>
+        employee.id === id ? { ...employee, employeeExitDate: newDate } : employee
+      )
+    );
+     await updateExitDateInDB(id, newDate);
+  }
+};
+const handleClearanceFileUpload = async (id: number) => {
+  const fileInput = document.getElementById(`clearanceFile-${id}`) as HTMLInputElement;
+  if (fileInput?.files?.[0]) {
+    try {
+      const file = fileInput.files[0];
+      const fileUrl = await uploadClearanceToSupabase(file); // Call your upload function
+
+      if (fileUrl) {
+        // Update the state with the returned URL (ensure it's always a string)
+        setPastEmployeeOrder((prev) =>
+          prev.map((employee) =>
+            employee.id === id ? { ...employee, clearanceLetter: fileUrl || "" } : employee
+          )
+        );
+        // upload the file Url in the data base 
+           await updateClearanceLetterInDB(id, fileUrl);
+      } else {
+        console.error("File upload failed or URL not returned.");
+      }
+    } catch (error) {
+      console.error("Error uploading clearance letter:", error);
+    }
+  }
+};
+
+const handleNoDueFileUpload = async (id: number) => {
+  const fileInput = document.getElementById(`noDueFile-${id}`) as HTMLInputElement;
+  if (fileInput?.files?.[0]) {
+    try {
+      const file = fileInput.files[0];
+      const fileUrl = await uploadNoDueToSupabase(file); // Call your upload function
+
+      if (fileUrl) {
+        // Update the state with the returned URL (ensure it's always a string)
+        setPastEmployeeOrder((prev) =>
+          prev.map((employee) =>
+            employee.id === id ? { ...employee, noDueLetter: fileUrl || "" } : employee
+          )
+        );
+         // upload the file Url in the data base 
+           await updateNoDueInDB(id, fileUrl);
+      } else {
+        console.error("File upload failed or URL not returned.");
+      }
+    } catch (error) {
+      console.error("Error uploading no due letter:", error);
+    }
+  }
+};
 
   // To dynamically change logo of clients based on client_id
   const updateLogoUrl = (client_id: number) => {
@@ -224,6 +298,7 @@ const TablesWidget15: React.FC<Props> = ({ className }) => {
                   <th className="px-3 min-w-150px">Full Name</th>
                   <th className="px-3 min-w-150px">Joining Date</th>
                   <th className="px-3 min-w-150px">Exit Date</th>
+                  <th className="px-3 min-w-150px">Status</th>
                   <th className="px-3 min-w-150px">Clearance Letter</th>
                   <th className="px-3 min-w-150px">No Due Letter</th>
                 </tr>
@@ -250,14 +325,33 @@ const TablesWidget15: React.FC<Props> = ({ className }) => {
                     </td>
                     <td className="text fw-bold">{employee.fullName}</td>
                     <td className="text fw-bold">{employee.employeeJoiningDate}</td>
-                    <td className="text fw-bold">{employee.employeeExitDate}</td>
+                    <td className="text fw-bold">{employee.employeeExitDate ? (employee.employeeExitDate)
+                     : (<input
+                      type="date"
+                      className="form-control"
+                      onChange={(e) => handleDateUpdate(employee.id, e.target.value)}
+                      />)}
+                     </td>
+                    <td className="text fw-bold">
+                     <button
+                        className={`btn btn-sm ${employee.status === 'Exited' ? 'btn-danger' : 'btn-warning'}`}
+                        onClick={() => toggleStatus(employee.id, employee.status)}
+                      >
+                        {employee.status}
+                      </button>
+                    </td>
                     <td>
-                      {employee.clearanceLetter ? (
+                       {employee.clearanceLetter ? (
                         <a href={employee.clearanceLetter} className="text-primary fw-bold" target="_blank" rel="noopener noreferrer">
                           View
                         </a>
                       ) : (
-                        <span className="text-muted">—</span>
+                        <input
+                          type="file"
+                          id={`clearanceFile-${employee.id}`}
+                          className="form-control"
+                          onChange={() => handleClearanceFileUpload(employee.id)}
+                        />
                       )}
                     </td>
                     <td>
@@ -266,7 +360,12 @@ const TablesWidget15: React.FC<Props> = ({ className }) => {
                           View
                         </a>
                       ) : (
-                        <span className="text-muted">—</span>
+                        <input
+                          type="file"
+                          id={`noDueFile-${employee.id}`}
+                          className="form-control"
+                          onChange={() => handleNoDueFileUpload(employee.id)}
+                        />
                       )}
                     </td>
                   </tr>

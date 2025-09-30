@@ -58,63 +58,66 @@ const CreatePastEmployee: React.FC = () => {
     }
   };
 
-  const formik = useFormik<IProfilePastEmployees>({
-    initialValues,
-    onSubmit: async () => {
-      setLoading(true);
-      setTimeout(async () => {
-        const updatedData = Object.assign(data, updatedPastEmployee);
-        setData(updatedData);
+const formik = useFormik<IProfilePastEmployees>({
+  initialValues,
+  onSubmit: async () => {
+    setLoading(true);
+    setTimeout(async () => {
+      const updatedData = Object.assign(data, updatedPastEmployee);
+      setData(updatedData);
 
-        if (data.client_id < 1 || data.associatedUserId == null) {
-          alert("Please Select all the fields");
+      if (data.client_id < 1 || data.associatedUserId == null) {
+        alert("Please Select all the fields");
+        setLoading(false);
+        return;
+      }
+
+      let clearanceUrl: string | null = null;
+      let noDueUrl: string | null = null;
+
+      // Optional: If clearanceFile is selected, upload it and get the URL
+      if (clearanceFile) {
+        clearanceUrl = await uploadClearanceToSupabase(clearanceFile);
+        if (!clearanceUrl) {
+          alert("Clearance Letter upload failed");
           setLoading(false);
           return;
         }
-      });
+      }
 
-        let clearanceUrl: string | null = null;
-        let noDueUrl: string | null = null;
-
-        if (clearanceFile) {
-            clearanceUrl = await uploadClearanceToSupabase(clearanceFile);
-            if (!clearanceUrl) {
-            alert("Clearance Letter upload failed");
-            setLoading(false);
-            return;
-            }
+      // Optional: If noDueFile is selected, upload it and get the URL
+      if (noDueFile) {
+        noDueUrl = await uploadNoDueToSupabase(noDueFile);
+        if (!noDueUrl) {
+          alert("NoDue document upload failed");
+          setLoading(false);
+          return;
         }
+      }
 
-        if (noDueFile) {
-            noDueUrl = await uploadNoDueToSupabase(noDueFile);
-            if (!noDueUrl) {
-            alert("NoDue document upload failed");
-            setLoading(false);
-            return;
-            }
-        }
+      // Past Employee object with optional fields
+      const pastEmployee: PastUser = {
+        associatedUserId: data.associatedUserId,
+        fullName: data.fullName,
+        employeeJoiningDate: data.employeeJoiningDate,
+        employeeExitDate: data.employeeExitDate || null, // Can be null if not provided
+        clearanceLetter: clearanceUrl || null, // Can be null if not uploaded
+        noDueLetter: noDueUrl || null, // Can be null if not uploaded
+        client_id: data.client_id,
+      };
 
-        const pastEmployee: PastUser = {
-            associatedUserId: data.associatedUserId,
-            fullName: data.fullName,
-            employeeJoiningDate: data.employeeJoiningDate,
-            employeeExitDate: data.employeeExitDate,
-            clearanceLetter: clearanceUrl,
-            noDueLetter: noDueUrl,
-            client_id: data.client_id,
-        };
+      console.log("Inserted PastEmployee Data :", pastEmployee);
+      const apiResponse = await createPastEmployee(pastEmployee);
 
-        console.log("Inserted PastEmployee Data :", pastEmployee);
-        const apiResponse = await createPastEmployee(pastEmployee);
-
-        if (apiResponse.status === 201) {
-            alert("Past Employee created successfully");
-        } else {
-            alert("An error occurred, please try again later");
-        }
-        setLoading(false);
-        }
-  });
+      if (apiResponse.status === 201) {
+        alert("Past Employee created successfully");
+      } else {
+        alert("An error occurred, please try again later");
+      }
+      setLoading(false);
+    });
+  },
+});
 
   return (
     <div>
@@ -186,7 +189,7 @@ const CreatePastEmployee: React.FC = () => {
                   <input
                     type="date"
                     className="form-control form-control-lg form-control-solid"
-                    onChange={(e) => updateData({ employeeExitDate: e.target.value })}
+                    onChange={(e) => updateData({ employeeExitDate: e.target.value || null })}
                   />
                 </div>
               </div>

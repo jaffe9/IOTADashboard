@@ -945,6 +945,138 @@ export const updateProposalStatus =  async (id : any , newStatus : any ) => {
   });
 } 
 // End of Proposal Status  
+// Start of Past Employee status 
+export const updatePastEmployeeStatus =  async (id : number , newStatus : string ) => {
+  let data = JSON.stringify([
+    {
+      status : newStatus
+    }
+  ]);
+  
+  let config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/pastEmployees?id=eq.${id}`,
+    headers: { 
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    if (axios.isAxiosError(error)){
+      console.error("Axios Error in update Past Employee  Status line 974 : ", error.response?.data || error.message)
+     }else{
+      console.error("Error in updating PastEmployee  Status to true " , error)
+     }
+  });
+} 
+// End of Update PastEmployee status 
+// Start of Update Clearance Letter
+export const updateClearanceLetterInDB =  async (id : number , fileUrl : string ) => {
+  let data = JSON.stringify([
+    {
+      clearanceLetter : fileUrl
+    }
+  ]);
+  
+  let config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/pastEmployees?id=eq.${id}`,
+    headers: { 
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    if (axios.isAxiosError(error)){
+      console.error("Axios Error in update Past Employee  Status line 974 : ", error.response?.data || error.message)
+     }else{
+      console.error("Error in updating PastEmployee  Status to true " , error)
+     }
+  });
+}  
+// End of Update CLearance letter
+// Start of Update ExitDate
+export const updateExitDateInDB =  async (id : number , newDate : string ) => {
+  let data = JSON.stringify([
+    {
+      employeeExitDate : newDate
+    }
+  ]);
+  
+  let config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/pastEmployees?id=eq.${id}`,
+    headers: { 
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    if (axios.isAxiosError(error)){
+      console.error("Axios Error in update Past Employee Exit Date Status line 1040 : ", error.response?.data || error.message)
+     }else{
+      console.error("Error in updating PastEmployee  Exit Date Status to true " , error)
+     }
+  });
+} 
+// End Of Update ExitDate
+// Start of update no due letter url
+export const updateNoDueInDB =  async (id : number , fileUrl : string ) => {
+  let data = JSON.stringify([
+    {
+      noDueLetter : fileUrl
+    }
+  ]);
+  
+  let config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/pastEmployees?id=eq.${id}`,
+    headers: { 
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    if (axios.isAxiosError(error)){
+      console.error("Axios Error in update Past Employee  Status line 974 : ", error.response?.data || error.message)
+     }else{
+      console.error("Error in updating PastEmployee  Status to true " , error)
+     }
+  });
+} 
+// End of no Due Letter Url 
 // Api update tempUser Status to false 
 export const updateUserId =  async (id : any ) => {
   const config = {
@@ -1374,6 +1506,7 @@ export const createPastEmployee = async (i:PastUser): Promise<{status:number; me
               clearanceLetter : i.clearanceLetter,
               client_id : i.client_id,
               noDueLetter : i.noDueLetter,
+              status : "OnNotice",
     }
   ]);
   console.log("APIData:" + data);
@@ -1408,7 +1541,7 @@ export const createPastEmployee = async (i:PastUser): Promise<{status:number; me
   }
   
 } 
-// End of PastEmployee table 
+// End of PastEmployee table  
 //Upload Cearance Letter 
 export const uploadClearanceToSupabase = async (file: File): Promise<string | null> => {
   const filePath = `iwt_clearanceLetters/${setYear}/${file.name}`;

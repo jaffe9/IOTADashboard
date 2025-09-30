@@ -53,7 +53,7 @@ export interface IProfilePastEmployees{
   client_id : number
   fullName : string
   employeeJoiningDate : string;
-  employeeExitDate : string;
+  employeeExitDate : any;
   clearanceLetter : any;
   noDueLetter : any;
 }

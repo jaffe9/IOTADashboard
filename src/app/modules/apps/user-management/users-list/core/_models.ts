@@ -29,7 +29,7 @@ export type PastUser = {
     associatedUserId?:number;
     fullName?:string;
     employeeJoiningDate? : string;
-    employeeExitDate?: string;
+    employeeExitDate?: any;
     clearanceLetter ?: any
     client_id ?:number;
     noDueLetter ?:any
