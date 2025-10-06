@@ -875,7 +875,42 @@ export const updateLeaveRecordStatus = async (id: any) => {
 
 }
 // End of update Leave Record 
+// Update Employee Isactive and isClientFacing status 
+export const updateUserStatus = async (id: any) => {
+  let data = JSON.stringify([
+    {
+      isActive : false ,
+      isClientFacing : false
+    }
+  ]);
+  
+  let config = {
+    method: 'patch',
+    maxBodyLength: Infinity,
+    url: `${API_URL}/user?id=eq.${id}`,
+    headers: { 
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`, 
+      'apikey': `${axios.defaults.headers.common['apikey']}`, 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    if (axios.isAxiosError(error)){
+      console.error("Axios Error in update User Status : ", error.response?.data || error.message)
+     }else{
+      console.error("Error in updating User to true " , error)
+     }
+  });
 
+}
+
+//
 //update paid Status
 export const updateInvoiceStatus =  async (id : any , invoice_paid_amount : any ) => {
   let data = JSON.stringify([
@@ -1790,34 +1825,58 @@ export const createClaimPage = async (c: ClaimRequest): Promise<{status:number; 
   }
 };
 
-export const uploadClaimsToSupabase = async (file:File) => {
-  const Cconfig = {
-    method : "POST",
-    maxBodyLength : Infinity,
-    url : `${STORAGE_URL}/object/iwt_claims/Year_2025/${update_ClaimDate}/${file.name}` ,
-    headers : {
-      'Authorization' :`${axios.defaults.headers.common['Authorization']}`,
-      'Content-Type' : file.type
-    },
-    data : file,
-  };
-  try{
-    const response = await axios(Cconfig);
-    console.log('uploade response',response)
+export const uploadClaimsToSupabase = async (file: File): Promise<string | null> => {
+  const filePath = `iwt_claims/${setYear}/${update_ClaimDate}/${file.name}`;
 
-    if (response.status === 200){
-      //Extract the file path 
-      const fileKey = response.data.file;
-      const publicUrl = `${STORAGE_URL}/object/iwt_claims/${update_ClaimDate}/${fileKey}`;
-      return publicUrl;
-    }else{
-      throw new Error('Claim Upload Failed')
+  const Cconfig = {
+    method: "POST",
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
+    },
+    data: file,
+  };
+
+  try {
+    // Step 1: Upload
+    const response = await axios(Cconfig);
+    if (response.status !== 200) throw new Error("Upload failed");
+
+    // Step 2: Generate signed URL
+    const signedUrlResponse = await axios.post(
+      `${STORAGE_URL}/object/sign/${filePath}`,
+      { expiresIn: 60 * 60 * 24 * 365 * 20 },
+      {
+        headers: {
+          'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (signedUrlResponse.status !== 200 || !signedUrlResponse.data?.signedURL) {
+      throw new Error("Failed to generate signed Url");
     }
-   }catch (error) {
-    console.error('Error in Cconfig',error)
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+
+    // Step 3: Shorten URL
+    const shortenResponse = await axios.get(`${CREATE_SHORT_URL}`, {
+      params: { url: fullSignedUrl },
+    });
+
+    if (shortenResponse.status === 200 && shortenResponse.data?.secureShortURL) {
+      return shortenResponse.data.secureShortURL;
+    } else {
+      throw new Error("Failed generation of short url");
+    }
+  } catch (error) {
+    console.error('Error in uploadClaimsToSupabase:', error);
+    return null;
   }
-    console.log(Cconfig.url)
-}
+};
 /// End of claim
 /// Update Claim start here 
 export const updateExpense = async (expense: any): Promise<any> => {

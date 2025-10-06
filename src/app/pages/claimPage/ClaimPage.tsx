@@ -12,6 +12,7 @@ import {
   ClaimRequest,
   Expenses,
 } from "../../modules/apps/user-management/users-list/core/_models";
+import { exp } from "@amcharts/amcharts5/.internal/core/util/Ease";
 
 
 
@@ -106,6 +107,15 @@ const handleClaimupload = async () => {
           setLoading(false)
           return
         }
+        let expUrl : string | null = null;
+        if(file){
+          expUrl = await uploadClaimsToSupabase(file);
+          if(!expUrl){
+            alert("Claim upload Failed ")
+            setLoading(false)
+            return ;
+          }
+        }
         const ClaimRequest : ClaimRequest = {
           expenseType: data.expenseType,
           expenseDate: data.expenseDate,
@@ -113,6 +123,7 @@ const handleClaimupload = async () => {
           expenseAmount: data.expenseAmount,
           associatedUserId: data.associatedUserId,
           expenseTypeDesc: data.expenseTypeDesc,
+          fileLocation : expUrl,
         };
         const apiResponse = await createClaimPage(ClaimRequest)
         if (apiResponse.status === 201)
@@ -301,10 +312,10 @@ const handleClaimupload = async () => {
                       placeholder="Upload TimeSheet"
                       onChange={handelFileChange}
                       />
-                      <span className="input-group-badge badge badge-success cursor-pointer"
+                      {/* <span className="input-group-badge badge badge-success cursor-pointer"
                         onClick={handleClaimupload}>
                         Click To Upload
-                        </span>
+                        </span> */}
                         </div>
                      
                     </div>

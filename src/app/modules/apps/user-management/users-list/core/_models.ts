@@ -218,7 +218,8 @@ export type ClaimRequest = {
   "expenseType": number,
   "expenseDate": string,
   "expenseAmount": string,
-  "expenseBy": string
+  "expenseBy": string,
+  fileLocation : any
 }
 
   export type Expense = {

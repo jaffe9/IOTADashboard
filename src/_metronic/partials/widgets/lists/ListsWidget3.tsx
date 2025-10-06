@@ -2,7 +2,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import {Dropdown1} from '../../content/dropdown/Dropdown1'
-import { getLeavesLeft, updateLeaveRecord, updateLeaveRecordStatus } from '../../../../apiFactory/apiHelper'
+import { getLeavesLeft, updateLeaveRecord, updateLeaveRecordStatus, updateUserStatus } from '../../../../apiFactory/apiHelper'
 import { numeric } from '@form-validation/bundle/popular'
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios'
@@ -92,6 +92,7 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
     if(!user) return ;
      try{
          await updateLeaveRecordStatus(user.id)
+         await updateUserStatus(user.user_id)
            // Remove Updated Inactive Records 
         setFilteredRecords((pre:LeaveBalanceRecord[]) => pre.filter((u) => u.id !== user.id));
          setSelectedUser(null)

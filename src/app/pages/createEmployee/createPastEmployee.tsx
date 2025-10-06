@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { apiHelper, createPastEmployee, uploadClearanceToSupabase, uploadNoDueToSupabase } from "../../../apiFactory/apiHelper";
+import { apiHelper, createPastEmployee, updateUserStatus, uploadClearanceToSupabase, uploadNoDueToSupabase } from "../../../apiFactory/apiHelper";
 import {
   IProfilePastEmployees,
   profileDetailsPastEmployees as initialValues,
@@ -110,6 +110,7 @@ const formik = useFormik<IProfilePastEmployees>({
       const apiResponse = await createPastEmployee(pastEmployee);
 
       if (apiResponse.status === 201) {
+        await updateUserStatus(pastEmployee.associatedUserId)
         alert("Past Employee created successfully");
       } else {
         alert("An error occurred, please try again later");
