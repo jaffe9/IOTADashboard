@@ -103,7 +103,7 @@ const EmployeeTimesheet: FC = () => {
         let timesheetFileLocation : string | null = null;
 
           if (file) {
-            timesheetFileLocation = await uploadInvoiceToSupabase(file);
+            timesheetFileLocation = await uploadFileToSupabase(file);
             if (!timesheetFileLocation) {
               alert("Invoice upload failed");
               setLoading(false);

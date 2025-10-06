@@ -342,7 +342,7 @@ export const getContractForAction = async (id: string) => {
 export const getAllEmployees = async () => {
   try{
     const response = await axiosEncoreInstance.get('/getAllEmp')
-   console.log("Response for getAllEmployee  :", response.data)
+  //  console.log("Response for getAllEmployee  :", response.data)
     return response.data.getAllEmp;
   }catch(error){
     if(axios.isAxiosError(error)){

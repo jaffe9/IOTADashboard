@@ -10,7 +10,7 @@ import { PastUser, User } from "../../modules/apps/user-management/users-list/co
 var allUserInfo: any = await apiHelper.getAllEmployees().then(async (data) => {
   return data;
 });
-console.log("this is form create employee : " ,allUserInfo)
+// console.log("this is form create employee : " ,allUserInfo)
 let updatedPastEmployee: IProfilePastEmployees = initialValues;
 
 const CreatePastEmployee: React.FC = () => {
