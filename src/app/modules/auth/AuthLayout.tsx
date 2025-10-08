@@ -2,6 +2,7 @@
 import {useEffect} from 'react'
 import {Outlet, Link} from 'react-router-dom'
 import {toAbsoluteUrl} from '../../../_metronic/helpers'
+import innovwayzLogo from '../../../_metronic/assets/fonticon/innovwayzLogo.png';
 
 const AuthLayout = () => {
   useEffect(() => {
@@ -61,7 +62,7 @@ const AuthLayout = () => {
         <div className='d-flex flex-column flex-center  py-15 px-5 px-md-15 w-100'>
           {/* begin::Logo */}
           <Link to='/' className='mb-12 mt-15'>
-            <img alt='Logo' src='src/_metronic/assets/fonticon/innovwayzLogo.png' className='h-100px' />
+            <img alt='Logo' src={innovwayzLogo} className='h-100px' />
           </Link>
           {/* end::Logo */}
 

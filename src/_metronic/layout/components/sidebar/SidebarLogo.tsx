@@ -4,6 +4,7 @@ import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import {useLayout} from '../../core'
 import {MutableRefObject, useEffect, useRef} from 'react'
 import {ToggleComponent} from '../../../assets/ts/components'
+import innovwayzLogo from '../../../assets/fonticon/innovwayzLogo.png';
 
 type PropsType = {
   sidebarRef: MutableRefObject<HTMLDivElement | null>
@@ -54,7 +55,7 @@ const SidebarLogo = (props: PropsType) => {
           <img
             width={'50'}
             alt='Logo'
-            src={toAbsoluteUrl('src/_metronic/assets/fonticon/innovwayzLogo.png')}
+            src={innovwayzLogo}
             className='h-25px app-sidebar-logo-default'
           />
         ) : (
@@ -76,7 +77,7 @@ const SidebarLogo = (props: PropsType) => {
            width={'40px'}
            height={'40px'}
           alt='Logo'
-          src={toAbsoluteUrl('src/_metronic/assets/fonticon/innovwayzLogo.png')}
+          src={innovwayzLogo}
           className='h-20px app-sidebar-logo-minimize'
         />
       </Link>

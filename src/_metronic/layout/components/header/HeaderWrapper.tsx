@@ -5,6 +5,7 @@ import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import {LayoutSetup, useLayout} from '../../core'
 import {Header} from './Header'
 import {Navbar} from './Navbar'
+import innovwayzLogo from '../../../assets/fonticon/innovwayzLogo.png';
 
 export function HeaderWrapper() {
   const {config, classes} = useLayout()
@@ -52,7 +53,7 @@ export function HeaderWrapper() {
                   <Link to='/dashboard' className='d-lg-none'>
                       <img
                         alt='Logo'
-                        src='/src/_metronic/assets/fonticon/innovwayzLogo.png'
+                        src={innovwayzLogo}
                         className='h-30px'
                       />
                   </Link>
