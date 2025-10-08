@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react"
 import { KTIcon, useDebounce } from "../../../helpers";
-import { getProposals, updateProposalStatus } from "../../../../apiFactory/apiHelper";
+import { getProposals, updateProposalStatus, uploadProposalToSupabase } from "../../../../apiFactory/apiHelper";
+import { number } from "yup";
+import { useFormik } from "formik";
+import { IProfileDetailsProposals,profileDetailsProposals as initialValues } from "../../../../app/modules/accounts/components/settings/SettingsModel";
+import { updateProposalData } from "../../../../apiFactory/apiHelper1";
 
 
 type Props = {
@@ -26,6 +30,9 @@ const TablesWidget14: React.FC<Props> = ({ className }) => {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilterMenu, setShowFilterMenu] = useState(false)
+  const [editingRowId, setEditingRowId] = useState<number | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [file,setFile] = useState(null)
   const itemsPerPage = 8;
 
   // Debounce search term
@@ -84,6 +91,19 @@ const TablesWidget14: React.FC<Props> = ({ className }) => {
     applyFilters();
   };
 
+  const handleFileChange = (event:any ) =>{
+      setFile(event.target.files[0])
+    }
+
+  const startEditing = (proposal: any) => {
+    formik.setValues(proposal);
+    setEditingRowId(proposal.id);
+  };
+  
+  const cancleEdit = () => {
+    setEditingRowId(null)
+    setFile(null)
+  }
 
 // To dynamically change logo of clients based on client_id
   const updateLogoUrl = (client_id: number) => {
@@ -128,13 +148,58 @@ const TablesWidget14: React.FC<Props> = ({ className }) => {
     try {
       await updateProposalStatus(id,newStatus)
       alert(`Updated Proposal Status as ${newStatus} for id ${id} `)
-    //   setFiltered((pre:proposalDetails[])  => pre.filter((p) => p.id !== id))
-    //   setProposalOrder((pre: proposalDetails[]) => pre.filter((u) => u.id !== id));
-    fetchProposalDetails();
+      
+      // Update the status immediately in both states
+      setProposalOrder((prev) => 
+        prev.map((p) => p.id === id ? { ...p, status: newStatus } : p)
+      );
+      setFiltered((prev) => 
+        prev.map((p) => p.id === id ? { ...p, status: newStatus } : p)
+      );
     }catch(error){
         console.error("Error in updating Proposal status:", error)
     }
   }
+
+  const formik = useFormik<IProfileDetailsProposals>({
+    initialValues,
+    onSubmit : async(values) => {
+      setLoading(true)
+      try{
+       let proposalUrl : string | null = null;
+       if (file){
+        proposalUrl = await uploadProposalToSupabase(file)
+        if (!proposalUrl){
+          alert("proposal upload has been failed")
+          setLoading(false)
+          return
+        }
+       }
+       const proposalUpdate : IProfileDetailsProposals = {
+         ...values,
+         status : "pending",
+         url : proposalUrl || values.url
+       }
+       console.log("Updated Proposa data successfylly :", proposalUpdate)
+       const apiResponse = await updateProposalData(proposalUpdate)
+
+       if (apiResponse.status === 200){
+           alert("Proposal updated successfully");
+          setLoading(false);
+          setEditingRowId(null);
+          setFile(null);
+          fetchProposalDetails();  // Refresh the proposals list after successful submission
+        }else {
+          alert("An error occurred, please try again later");
+          setLoading(false);
+        }
+      }catch(error){
+        console.error("Error creating proposal", error);
+        alert("Error updating proposal");
+        setLoading(false);
+      }
+    }
+  })
 
   const currentData = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -278,12 +343,12 @@ const TablesWidget14: React.FC<Props> = ({ className }) => {
                   <th className="px-3 w-50px">Client</th>
                   <th className="px-3 min-w-150px">Resource</th>
                   <th className="px-3 min-w-150px">Designation</th>
-                  <th className="px-3 min-w-120px">Billing Annually</th>
-                  <th className="px-3 min-w-120px">Billing Months</th>
+                  <th className="px-1 min-w-150px">Billing Annually (Excl. Vat)</th>
+                  <th className="px-1 min-w-150px">Billing Months</th>
                   <th className="px-3 min-w-100px">Version</th>
                   <th className="px-3 min-w-100px">Status</th>
                   <th className="px-3 min-w-150px">URL</th>
-                  {/* <th className="px-3 min-w-120px">Action</th> */}
+                  <th className="px-3 min-w-120px">Action</th>
                 </tr>
               </thead>
               <tbody className="border border-grey border-2">
@@ -306,74 +371,149 @@ const TablesWidget14: React.FC<Props> = ({ className }) => {
                         </span>
                       </div>
                     </td>
-                    <td className="text fw-bold">{proposal.resourceName}</td>
-                    <td className="text fw-bold">{proposal.designation}</td>
-                    <td className="text fw-bold">{proposal.billingAnnually.toLocaleString("en-Us",{maximumFractionDigits:2,minimumFractionDigits:2})}</td>
-                    <td className="text fw-bold">{proposal.billingMonths}</td>
-                    <td className="text-danger fw-bold">{proposal.version}</td>
-                    {/* <td>
-                      <span className={`badge ${proposal.status === 'approved' ? 'badge-success' : proposal.status === 'rejected' ? 'badge-danger' : 'badge-warning'}`}>
-                        <strong>{proposal.status}</strong>
-                      </span>
-                    </td> */}
                     <td>
-  <div className="btn-group" role="group" aria-label="Proposal Status">
-    <button
-      type="button"
-      className={`btn btn-sm ${proposal.status === 'accepted' ? 'btn-success' : 'btn-outline-success'}`}
-      onClick={() => handleStatusChange(proposal.id, 'accepted')}
-    >
-      Accepted
-    </button>
-    <button
-      type="button"
-      className={`btn btn-sm ${proposal.status === 'rejected' ? 'btn-danger' : 'btn-outline-danger'}`}
-      onClick={() => handleStatusChange(proposal.id, 'rejected')}
-    >
-      Rejected
-    </button>
-    <button
-      type="button"
-      className={`btn btn-sm ${proposal.status === 'pending' ? 'btn-warning' : 'btn-outline-warning'}`}
-      onClick={() => handleStatusChange(proposal.id, 'pending')}
-    >
-      Pending
-    </button>
-    <button
-      type="button"
-      className={`btn btn-sm ${proposal.status === 'revised' ? 'btn-info' : 'btn-outline-info'}`}
-      onClick={() => handleStatusChange(proposal.id, 'revised')}
-    >
-      Revised
-    </button>
-  </div>
-</td>
-                    <td>
-                      {proposal.url ? (
-                        <a href={proposal.url} className="text-primary fw-bold" target="_blank" rel="noopener noreferrer">
-                          <span style={{
-                            display: 'inline-block',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            maxWidth: '150px'
-                          }} title={proposal.url}>
-                            View Proposal
-                          </span>
-                        </a>
+                      {editingRowId === proposal.id ? (
+                        <input
+                          type="text"
+                          name="resourceName"
+                          className="form-control form-control-sm"
+                          value={formik.values.resourceName}
+                          onChange={formik.handleChange}
+                        />
                       ) : (
-                        <span className="text-muted">—</span>
+                        proposal.resourceName
                       )}
                     </td>
-                    {/* <td>
+                    <td>
+                      {editingRowId === proposal.id ? (
+                        <input
+                          type="text"
+                          name="designation"
+                          className="form-control form-control-sm"
+                          value={formik.values.designation}
+                          onChange={formik.handleChange}
+                        />
+                      ) : (
+                        proposal.designation
+                      )}
+                    </td>
+                    <td>
+                      {editingRowId === proposal.id ? (
+                        <input
+                          type="number"
+                          name="billingAnnually"
+                          className="form-control form-control-sm"
+                          value={formik.values.billingAnnually}
+                          onChange={formik.handleChange}
+                        />
+                      ) : (
+                        `SAR ${proposal.billingAnnually.toLocaleString()}`
+                      )}
+                    </td>
+                    <td>
+                      {editingRowId === proposal.id ? (
+                        <select
+                          name="billingMonths"
+                          className="form-control form-control-sm"
+                          value={formik.values.billingMonths}
+                          onChange={formik.handleChange}
+                        >
+                          <option value="">Select Months</option>
+                          <option value="6 months">6 months</option>
+                          <option value="11 months">11 months</option>
+                          <option value="12 months">12 months</option>
+                        </select>
+                      ) : (
+                        proposal.billingMonths
+                      )}
+                    </td>
+                    <td>
+                      {editingRowId === proposal.id ? (
+                        <input
+                          type="number"
+                          name="version"
+                          className="form-control form-control-sm"
+                          value={formik.values.version}
+                          onChange={formik.handleChange}
+                        />
+                      ) : (
+                        proposal.version
+                      )}
+                    </td>
+                    <td>
+                    <div className="btn-group" role="group" aria-label="Proposal Status">
                       <button
-                        className='badge badge-success'
-                        onClick={() => handleProposalStatusUpdate(proposal.id, proposal.associated_user_id, proposal.resourceName)}
-                        style={{ border: 'none', cursor: 'pointer' }}
+                        type="button"
+                        className={`btn btn-sm ${proposal.status === 'accepted' ? 'btn-success' : 'btn-outline-success'}`}
+                        onClick={() => handleStatusChange(proposal.id, 'accepted')}
                       >
-                        <strong>Update Status</strong>
+                        Accepted
                       </button>
-                    </td> */}
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${proposal.status === 'rejected' ? 'btn-danger' : 'btn-outline-danger'}`}
+                        onClick={() => handleStatusChange(proposal.id, 'rejected')}
+                      >
+                        Rejected
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${proposal.status === 'pending' ? 'btn-warning' : 'btn-outline-warning'}`}
+                        onClick={() => handleStatusChange(proposal.id, 'pending')}
+                      >
+                        Pending
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${proposal.status === 'revised' ? 'btn-info' : 'btn-outline-info'}`}
+                        onClick={() => handleStatusChange(proposal.id, 'revised')}
+                      >
+                        Revised
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    {editingRowId === proposal.id ? (
+                      <input
+                        type="file"
+                        name="url"
+                        className="form-control form-control-sm"
+                        onChange={handleFileChange}
+                      />
+                    ) : (
+                      <a href={proposal.url} target="_blank" rel="noopener noreferrer">View Proposal</a>
+                    )}
+                  </td>
+                    <td>
+                      {editingRowId === proposal.id ? (
+                       <div className="d-flex gap-2">
+                         <button 
+                           type="button" 
+                           className="btn btn-sm btn-success"
+                           onClick={() => formik.handleSubmit()}
+                           disabled={loading}
+                         >
+                           {loading ? 'Submitting...' : 'Submit'}
+                         </button>
+                         <button 
+                           type="button" 
+                           className="btn btn-sm btn-secondary"
+                           onClick={cancleEdit}
+                           disabled={loading}
+                         >
+                           Cancel
+                         </button>
+                       </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="badge badge-primary"
+                          onClick={() => startEditing(proposal)}
+                        >
+                          Edit
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

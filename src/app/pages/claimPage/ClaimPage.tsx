@@ -360,7 +360,7 @@ const handleClaimupload = async () => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={handleClaimupload}
+                    // onClick={handleClaimupload}
                     
                   >
                     {!loading && "Save Changes"}

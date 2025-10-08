@@ -176,11 +176,11 @@ const CreateProposal: FC = () => {
                 </div>
 
                 {/* Billing Annually */}
-                <div className="row mb-6">
+                <div className="row mb-6 align-items-center">
                   <label className="col-lg-4 col-form-label fw-bold fs-6">
                     <span className="required">Billing Annually</span>
                   </label>
-                  <div className="col-lg-8 fv-row">
+                  <div className="col-lg-8 fv-row d-flex gap-3">
                     <input
                        type="number"
                         className="form-control form-control-lg form-control-solid"
@@ -191,6 +191,24 @@ const CreateProposal: FC = () => {
                           formik.setFieldValue("billingAnnually",value.target.value)
                         }}
                     />
+                      <select
+                        className="form-select form-select-solid form-select-lg fw-bold"
+                        style={{ maxWidth: "120px" }}
+                        onChange={(e) => {
+                          const selectedCurrency = e.target.value;
+                          updateData({ currency: selectedCurrency });
+
+                          if (selectedCurrency === "USD") {
+                            // Convert to SAR equivalent
+                            const converted = (data.billingAnnually || 0) * 3.75;
+                            updateData({ billingAnnually: converted });
+                            formik.setFieldValue("billingAnnually", converted);
+                          }
+                        }}
+                      >
+                        <option value="SAR">SAR</option>
+                        <option value="USD">USD</option>
+                      </select>
                   </div>
                 </div>
 

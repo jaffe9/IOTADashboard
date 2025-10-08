@@ -183,6 +183,7 @@ export type IProfileDetailsProposals = {
   status: string;
   url: string;
   designation: string;
+  currency:string;
 }
 
 export interface IUpdateEmail {
@@ -410,7 +411,8 @@ export const profileDetailsProposals : IProfileDetailsProposals = {
   version: 0,
   status: "",
   url: "",
-  designation: ""
+  designation: "",
+  currency: ""
 }
 
 export const profileDetailsPastEmployees : IProfilePastEmployees = {
