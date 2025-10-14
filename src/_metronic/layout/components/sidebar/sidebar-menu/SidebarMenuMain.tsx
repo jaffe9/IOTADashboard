@@ -54,6 +54,7 @@ const SidebarMenuMain = () => {
       </div>
       <SidebarMenuItem to='/claim' icon='dollar' title='Claims' fontIcon='bi-layers' />
       <SidebarMenuItem to='/getInvoiceDetails' icon='note-2' title='Invoice Details' fontIcon='bi-layers' />
+      <SidebarMenuItem to='/employeePayslip' icon='scroll' title='Upload Payslip' fontIcon='bi-layers'/>
       <div className='menu-item'>
       </div>
       <div className='menu-item'>

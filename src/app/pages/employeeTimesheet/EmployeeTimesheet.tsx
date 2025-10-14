@@ -79,6 +79,7 @@ const EmployeeTimesheet: FC = () => {
       client: hasMatch.companyName,
       fName: userName,
       sEmployee: hasMatch.employeeId,
+      associatedUserId : hasMatch.id
     });
   };
 
@@ -115,6 +116,7 @@ const EmployeeTimesheet: FC = () => {
           employeeId: data.sEmployee,
           employeeName: data.fName,
           employeeClient: data.client,
+          associatedUserId : data.associatedUserId,
           timesheetMonthYear: data.monthyear,
           workingDays: data.workingDays,
           holidayDays: data.holidays,
@@ -126,10 +128,11 @@ const EmployeeTimesheet: FC = () => {
           timesheetFileLocation:timesheetFileLocation,
           sentToFinance: "",
           approvedDate: undefined,
-          approvedBy: undefined,
+          approvedBy: data.approvedBy,
           approved: undefined,
         
         };
+        console.log("This is the data from Employee Timesheet:", timeSheetRequest)
         const apiResponse = await createEmployeeTimesheet(timeSheetRequest)
         if (apiResponse.status === 201)
           {
@@ -176,6 +179,7 @@ const EmployeeTimesheet: FC = () => {
                     onChange={async (e) => {
                       await handleUserChange(e.target.value);
                       formik.setFieldValue("client", updatedUserInfo.client);
+                      formik.setFieldValue("associatedUserId", updatedUserInfo.associatedUserId)
                     }}
                     value={initialValues.fName}
                   > 
@@ -326,6 +330,27 @@ const EmployeeTimesheet: FC = () => {
                           </div>
                         </div>
                       )}
+                    </div>
+                  </div>
+
+                  <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label required fw-bold fs-6">
+                      Approved By
+                    </label>
+                    <div className="col-lg-8 fv-row">
+                    
+                      <input
+                      type="text"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Time Sheet Approved By"
+                      
+                      onChange={(value) => {
+                        updateData({ approvedBy: value.target.value });
+                        formik.setFieldValue("approvedBy",value.target.value)
+                        }}
+                      >
+                        
+                      </input>
                     </div>
                   </div>
                   

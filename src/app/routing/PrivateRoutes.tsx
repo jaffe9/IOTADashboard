@@ -10,6 +10,7 @@ import OpportunityPage from '../modules/apps/opportunity/OpportunityPage'
 import { CreateProposal } from '../pages/proposalPage/createProposal'
 import { CreatePastEmployee } from '../pages/createEmployee/createPastEmployee'
 import { TablesWidget15 } from '../../_metronic/partials/widgets/tables/TablesWidget15'
+import { CreatePayslip } from '../pages/Payslips/createPayslips'
 
 const PrivateRoutes = () => {
   // Existing lazy loaded components
@@ -28,6 +29,7 @@ const PrivateRoutes = () => {
   const ContractPageWrapper = lazy(() => import('../pages/contractPage/ContractPageWrapper'))
   const CreateEmployeeWrapper = lazy(() => import('../pages/createEmployee/CreateEmployeeWrapper'))
   const UpdateEmployee = lazy(() => import('../pages/createEmployee/UpdateEmployee').then(module => ({ default: module.UpdateEmployee })))
+  const CreatePayslip = lazy(() => import('../pages/Payslips/createPayslips').then(module => ({ default: module.CreatePayslip })))
   const GetInvoiceDetails = lazy(() => import('../pages/invoiceInfo/invoiceDetails').then(module => ({ default: module.GetInvoiceDetails })))
   const UpdateSalary = lazy(() => import('../pages/salaryIncrement/updateSalary').then(module => ({ default: module.UpdateSalary })))
   const AddNewSalary = lazy(() => import('../pages/salaryIncrement/Salary').then(module => ({ default: module.AddNewSalary })))
@@ -63,6 +65,14 @@ const PrivateRoutes = () => {
           element={
             <SuspensedView>
               <EmployeeTimesheetWrapper />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='employeePayslip'
+          element={
+            <SuspensedView>
+              <CreatePayslip />
             </SuspensedView>
           }
         />

@@ -1,5 +1,5 @@
 import axios, { isAxiosError } from "axios";
-import { Proposal } from "../app/modules/apps/user-management/users-list/core/_models";
+import { Proposal, Payslips } from "../app/modules/apps/user-management/users-list/core/_models";
 
 axios.defaults.headers.common['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
 axios.defaults.headers.common['apikey'] = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
@@ -101,3 +101,102 @@ export const updateProposalData = async (p: Proposal): Promise<{status:number; m
     return { status: 500, message: "Error updating proposal" };
   }
 };
+
+
+export const createPayslip = async (p: Payslips): Promise<{status:number; message:string}> => {
+  const data = JSON.stringify([
+    {
+        associatedUserId : p.associatedUserId,
+        paySlipLink : p.paySlipLink ,
+        monthYear : p.monthYear,
+        fullName : p.fullName,
+    }
+  ]);
+  console.log("APIData:" + data);
+  const config = {
+    method: 'post',
+    url: `${API_URL}/payslipTable`,
+    headers: {
+      'apikey': `${axios.defaults.headers.common['apikey']}`, // Use environment variable
+      'Authorization' :`${axios.defaults.headers.common['Authorization']}`, // Use environment variable
+      'Content-Type': 'application/json'
+    },
+    data: data
+  };
+
+  try {
+    const response = await axios.request(config);
+    
+    if (response.status === 201) {
+      return { status: response.status, message: "Success" }; // Return an object
+    } else {
+     return { status: response.status, message: "Failed" }; // Return an object
+    }
+  } catch (error) {
+    console.error("Error creating payslip:", error);
+    return { status: 500, message: "Error occurred while creating payslip" }; // Return an object
+  }
+};
+
+export const uploadPayslipsToSupabase= async (file: File): Promise<string | null> => {
+  const filePath = `iwt_payslips/${setYear}/${update_date}/${file.name}`;
+
+  const uploadConfig = {
+    method: 'POST',
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
+    },
+    data: file,
+  };
+
+  try {
+    // Step 1: Upload to Supabase
+    const uploadResponse = await axios(uploadConfig);
+    if (uploadResponse.status !== 200) throw new Error("Upload failed");
+
+    // Step 2: Generate Signed URL (1 year)
+    const signedUrlResponse = await axios.post(
+      `${STORAGE_URL}/object/sign/${filePath}`,
+      { expiresIn: 60 * 60 * 24 * 365 * 20 },
+      {
+        headers: {
+          'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (
+      signedUrlResponse.status !== 200 ||
+      !signedUrlResponse.data?.signedURL
+    ) {
+      throw new Error("Failed to generate signed URL");
+    }
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+
+    // // Step 3: Shorten the Signed URL
+    // const shortenResponse = await axios.get(
+    //   `${CREATE_SHORT_URL}`,
+    //   {
+    //     params: { url: fullSignedUrl },
+    //   }
+    // );
+
+    // if (
+    //   shortenResponse.status === 200 &&
+    //   shortenResponse.data?.secureShortURL
+    // ) {
+    //   return shortenResponse.data.secureShortURL; //  This will go into invoice_url
+    // } else {
+    //   throw new Error("Short URL generation failed");
+    // }
+    return fullSignedUrl
+  } catch (error) {
+    console.error('Error uploading, signing, or shortening invoice URL:', error);
+    return null;
+  }
+}; 

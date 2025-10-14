@@ -46,6 +46,7 @@ export interface IProfileDetails {
   }
   loadDefault: boolean;
   associatedAccountManager : number;
+  approvedBy : string
 }
 
 export interface IProfilePastEmployees{
@@ -186,6 +187,13 @@ export type IProfileDetailsProposals = {
   currency:string;
 }
 
+export type IProfileDetailsPayslips = {
+   associatedUserId : number,
+   fullName : string,
+   paySlipLink : any ,
+   monthYear : string 
+}
+
 export interface IUpdateEmail {
   newEmail: string;
   confirmPassword: string;
@@ -293,6 +301,7 @@ export const profileDetailsInitValues: IProfileDetails = {
   email: "",
   associatedAccountManager: 0,
   id: 0,
+  approvedBy : ""
 };
 
 export const profileDetailsInitValuesContract: IProfileDetailsContract = {
@@ -415,6 +424,13 @@ export const profileDetailsProposals : IProfileDetailsProposals = {
   currency: ""
 }
 
+export const profileDetailsPayslips : IProfileDetailsPayslips = {
+  associatedUserId : 0,
+  paySlipLink : "",
+  fullName : "",
+  monthYear : ""
+}
+
 export const profileDetailsPastEmployees : IProfilePastEmployees = {
   client_id: 0,
   fullName: "",
@@ -489,3 +505,4 @@ export const notifications: INotifications = {
 export const deactivateAccount: IDeactivateAccount = {
   confirm: false,
 };
+

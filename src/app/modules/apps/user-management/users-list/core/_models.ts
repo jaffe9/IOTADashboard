@@ -167,8 +167,9 @@ export type TimesheetRequest = {
   "timesheetFileLocation": string | null,
   sentToFinance: any
   approvedDate: any
-  approvedBy: any
+  approvedBy: string
   approved: any
+  associatedUserId:number,
   "workingDays": string,
   "employeeId": string,
   "employeeName": string,
@@ -298,6 +299,12 @@ export type Proposal = {
   designation: string;
 }
 
+export type Payslips = {
+  associatedUserId : number,
+  paySlipLink : string ,
+  fullName : string,
+  monthYear : string
+}
 export const initialUser: User = {
   employeeId: 'avatars/300-6.jpg',
   occupation: 'Art Director',

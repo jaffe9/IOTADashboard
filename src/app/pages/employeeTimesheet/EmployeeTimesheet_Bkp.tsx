@@ -103,6 +103,7 @@ const EmployeeTimesheet: FC = () => {
           employeeId: data.sEmployee,
           employeeName: data.fName,
           employeeClient: data.client,
+          associatedUserId : data.associatedUserId,
           timesheetMonthYear: data.monthyear,
           workingDays: data.workingDays,
           holidayDays: data.holidays,
@@ -114,7 +115,7 @@ const EmployeeTimesheet: FC = () => {
           timesheetFileLocation:"",
           sentToFinance: "",
           approvedDate: undefined,
-          approvedBy: undefined,
+          approvedBy: data.approvedBy,
           approved: undefined,
         
         };

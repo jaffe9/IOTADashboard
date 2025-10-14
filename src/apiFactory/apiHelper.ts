@@ -342,7 +342,7 @@ export const getContractForAction = async (id: string) => {
 export const getAllEmployees = async () => {
   try{
     const response = await axiosEncoreInstance.get('/getAllEmp')
-  //  console.log("Response for getAllEmployee  :", response.data)
+    // console.log("Response for getAllEmployee  :", response.data)
     return response.data.getAllEmp;
   }catch(error){
     if(axios.isAxiosError(error)){
@@ -351,7 +351,7 @@ export const getAllEmployees = async () => {
       console.log("Error in getiiin getAllEmployee  : ", error)
     }
   }
-};getAllEmployees()
+};
 
 export const getAllClaimEmployees = async () => {
    try{
@@ -1990,6 +1990,7 @@ export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<{sta
     {
       employeeId: t.employeeId,
       employeeName: t.employeeName,
+      associatedUserId : t.associatedUserId,
       employeeClient: t.employeeClient,
       timesheetMonthYear: t.timesheetMonthYear,
       workingDays:t.workingDays,
@@ -1997,8 +1998,8 @@ export const createEmployeeTimesheet = async (t: TimesheetRequest): Promise<{sta
       holidayDates: t.holidayDates,
       leaveDays: t.leaveDays,
       leaveDates: t.leaveDates,
-      approved:false,
-      approvedBy:null,
+      approved:true,
+      approvedBy:t.approvedBy,
       approvedDate:null,
       sentToFinance:false,
       timesheetFileLocation:t.timesheetFileLocation,
