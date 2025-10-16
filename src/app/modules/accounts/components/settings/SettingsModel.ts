@@ -46,7 +46,8 @@ export interface IProfileDetails {
   }
   loadDefault: boolean;
   associatedAccountManager : number;
-  approvedBy : string
+  approvedBy : string,
+  employeeJoiningDate : string
 }
 
 export interface IProfilePastEmployees{
@@ -301,7 +302,8 @@ export const profileDetailsInitValues: IProfileDetails = {
   email: "",
   associatedAccountManager: 0,
   id: 0,
-  approvedBy : ""
+  approvedBy : "",
+  employeeJoiningDate: ""
 };
 
 export const profileDetailsInitValuesContract: IProfileDetailsContract = {

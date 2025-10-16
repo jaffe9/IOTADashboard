@@ -73,6 +73,7 @@ const UpdateEmployee: FC = () => {
       companyName:hasMatch.companyName,
       phone : hasMatch.phone,
       language : hasMatch.language,
+      employeeJoiningDate :hasMatch.employeeJoiningDate
     });
   };
 
@@ -106,7 +107,8 @@ const UpdateEmployee: FC = () => {
           client_id: data.client_id,
           contract_id : data.contract_id,
           associatedAccountManager: data.associatedAccountManager,
-          id: data.id
+          id: data.id,
+          employeeJoiningDate : data. employeeJoiningDate
         };
         console.log("updated employee response:" , tempEmp)
         const apiResponse = await updateEmployeeData(tempEmp)
@@ -376,6 +378,35 @@ const UpdateEmployee: FC = () => {
                         </option>
                       ))}
                     </select>
+                    </div>
+                  </div>
+
+                  <div className="row mb-6">
+                      <label className="col-lg-4 col-form-label fw-bold fs-6">
+                        <span className="required">Joininig Date</span>
+                      </label>
+                    <div className="col-lg-8 fv-row">
+                      <Flatpickr
+                        className="form-control form-control-lg form-control-solid"
+                        options={{
+                          mode: "single",
+                          dateFormat: "Y-M-D",
+                        }}
+                        onChange={(selectedDates) => {
+                            updateData({ 
+                              employeeJoiningDate: selectedDates.toLocaleString("en", {
+                            year: "numeric",
+                            month : "2-digit",
+                            day : "2-digit",
+                            }).replace(/\//g, "-") });                      
+                        }}
+                      />
+                      {formik.touched.employeeJoiningDate && formik.errors.employeeJoiningDate && (
+                       <div className="fv-plugins-message-container">
+                        <div className="fv-help-block">
+                          {formik.errors.employeeJoiningDate}
+                        </div>
+                       </div>)}
                     </div>
                   </div>
 

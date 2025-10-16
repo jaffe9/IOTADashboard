@@ -91,7 +91,8 @@ const CreateEmployee: FC = () => {
           client_id: data.client_id,
           associatedAccountManager: data.associatedAccountManager,
           id: 0,
-          contract_id: ""
+          contract_id: "",
+          employeeJoiningDate : data.employeeJoiningDate,
         };
         console.log("Temp employee response:" , tempEmp)
         const apiResponse = await createTempEmployee(tempEmp)
@@ -328,6 +329,35 @@ const CreateEmployee: FC = () => {
                           </div>
                         </div>
                       )}
+                    </div>
+                  </div>
+
+                  <div className="row mb-6">
+                      <label className="col-lg-4 col-form-label fw-bold fs-6">
+                        <span className="required">Joininig Date</span>
+                      </label>
+                    <div className="col-lg-8 fv-row">
+                      <Flatpickr
+                        className="form-control form-control-lg form-control-solid"
+                        options={{
+                          mode: "single",
+                          dateFormat: "Y-M-D",
+                        }}
+                        onChange={(selectedDates) => {
+                            updateData({ 
+                              employeeJoiningDate: selectedDates.toLocaleString("en", {
+                            year: "numeric",
+                            month : "2-digit",
+                            day : "2-digit",
+                            }).replace(/\//g, "-") });                      
+                        }}
+                      />
+                      {formik.touched.employeeJoiningDate && formik.errors.employeeJoiningDate && (
+                       <div className="fv-plugins-message-container">
+                        <div className="fv-help-block">
+                          {formik.errors.employeeJoiningDate}
+                        </div>
+                       </div>)}
                     </div>
                   </div>
 

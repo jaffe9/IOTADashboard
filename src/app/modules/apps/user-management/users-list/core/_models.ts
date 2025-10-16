@@ -264,6 +264,7 @@ export type temEmp = {
 "client_id" : number,
 "associatedAccountManager" : number,
 "contract_id": string,
+employeeJoiningDate : string
 }
 
 export type ListOfTimesheet = {

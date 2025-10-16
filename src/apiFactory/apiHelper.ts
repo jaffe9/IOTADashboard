@@ -1191,7 +1191,7 @@ export const updateEmployeeData = async (t: temEmp): Promise<{status:number; mes
       //  communication : null,
       address : t.address,
       socialNetworks : null,
-      // employeeJoiningDate : null,
+      employeeJoiningDate : t.employeeJoiningDate,
       loginId : null,
       // employeeId : null,
       employeeBand : null,
@@ -1260,7 +1260,6 @@ export const createTempEmployee = async (t: temEmp): Promise<{status:number; mes
     //  communication : null,
       address : t.address,
       socialNetworks : null,
-      employeeJoiningDate : null,
       loginId : null,
       employeeId : null,
       employeeBand : null,
@@ -1269,6 +1268,7 @@ export const createTempEmployee = async (t: temEmp): Promise<{status:number; mes
       isActive : true,
       contract_id : null,
       associatedAccountManager : t.associatedAccountManager,
+      employeeJoiningDate : t.employeeJoiningDate,
 
     }
   ]);
