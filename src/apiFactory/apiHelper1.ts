@@ -200,3 +200,20 @@ export const uploadPayslipsToSupabase= async (file: File): Promise<string | null
     return null;
   }
 }; 
+
+// get the salaries for payslips generation 
+export const getSalForPay = async (employeeId : string) => {
+  try{
+    const response = await axiosInstance.get(
+      `user?id=eq.${employeeId}&select=*,salary(user_id,*)`
+    );
+    console.log("Response for getSalaray for payslip  :", response.data)
+    return response.data;
+  }catch(error){
+    if(axios.isAxiosError(error)){
+       console.log("Error in getting getting sal for payslips  :" , error.response?.data || error.message )
+    }else{
+      console.log("Error in getiing salaries for payslips  : ", error)
+    }
+  }
+};
