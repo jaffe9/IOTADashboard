@@ -11,6 +11,7 @@ import { ToolbarWrapper } from '../../../../../_metronic/layout/components/toolb
 import { Content } from '../../../../../_metronic/layout/components/content'
 import { IqamaListViewProvider, useIqamaListView  } from './core/IqamaListViewProvider'
 import { ContractListViewProvider, useContractListView } from './core/ContractListViewProvider'
+import { PayslipModal } from './user-edit-modal/PayslipModel'
 
 
 const UsersList = () => {
@@ -24,7 +25,7 @@ const UsersList = () => {
         <UsersListHeader />
         <UsersTable />
       </KTCard>
-      {itemIdForUpdate !== undefined && <UserEditModal />}
+       {itemIdForUpdate !== undefined && <PayslipModal />} {/* ✅ CHANGED */}
       {itemIqamaForUpdate !== undefined && <IqamaEditModal />}
       { itemContractForUpdate !== undefined && <ContractEditModal/>}
     </>
@@ -32,14 +33,18 @@ const UsersList = () => {
 }
 
 const UsersListWrapper = () => (
-  <QueryRequestProvider>
+ <QueryRequestProvider>
     <QueryResponseProvider>
-      <ListViewProvider> || <IqamaListViewProvider> || <ContractListViewProvider>
-        <ToolbarWrapper />
-        <Content>
-          <UsersList />
-        </Content>
-        </ContractListViewProvider> || </IqamaListViewProvider> || </ListViewProvider> 
+      <ListViewProvider>
+        <IqamaListViewProvider>
+          <ContractListViewProvider>
+            <ToolbarWrapper />
+            <Content>
+              <UsersList />
+            </Content>
+          </ContractListViewProvider>
+        </IqamaListViewProvider>
+      </ListViewProvider>
     </QueryResponseProvider>
   </QueryRequestProvider>
 )
