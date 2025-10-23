@@ -5,6 +5,9 @@ import { Salary } from "../../modules/apps/user-management/users-list/core/_mode
 import { apiHelper, updateSalaryIncrement } from "../../../apiFactory/apiHelper";
 import { KTIcon, useDebounce } from "../../../_metronic/helpers";
 import { MenuComponent } from "../../../_metronic/assets/ts/components";
+import { sendAllPayslips} from "../../../_metronic/helpers/SendPayslipToEmp";
+
+
 
 const UpdateSalary: FC = () => {
   const [allUserInfo, setAllUserInfo] = useState<Salary[]>([]);
@@ -15,6 +18,22 @@ const UpdateSalary: FC = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const [loadPay, setLoadPay] = useState(false)
+
+
+  const handleSendPayslips = async () => {
+    setLoadPay(true);
+    try{
+      await sendAllPayslips()
+      alert("All payslips sent Successfully!")
+    }catch(error){
+     console.error("Error in sending Payslips:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    alert(`Error sending payslips: ${errorMessage}`);
+    }finally{
+      setLoadPay(false)
+    }
+  }
   
   // Debounce search term
   const debouncedSearchTerm = useDebounce(searchTerm, 150);
@@ -200,6 +219,17 @@ const UpdateSalary: FC = () => {
             >
               <KTIcon iconName="filter" className="fs-2" />
               Filter
+            </button>
+          {/* Send Payslip Button */}
+            <button
+              type="button"
+              className="btn btn-light-primary me-3"
+              onClick={handleSendPayslips}
+              disabled={loadPay}
+              data-kt-menu-placement="bottom-end"
+            >
+              <KTIcon iconName="ki-duotone ki-arrow-up-right" className="fs-2"  />
+              {loadPay ? "Sending..." : "Payslips"}
             </button>
             
             {/* Filter SubMenu */}

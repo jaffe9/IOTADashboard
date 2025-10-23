@@ -217,3 +217,42 @@ export const getSalForPay = async (employeeId : string) => {
     }
   }
 };
+
+export const fetchPayslip = async (month : string, year : string) => {
+   try{
+     const response = await axiosInstance.get(`payslipTable?select=associatedUserId(fullName,email),paySlipLink&monthYear=eq.${month} ${year}`)
+     return response.data
+   }catch(error){
+     if(isAxiosError(error)){
+      console.error("Error in fetching PaySlips of Employee :", error.response?.data)
+     }else{
+      console.error("Some internal Server Error :", error)
+     }
+   }
+}
+
+
+export const sendPayslipEmail = async (email: string, name: string, link: string, month: string, year: string) => {
+  try {
+    const response = await axiosEncoreInstance.post(
+      "/sendPayslipEmail",
+      { email, name, link, month, year },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    console.log(`Email sent to ${email}:`, response.data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error in sending payslip email:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+        url: error.config?.url,
+        payload: { email, name, link, month, year }
+      });
+    } else {
+      console.error("Error in sending payslip email:", error);
+    }
+    throw error;
+  }
+};
