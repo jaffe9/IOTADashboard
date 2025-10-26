@@ -18,7 +18,7 @@ type LeaveBalanceRecord = {
   leaves_used: number;
   leave_left_current_year:number;
   year:number;
-  user_id: { id : number , username: string , companyName:string , employeeJoiningDate:string , contract_id:{billing_months: number} };
+  user_id: { id : number , username: string , companyName:string , employeeJoiningDate:string , contract_id:{billing_months: number}, pic : string };
   isActive:string
 };
 
@@ -264,59 +264,6 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
 };
 
 
-// To dynamically change logo of clients based on activeTab
-const updatePicUrl = (user_id : { username: string}) => {
-  switch (user_id.username){
-    case 'Balasubramanian' :
-        return '/media/svg/ConsultantPhotos/Bala_Pic.jpeg'
-    case 'Baskar Muniyandi' :
-        return '/media/svg/ConsultantPhotos/Baskar_Pic.jpg'
-    case 'Hala Abukhalaf' :
-        return '/media/svg/ConsultantPhotos/Hala_Pic.jpeg'
-    case 'Rakesh Kumar':
-        return '/media/svg/ConsultantPhotos/Rakesh_pic.png'
-    case 'Sadath Khan' :
-        return '/media/svg/ConsultantPhotos/Sadath_Pic.jpeg'
-    case 'Samiullah Kaleemullah' :
-        return '/media/svg/ConsultantPhotos/Samiullah_Pic.jpeg'
-    case 'Sandeep Puppala' :
-        return '/media/svg/ConsultantPhotos/Sandeep_Pic.jpeg'
-    case 'Thameem Ansari' :
-        return '/media/svg/ConsultantPhotos/Thameem_Pic.jpeg'
-    case 'Vignesh Prakesh' :
-        return '/media/svg/ConsultantPhotos/Vignesh_Pic.jpeg'
-    case 'Waseem Khan' :
-        return '/media/svg/ConsultantPhotos/Wasim_Pic.jpeg'
-    case 'Venkata Tejesh' :
-        return "/media/svg/ConsultantPhotos/Tejesh_Pic.jpeg"
-    case 'Nandha Kumar' :
-         return '/media/svg/ConsultantPhotos/Nandha_kumar_Ramamoorty_Pic.jpg'
-    case 'Faiz Mohammed' :
-         return '/media/svg/ConsultantPhotos/Faiz_Mahmood_Khan_Pic.jpg'
-    case 'Vignesh Rajan' :
-         return 'media/svg/ConsultantPhotos/Vignesh_Rajan_Amex.jpg'
-    case 'Ahmed Elsobky' :
-         return 'media/svg/ConsultantPhotos/Ahmed_Elsobkey.jpg'
-    case 'Zakir Hussain' :
-         return 'media/svg/ConsultantPhotos/Zakir_Hussain.jpg'
-    case 'Pradeep Kumar' :
-         return 'media/svg/ConsultantPhotos/Pradeep_Kumar_Pic.jpg'
-    case 'Amal Al Waheed':
-         return 'media/svg/ConsultantPhotos/Amal_Al_Waheed.jpeg'
-    case 'Venkateshwara Reddy Y':
-         return 'media/svg/ConsultantPhotos/VenkateshwaraYReddy.jpeg'
-    case 'Yasmine Khaldi':
-         return 'media/svg/ConsultantPhotos/Yasmine_Khaldi.jpg'
-    case 'Syeda Zeba' :
-         return 'public/media/svg/ConsultantPhotos/Syeda_Zeba.jpeg'
-    case 'Marwa Shalot' :
-         return 'media/svg/ConsultantPhotos/Marwa Pic.jpg'
-    case 'John Seleb' :
-         return 'media/svg/ConsultantPhotos/John Pic.jpeg'
-  }
-}
-
-
 // Helper Function to Render Table
 const renderTable = (records: LeaveBalanceRecord[] , handleOpenModal: any  ) => {
   return (
@@ -345,7 +292,7 @@ const renderTable = (records: LeaveBalanceRecord[] , handleOpenModal: any  ) => 
                 <div className="h-screen flex items-center justify-center">
                   <span className="symbol-label">
                     <img
-                      src={updatePicUrl({username: record.user_id.username})}
+                      src={record.user_id.pic}
                       className=""
                       style={{
                         height : '60px',

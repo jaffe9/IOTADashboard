@@ -25,7 +25,7 @@ const admin = "db273513-e759-4f6a-99b4-8371423a45b8";
 const getUsers = async (query: string) : Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  // console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select=id,username,email,firstName,lastName,occupation,companyName,phone,employeeJoiningDate,employeeId&isClientFacing=eq.1&order=id`;
@@ -50,7 +50,7 @@ const getUsers = async (query: string) : Promise<UsersQueryResponse> => {
 const getUserById = async (id: ID): Promise<User | undefined> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  // console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_USERS_URL}?select=username,email,firstName,lastName,occupation,timeZone,phone,employeeJoiningDate,pic&id=eq.${id}`;
@@ -132,7 +132,7 @@ const UpdateIqamaExp = async(iq:National_id) : Promise<any> => {
  const getEmpForIqamaInForm = async () : Promise<UsersQueryResponse> => {
   let url = "";
   const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-  console.log("From api Helper:", loggedUser)
+  // console.log("From api Helper:", loggedUser)
   if (loggedUser === `${admin}`) {
     // Admin case
     url = `${GET_IQAMA_DETAILS_URL}?select=id,national_id,expiry_date,associated_user_id(username,email)&order=id`;
@@ -192,7 +192,7 @@ const UpdateContractExp = async(c:Contract) : Promise<any> => {
  const getEmpForContractInForm = async () : Promise<UsersQueryResponse> => {
     let url = "";
     const loggedUser =  getLoggedUser(); // Get the currently logged-in user
-    console.log("From api Helper:", loggedUser)
+    // console.log("From api Helper:", loggedUser)
     if (loggedUser === `${admin}`) {
       // Admin case
       url = `${GET_CONTRACT_DETAILS_URL}?select=id,client_id(client_name),contract_no,billing_start_date,billing_end_date,billing_months,associatedAccountManager(accountManagerName),contract_date,contract_end_date,billing_value,associated_user_id(username,email)&order=id`;

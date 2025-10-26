@@ -2,7 +2,7 @@ import { useState, FC, useEffect } from "react";
 import { useFormik } from "formik";
 
 import { IProfileDetailsPayslips, profileDetailsPayslips as initialValues } from "../../modules/accounts/components/settings/SettingsModel";
-import { createPayslip, uploadPayslipsToSupabase } from "../../../apiFactory/apiHelper1";
+import { checkPayslipExist, createPayslip, uploadPayslipsToSupabase } from "../../../apiFactory/apiHelper1";
 import { apiHelper,getAllEmployees } from "../../../apiFactory/apiHelper";
 
 // var allUserInfo: any = await apiHelper.getAllEmployees().then((data) => data.data);
@@ -46,50 +46,69 @@ useEffect(() => {
     setFile(event.target.files[0]);
   };
 
-  const handleUpload = async () => {
-    if (!file) {
-      alert("Please select a payslip file");
-      return;
-    }
+  // const handleUpload = async () => {
+  //   if (!file) {
+  //     alert("Please select a payslip file");
+  //     return;
+  //   }
 
-    try {
-      const payslipUrl = await uploadPayslipsToSupabase(file);
-      if (!payslipUrl) {
-        alert("Payslip upload failed");
-        return;
-      }
-      updateData({ paySlipLink: payslipUrl });
-      alert("Payslip uploaded successfully");
-    } catch (error) {
-      console.error("Error uploading payslip:", error);
-      alert("Error uploading payslip");
-    }
-  };
+  //   try {
+  //     const payslipUrl = await uploadPayslipsToSupabase(file);
+  //     if (!payslipUrl) {
+  //       alert("Payslip upload failed");
+  //       return;
+  //     }
+  //     updateData({ paySlipLink: payslipUrl });
+  //     alert("Payslip uploaded successfully");
+  //   } catch (error) {
+  //     console.error("Error uploading payslip:", error);
+  //     alert("Error uploading payslip");
+  //   }
+  // };
 
   const formik = useFormik<IProfileDetailsPayslips>({
     initialValues,
     onSubmit: async () => {
       setLoading(true);
-      setTimeout(async () => {
+      // setTimeout(async () => {
         const updatedData = Object.assign(data, updatedPayslips);
         console.log("This is the data from payslip :", updatedData)
         setData(updatedData);
 
-         let paySlipUrl : null | string = null 
-        if(file){
-          paySlipUrl = await uploadPayslipsToSupabase(file)
-              if (!paySlipUrl) {
-              alert("PaySlip upload failed");
-              setLoading(false);
-              return;
-             }
-         }
-
-        if (data.associatedUserId < 1 || !data.paySlipLink || !data.monthYear) {
+        if (data.associatedUserId < 1  || !data.monthYear) { //|| !data.paySlipLink
           alert("Please fill all required fields");
           setLoading(false);
           return;
         }
+
+        // Add file check separately
+        if (!file) {
+          alert("Please upload a payslip file");
+          setLoading(false);
+          return;
+        }
+
+      const exists = await checkPayslipExist(data.associatedUserId,data.monthYear);
+      console.log("This is data form exits :" , exists)
+      if (exists) {
+            alert(`A payslip for ${data.fullName} already exists for ${data.monthYear}. Please check existing records.`);
+            setLoading(false);
+            return;
+        }
+
+          let paySlipUrl: null | string = null;
+          if (file) {
+            paySlipUrl = await uploadPayslipsToSupabase(file);
+            if (!paySlipUrl) {
+              alert("PaySlip upload failed");
+              setLoading(false);
+              return;
+            }
+          } else {
+            alert("Please upload a payslip file");
+            setLoading(false);
+            return;
+          }
        
         const payslipData: IProfileDetailsPayslips = {
           fullName : data.fullName,
@@ -109,7 +128,7 @@ useEffect(() => {
           alert("An error occurred, please try again later");
           setLoading(false);
         }
-      }, 1000);
+      // }, 1000);
     },
   });
 
@@ -163,7 +182,7 @@ useEffect(() => {
                       onChange={(e) => {
                         const [year,month] = e.target.value.split("-");
                         const date = new Date(Number(year), Number(month)-1);
-                        const formatted_date = date.toLocaleString("en-IN", {month : "short", year : "numeric"});
+                        const formatted_date = date.toLocaleString("en-US", {month : "short", year : "numeric"});
                         updateData({monthYear : formatted_date})
                         formik.setFieldValue("monthYear", formatted_date);
                       }}
@@ -199,7 +218,7 @@ useEffect(() => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={handleUpload}
+                    // onClick={handleUpload}
                   >
                     {!loading && "Save Payslip"}
                     {loading && (

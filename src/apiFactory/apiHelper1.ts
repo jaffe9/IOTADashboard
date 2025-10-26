@@ -1,6 +1,7 @@
 import axios, { isAxiosError } from "axios";
 import { Proposal, Payslips } from "../app/modules/apps/user-management/users-list/core/_models";
 
+
 axios.defaults.headers.common['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
 axios.defaults.headers.common['apikey'] = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
 
@@ -254,5 +255,27 @@ export const sendPayslipEmail = async (email: string, name: string, link: string
       console.error("Error in sending payslip email:", error);
     }
     throw error;
+  }
+};
+
+// Check for existing payslip before uploading 
+export const checkPayslipExist = async (id: number, monthYear: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `payslipTable?select=associatedUserId,monthYear&associatedUserId=eq.${id}&monthYear=eq.${monthYear}`
+    );
+   
+    console.log("This is response from checkPayslip : ", response.data, response.config.url)
+    // Return true if array has items, false if empty
+    return response.data && response.data.length > 0;
+    
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error from checkPayslips:", error.response?.data);
+    } else {
+      console.error("Internal server error while checking existing payslip!");
+    }
+    // Return false on error to allow submission (or throw error to prevent it)
+    return false;
   }
 };

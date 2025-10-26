@@ -309,7 +309,7 @@ const handleClaimupload = async () => {
                       <input
                       type="file"
                       className="form-control form-control-lg form-control-solid"
-                      placeholder="Upload TimeSheet"
+                      placeholder="Upload Claim file"
                       onChange={handelFileChange}
                       />
                       {/* <span className="input-group-badge badge badge-success cursor-pointer"
@@ -337,7 +337,7 @@ const handleClaimupload = async () => {
                     }}
                     //value={initialValues.expenseBy}
                   > 
-                    <option value="">Select Account Manager</option>
+                    <option value="">Select Expense Paid By</option>
                     {allUserInfo.manager.map((data: any, i: number) => (
                       <option key={i} value={data.accountManagerName} hidden={data.isDisabled == true}>
                         {data.accountManagerName}

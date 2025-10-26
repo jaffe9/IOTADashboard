@@ -69,7 +69,13 @@ const axiosInstance = axios.create({
     'Authorization': `${axios.defaults.headers.common['Authorization']}`
   }
 });
-
+const axiosSupaFuncInstance = axios.create({
+  baseURL: 'https://zhplktaovpyenmypkjql.supabase.co/functions/v1',
+  headers: {
+    'apikey': `${axios.defaults.headers.common['apikey']}`,
+    'Authorization': `${axios.defaults.headers.common['Authorization']}`
+  }
+});
 const axiosEncoreInstance = axios.create({
   baseURL: 'https://staging-iwtapiserver-6x92.encr.app',
   headers: {
@@ -273,7 +279,7 @@ export const getPaidInvoices = async () => {
 export const getSalaryInfoByEmployee = async (id: any) => {
   try{
     const response = await axiosEncoreInstance.get(`/empSalInfo?id=${id}`, { timeout : 1500 } )
-   console.log("Response for getSalaryInfoByEmployee  :", response.data)
+  //  console.log("Response for getSalaryInfoByEmployee  :", response.data)
     return response.data;
   }catch(error){
     if(axios.isAxiosError(error)){
@@ -1155,6 +1161,7 @@ const config = {
 try {
   const response = await axios.request(config);
   console.log(`User moved successfully : ${JSON.stringify(response.data)}`)
+  await axiosSupaFuncInstance.get('/database-access')
   return response.data
 
 }catch(e){
