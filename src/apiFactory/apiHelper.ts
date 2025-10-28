@@ -1271,6 +1271,7 @@ export const createTempEmployee = async (t: temEmp): Promise<{status:number; mes
       employeeId : null,
       employeeBand : null,
       isClientFacing : true,
+      onNationalId : false,
       client_id : t.client_id,
       isActive : true,
       contract_id : null,

@@ -11,6 +11,7 @@ import { CreateProposal } from '../pages/proposalPage/createProposal'
 import { CreatePastEmployee } from '../pages/createEmployee/createPastEmployee'
 import { TablesWidget15 } from '../../_metronic/partials/widgets/tables/TablesWidget15'
 import { CreatePayslip } from '../pages/Payslips/createPayslips'
+import { CreateNationalIdInfo } from '../pages/NationalIdPage/createNationalId'
 
 const PrivateRoutes = () => {
   // Existing lazy loaded components
@@ -161,6 +162,14 @@ const PrivateRoutes = () => {
           element={
             <SuspensedView>
               <ExpenseManager />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='/dashboard/postNatId'
+          element={
+            <SuspensedView>
+              <CreateNationalIdInfo />
             </SuspensedView>
           }
         />

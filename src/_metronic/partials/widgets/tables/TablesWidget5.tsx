@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import { getNationalIdExp } from '../../../../apiFactory/apiHelper';
 import { error } from 'console';
+import { Link } from 'react-router-dom';
 
 type Props = {
   className: string
@@ -61,15 +62,12 @@ const TablesWidget5 = ({ className }: Props) => {
         </h3>
         <div className='card-toolbar'>
           <ul className='nav'>
-            <li className='nav-item'>
-              <a
-                className='nav-link btn btn-sm btn-color-muted btn-active btn-active-light-primary active fw-bold px-4 me-1'
-                data-bs-toggle='tab'
-                href='#kt_table_widget_5_tab_1'
-              >
-                
-              </a>
-            </li>
+          <Link
+            to='/dashboard/postNatId'
+            className='btn btn-sm btn-primary fw-bold px-4 me-1'
+          >
+            + National ID
+          </Link>
             <li className='nav-item'>
               <a
                 className='nav-link btn btn-sm btn-color-muted btn-active btn-active-light-primary fw-bold px-4 me-1'

@@ -1,5 +1,6 @@
 import axios, { isAxiosError } from "axios";
 import { Proposal, Payslips } from "../app/modules/apps/user-management/users-list/core/_models";
+import { INationalIdInfo } from "../app/pages/NationalIdPage/createNationalId";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
@@ -276,6 +277,72 @@ export const checkPayslipExist = async (id: number, monthYear: string) => {
       console.error("Internal server error while checking existing payslip!");
     }
     // Return false on error to allow submission (or throw error to prevent it)
+    return false;
+  }
+};
+
+export const getMissingNationalId = async() =>{
+   try{
+     const response = await axiosEncoreInstance.get("/getUserForNId")
+     console.log("Missing National Id are : ", response.data)
+     return response.data
+   }catch(error){
+    if(isAxiosError(error)){
+      console.error("Error in fetching National Id :", error.response?.data)
+    }else{
+      console.error("Internal server error in line 292 of getMissingNationalId")
+    }
+   }
+}
+
+export const createNationalId = async (i:INationalIdInfo): Promise<{status:number; message:string}> => {
+  console.log("Sending National Id response to Encore API:", i);
+
+  try {
+    const response = await axiosEncoreInstance.post('/postNationalId', i, {
+      headers: {
+        'Content-Type': 'application/json',
+        // If your Encore API requires auth token, add here:
+         'Authorization': 'slkjdfoihgiojooe'
+      }
+    });
+
+    if (response.status === 201 || 204) {
+      console.log("Encore API Response:", response.data);
+      return { status: response.data.status, message: response.data.message };
+    } else {
+      console.error("Encore API failed:", response.statusText);
+      return { status: response.status, message: "Failed" };
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("Encore API Error:", error.response?.data || error.message);
+    } else {
+      console.error("Unexpected error:", error);
+    }
+
+    return { status: 500, message: "Error Submitting national id via Encore API" };
+  }
+};
+
+// -------------------------- Check National Id for the user --------------------------------
+export const checkNationalIdExist = async (id: number) => {
+  try {
+    const response = await axiosInstance.get(
+      `nationalIdInfo?select=*&associated_user_id=eq.${id}`
+    );
+   
+    console.log("This is response from CheckNational id : ", response.data, response.config.url);
+    
+    // Return true if array has items, false if empty
+    return response.data && response.data.length > 0;
+    
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error from checkNationalIdExist:", error.response?.data);
+    } else {
+      console.error("Internal server error while checking existing national ID!");
+    }
     return false;
   }
 };
