@@ -5,7 +5,7 @@ import { number } from "yup";
 import { useFormik } from "formik";
 import { IProfileDetailsProposals,profileDetailsProposals as initialValues } from "../../../../app/modules/accounts/components/settings/SettingsModel";
 import { updateProposalData } from "../../../../apiFactory/apiHelper1";
-
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   className: string
@@ -34,7 +34,7 @@ const TablesWidget14: React.FC<Props> = ({ className }) => {
   const [loading, setLoading] = useState(false)
   const [file,setFile] = useState(null)
   const itemsPerPage = 8;
-
+  const navigate = useNavigate()
   // Debounce search term
   const debouncedSearchTerm = useDebounce(searchTerm, 150);
 
@@ -236,7 +236,7 @@ const TablesWidget14: React.FC<Props> = ({ className }) => {
               className="btn btn-light-primary me-3"
             //   data-kt-menu-trigger="click"
             //   data-kt-menu-placement="bottom-end"
-              onClick={() => window.location.href = '/createProposal'} // Replace with actual URL
+             onClick={() => navigate('/createProposal')}// Replace with actual URL
             >
               + Proposal
             </button>

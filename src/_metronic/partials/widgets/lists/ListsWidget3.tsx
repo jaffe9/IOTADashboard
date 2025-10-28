@@ -25,7 +25,8 @@ type LeaveBalanceRecord = {
 const ListsWidget3: React.FC<Props> = ({ className }) => {
   const [expiringRecords, setExpiringRecords] = useState<LeaveBalanceRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<LeaveBalanceRecord[]>([]);
-  const [activeTab, setActiveTab] = useState(2024); // Default to Tab 1 (2024)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [ showConfirm , setShowConfirm ] = useState(false) // Show pop up card to confirm 
   const [ selectedUser , setSelectedUser ] = useState<LeaveBalanceRecord | null>(null)
   const [updatedLeaves , setUpdatedLeaves ] = useState({
@@ -33,6 +34,12 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
     leave_left_current_year: 0,
   }) 
 
+  const paginatedRecords = filteredRecords.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
+
+const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
   const fetchLeaveBalance = async () => {
     try {
       const records = await getLeavesLeft();
@@ -123,7 +130,10 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
     setSelectedUser(null)
     setShowConfirm(false)
   }
-
+  const currentYear = new Date().getFullYear()
+  const [activeTab, setActiveTab] = useState(currentYear)
+  const previousYear = currentYear - 1;
+  const nextYear = currentYear + 1;
   return (
     <div className={`card ${className}`}>
       {/* Card Header */}
@@ -134,33 +144,20 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
         </h3>
         <div className="card-toolbar">
           <ul className="nav">
-            <li className="nav-item">
-              <a
-                className={`nav-link btn btn-sm ${
-                  activeTab === 2024 ? 'btn-active btn-active-light-primary active' : 'btn-color-muted'
-                } fw-bold px-4 me-1`}
-                onClick={() => handleTabClick(2024)}
-              >
-                 2024
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                className={`nav-link btn btn-sm ${
-                  activeTab === 2025 ? 'btn-active btn-active-light-primary active' : 'btn-color-muted'
-                } fw-bold px-4 me-1`}
-                onClick={() => handleTabClick(2025)}
-              >
-                 2025
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                className={`nav-link btn btn-sm btn-color-muted btn-active btn-active-light-primary fw-bold px-4`}
-              >
-                2026
-              </a>
-            </li>
+            {[previousYear, currentYear, nextYear].map((year) => (
+              <li className="nav-item" key={year}>
+                <a
+                  className={`nav-link btn btn-sm ${
+                    activeTab === year
+                      ? 'btn-active btn-active-light-primary active'
+                      : 'btn-color-muted'
+                  } fw-bold px-4 me-1`}
+                  onClick={() => handleTabClick(year)}
+                >
+                  {year}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -171,12 +168,12 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
           <div
             className={`tab-pane fade ${activeTab === 2024 ? 'show active' : ''}`}
           >
-            {renderTable(filteredRecords , handleOpenModal)}
+            {renderTable(paginatedRecords, handleOpenModal, currentPage, totalPages, setCurrentPage)}
           </div>
           <div
             className={`tab-pane fade ${activeTab === 2025 ? 'show active' : ''}`}
           >
-            {renderTable(filteredRecords , handleOpenModal)}
+            {renderTable(paginatedRecords, handleOpenModal, currentPage, totalPages, setCurrentPage)}
           </div>
           <div className="tab-pane fade" id="kt_table_widget_5_tab_3">
             {/* Tab 3 content (if applicable) */}
@@ -265,7 +262,13 @@ const ListsWidget3: React.FC<Props> = ({ className }) => {
 
 
 // Helper Function to Render Table
-const renderTable = (records: LeaveBalanceRecord[] , handleOpenModal: any  ) => {
+const renderTable = (
+  records: LeaveBalanceRecord[],
+  handleOpenModal: any,
+  currentPage: number,
+  totalPages: number,
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+) => {
   return (
     <div className="table-responsive">
       <table className="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-4 border border-grey border-2">
@@ -332,9 +335,30 @@ const renderTable = (records: LeaveBalanceRecord[] , handleOpenModal: any  ) => 
           ))}
         </tbody>
       </table>
+           {/* Pagination Controls */}
+      {records.length > 0 && (
+        <div className="d-flex justify-content-between align-items-center mt-4">
+          <button
+            className="btn btn-sm btn-light-primary"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          >
+            Previous
+          </button>
 
+          <span className="text-gray-700 fw-semibold">
+            Page {currentPage} of {totalPages}
+          </span>
 
-      
+          <button
+            className="btn btn-sm btn-light-primary"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
