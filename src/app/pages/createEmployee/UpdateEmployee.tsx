@@ -130,18 +130,18 @@ const UpdateEmployee: FC = () => {
           pic: picUrl
         };
         console.log("updated employee response:" , tempEmp)
-        // const apiResponse = await updateEmployeeData(tempEmp)
+        const apiResponse = await updateEmployeeData(tempEmp)
       
-        // if (apiResponse.status === 204)
-        //   {
-        //     alert("Employee updated  Successful");
-        //     setLoading(false);
-        //   }
-        //   else
-        //   {
-        //     alert("An error occurred, please try again later");
-        //     setLoading(false);
-        //   }
+        if (apiResponse.status === 204)
+          {
+            alert("Employee updated  Successful");
+            setLoading(false);
+          }
+          else
+          {
+            alert("An error occurred, please try again later");
+            setLoading(false);
+          }
       }, 1000);
     },
   });
