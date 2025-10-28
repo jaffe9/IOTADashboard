@@ -346,3 +346,66 @@ export const checkNationalIdExist = async (id: number) => {
     return false;
   }
 };
+
+// ---------------------- Code for Upload pic start here-------------------------------------
+export const uploadPicToSupabase = async (file: File): Promise<string | null> => {
+  const filePath = `iwt_user_pic/${setYear}/${file.name}`;
+
+  const uploadConfig = {
+    method: 'POST',
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
+    },
+    data: file,
+  };
+
+  try {
+    // Step 1: Upload to Supabase
+    const uploadResponse = await axios(uploadConfig);
+    if (uploadResponse.status !== 200) throw new Error("Upload failed");
+
+    // Step 2: Generate Signed URL (1 year)
+    const signedUrlResponse = await axios.post(
+      `${STORAGE_URL}/object/sign/${filePath}`,
+      { expiresIn: 60 * 60 * 24 * 365 * 20 },
+      {
+        headers: {
+          'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (
+      signedUrlResponse.status !== 200 ||
+      !signedUrlResponse.data?.signedURL
+    ) {
+      throw new Error("Failed to generate signed URL");
+    }
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+
+    // Step 3: Shorten the Signed URL
+    const shortenResponse = await axios.get(
+      `${CREATE_SHORT_URL}`,
+      {
+        params: { url: fullSignedUrl },
+      }
+    );
+
+    if (
+      shortenResponse.status === 200 &&
+      shortenResponse.data?.secureShortURL
+    ) {
+      return shortenResponse.data.secureShortURL; //  This will go into invoice_url
+    } else {
+      throw new Error("Short URL generation failed");
+    }
+  } catch (error) {
+    console.error('Error uploading, signing, or shortening invoice URL:', error);
+    return null;
+  }
+};

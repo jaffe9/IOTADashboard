@@ -15,6 +15,8 @@ import {
 
 import ChipSelector from "./multiSelectDropDown";
 import { Value } from "sass";
+import { file } from "@form-validation/bundle/popular";
+import { uploadPicToSupabase } from "../../../apiFactory/apiHelper1";
 
 
 
@@ -31,11 +33,19 @@ let updatedUserInfo: IProfileDetails = initialValues;
 
 const CreateEmployee: FC = () => {
   const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
+  const [file, setFile] = useState(null)
   const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
 
+  const handleFileChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const selectedFile = e.target.files?.[0];
+  if (selectedFile) {
+    setFile(selectedFile as any);
+  }
+  
+  }
 
   const handleAccountManagerChange = async (accountManagerid : number) => {
     updateData({
@@ -69,13 +79,20 @@ const CreateEmployee: FC = () => {
       setTimeout(async () => {
         const updatedData = Object.assign(data, updatedUserInfo);
         setData(updatedData);
-        if(data.client_id < 1 || data.associatedAccountManager == null || data.uName == null || data.fullName == null  )
+        if(data.client_id < 1 || data.associatedAccountManager == null || data.uName == null || data.fullName == null || !file)
         {
-          alert("Please select all fields")
+          alert("Please select all required fields including employee picture")
           setLoading(false)
           return
         }
-        const tempEmp : temEmp = {
+        let picUrl: string | null = null  
+        picUrl = await uploadPicToSupabase(file)
+        if(!picUrl){
+          alert("Failed to upload employee picture!")
+          setLoading(false)
+          return;
+        }
+          const tempEmp : temEmp = {
           username: data.uName,
           password: data.password,
           email: data.email,
@@ -92,7 +109,8 @@ const CreateEmployee: FC = () => {
           associatedAccountManager: data.associatedAccountManager,
           id: 0,
           contract_id: "",
-          employeeJoiningDate : data.employeeJoiningDate,
+          employeeJoiningDate: data.employeeJoiningDate,
+          pic: picUrl
         };
         console.log("Temp employee response:" , tempEmp)
         const apiResponse = await createTempEmployee(tempEmp)
@@ -404,31 +422,6 @@ const CreateEmployee: FC = () => {
                         )}
                       </div>
                     </div>
-                  {/* <div className="row mb-6">
-                    <label className="col-lg-4 col-form-label fw-bold fs-6">
-                      <span className="required">TimeZone </span>
-                    </label>
-                    <div className="col-lg-8 fv-row">
-                    <select
-                        className='form-select form-select-lg form-select-solid'
-                        data-control='select2'
-                        data-placeholder='Select TiemZone...'
-      
-                        onChange={(e) => updateData({timeZone: e.target.value})}
-                      >
-                         <option hidden>Select TimeZone</option>
-                          <option value="AST">Arab Standard Time</option>
-                      </select>
-            
-                      {formik.touched.timeZone&& formik.errors.timeZone&& (
-                        <div className="fv-plugins-message-container">
-                          <div className="fv-help-block">
-                            {formik.errors.timeZone}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div> */}
 
                   <div className="row mb-6">
                     <label className="col-lg-4 col-form-label fw-bold fs-6">
@@ -453,6 +446,23 @@ const CreateEmployee: FC = () => {
                         </div>
                       )}
                     </div>
+                  </div>
+
+                 <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      Pic Upload
+                    </label>
+                   <div className="col-lg-8 fv-row">
+                    <div className="input-group"> 
+                      <input
+                      type="file"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Upload TimeSheet"
+                      onChange={handleFileChange}
+                      />
+                    </div>
+                     
+                   </div>
                   </div>
 
                   <div className="row mb-6">

@@ -16,6 +16,7 @@ import {
 import ChipSelector from "./multiSelectDropDown";
 import { Value } from "sass";
 import { Contract } from "../../../_metronic/helpers";
+import { uploadPicToSupabase } from "../../../apiFactory/apiHelper1";
 
 
 
@@ -32,11 +33,19 @@ let updatedUserInfo: IProfileDetails = initialValues;
 
 const UpdateEmployee: FC = () => {
   const [data, setData] = useState<IProfileDetails>(updatedUserInfo);
+  const [file, setFile] = useState(null)
   const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
     const updatedData = Object.assign(updatedUserInfo, fieldsToUpdate);
     setData(updatedData);
   };
 
+  const handleFileChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const selectedFile = e.target.files?.[0];
+  if (selectedFile) {
+    setFile(selectedFile as any);
+  }
+  
+  }
 
   const handleContractChange = async ( contract_id : string) => {
     updateData({
@@ -91,6 +100,15 @@ const UpdateEmployee: FC = () => {
           setLoading(false)
           return
         }
+        let picUrl: string | null = null  
+        if (file) {  // Only upload if a new file was selected
+          picUrl = await uploadPicToSupabase(file)
+          if(!picUrl){
+            alert("Failed to upload employee picture!")
+            setLoading(false)
+            return;
+          }
+        }
         const tempEmp : temEmp = {
           username: data.uName,
           password: data.password,
@@ -105,24 +123,25 @@ const UpdateEmployee: FC = () => {
           timeZone: data.timeZone,
           address: data.address,
           client_id: data.client_id,
-          contract_id : data.contract_id,
+          contract_id: data.contract_id,
           associatedAccountManager: data.associatedAccountManager,
           id: data.id,
-          employeeJoiningDate : data. employeeJoiningDate
+          employeeJoiningDate: data.employeeJoiningDate,
+          pic: picUrl
         };
         console.log("updated employee response:" , tempEmp)
-        const apiResponse = await updateEmployeeData(tempEmp)
+        // const apiResponse = await updateEmployeeData(tempEmp)
       
-        if (apiResponse.status === 204)
-          {
-            alert("Employee updated  Successful");
-            setLoading(false);
-          }
-          else
-          {
-            alert("An error occurred, please try again later");
-            setLoading(false);
-          }
+        // if (apiResponse.status === 204)
+        //   {
+        //     alert("Employee updated  Successful");
+        //     setLoading(false);
+        //   }
+        //   else
+        //   {
+        //     alert("An error occurred, please try again later");
+        //     setLoading(false);
+        //   }
       }, 1000);
     },
   });
@@ -487,6 +506,23 @@ const UpdateEmployee: FC = () => {
                         </div>
                       )}
                     </div>
+                  </div>
+
+                   <div className="row mb-6">
+                    <label className="col-lg-4 col-form-label  fw-bold fs-6">
+                      Pic Upload
+                    </label>
+                   <div className="col-lg-8 fv-row">
+                    <div className="input-group"> 
+                      <input
+                      type="file"
+                      className="form-control form-control-lg form-control-solid"
+                      placeholder="Upload TimeSheet"
+                      onChange={handleFileChange}
+                      />
+                    </div>
+                     
+                   </div>
                   </div>
 
                   <div className="row mb-6">
