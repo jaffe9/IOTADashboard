@@ -1,6 +1,7 @@
 import axios, { isAxiosError } from "axios";
 import { Proposal, Payslips } from "../app/modules/apps/user-management/users-list/core/_models";
 import { INationalIdInfo } from "../app/pages/NationalIdPage/createNationalId";
+import { ILeaveEntitlement } from "../app/pages/LeavePage/createLeaveEntitlment";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
@@ -284,7 +285,7 @@ export const checkPayslipExist = async (id: number, monthYear: string) => {
 export const getMissingNationalId = async() =>{
    try{
      const response = await axiosEncoreInstance.get("/getUserForNId")
-     console.log("Missing National Id are : ", response.data)
+    //  console.log("Missing National Id are : ", response.data)
      return response.data
    }catch(error){
     if(isAxiosError(error)){
@@ -329,10 +330,10 @@ export const createNationalId = async (i:INationalIdInfo): Promise<{status:numbe
 export const checkNationalIdExist = async (id: number) => {
   try {
     const response = await axiosInstance.get(
-      `nationalIdInfo?select=*&associated_user_id=eq.${id}`
+      `nationalIdInfo?select=id,associated_user_id&associated_user_id=eq.${id}`
     );
    
-    console.log("This is response from CheckNational id : ", response.data, response.config.url);
+    // console.log("This is response from CheckNational id : ", response.data, response.config.url);
     
     // Return true if array has items, false if empty
     return response.data && response.data.length > 0;
@@ -346,7 +347,57 @@ export const checkNationalIdExist = async (id: number) => {
     return false;
   }
 };
+// ------------------------ create the leave record api start here -------------------------------------
+export const createLeaveEntiltlment = async (l:ILeaveEntitlement): Promise<{status:number; message:string}> => {
+  console.log("Sending Leave record response to Encore API:", l);
 
+  try {
+    const response = await axiosEncoreInstance.post('/postLeaveEntitlements', l, {
+      headers: {
+        'Content-Type': 'application/json',
+        // If your Encore API requires auth token, add here:
+         'Authorization': 'slkjdfoihgiojooe'
+      }
+    });
+
+    if (response.status === 201 || 204) {
+      console.log("Encore API Response:", response.data);
+      return { status: response.data.status, message: response.data.message };
+    } else {
+      console.error("Encore API failed:", response.statusText);
+      return { status: response.status, message: "Failed" };
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)){
+      console.error("Encore API Error:", error.response?.data || error.message);
+    } else {
+      console.error("Unexpected error:", error);
+    }
+
+    return { status: 500, message: "Error Submitting Leave Entitlement record via Encore API" };
+  }
+};
+// ------------------------ check Existing Leaves for user ---------------------------------------------
+export const checkLeaveEntitlmentExist = async (id: number, year:number) => {
+  try {
+    const response = await axiosInstance.get(
+      `leaveEntitlment?select=user_id,year&user_id=eq.${id}&year=eq.${year}`
+    );
+   
+    // console.log("This is response from Check Leave Entitlement id : ", response.data, response.config.url);
+    
+    // Return true if array has items, false if empty
+    return response.data && response.data.length > 0;
+    
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error from check Leave Entitle ment id:", error.response?.data);
+    } else {
+      console.error("Internal server error while checking existing national ID!");
+    }
+    return false;
+  }
+};
 // ---------------------- Code for Upload pic start here-------------------------------------
 export const uploadPicToSupabase = async (file: File): Promise<string | null> => {
   const filePath = `iwt_user_pic/${setYear}/${file.name}`;

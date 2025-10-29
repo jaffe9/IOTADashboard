@@ -8,6 +8,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios'
 import { Value } from 'sass'
 import { left } from '@popperjs/core'
+import { Link } from 'react-router-dom'
 type Props = {
   className: string
 }
@@ -144,6 +145,12 @@ const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
         </h3>
         <div className="card-toolbar">
           <ul className="nav">
+          <Link
+            to='/dashboard/postLeaveEntlment'
+            className='btn btn-sm btn-primary fw-bold px-4 me-1'
+          >
+            + Leave Record
+          </Link>
             {[previousYear, currentYear, nextYear].map((year) => (
               <li className="nav-item" key={year}>
                 <a
