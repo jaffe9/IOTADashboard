@@ -3,6 +3,7 @@ import { Proposal, Payslips } from "../app/modules/apps/user-management/users-li
 import { INationalIdInfo } from "../app/pages/NationalIdPage/createNationalId";
 import { ILeaveEntitlement } from "../app/pages/LeavePage/createLeaveEntitlment";
 import { ErrorsPage } from "../app/modules/errors/ErrorsPage";
+import { tempUserRecord } from "../_metronic/partials/widgets";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
@@ -510,5 +511,32 @@ export const checkExistEmployee = async(fullName : string, occupation : string) 
       console.error("Internal serve error :", error)
     }
     return false;
+  }
+}
+//------------------------------------------- Patch Api for update Joining Date ---------------------------------------
+export const updateJoiningDate = async (j: tempUserRecord ) : Promise<{status:number;message:string}> => {
+  console.log("Sending Emp Joining Date for Update to Encore ApI")
+  try{
+   const response = await axiosEncoreInstance.patch('/updateJoiningDate',j,{
+    headers: {
+      "Content-Type" : 'application/json',
+      "Authorization" : 'slkjdfolhgiojooe'
+    }
+   });
+   if (response.status === 200){
+    console.log("Encore API Response : ", response.data);
+    return {status:response.data.status, message:response.data.message}
+   }else{
+    console.error("Error in Patch API : ", response.statusText);
+    return { status : response.data.status , message : "Failed"}
+   }
+   
+  }catch(error){
+   if(axios.isAxiosError(error)){
+    console.error("Encore API Error :" , error.response?.data || error.message);
+   }else{
+    console.error("Unexpected Error has Occured :", error);
+   }
+   return {status : 500, message : "Error in updating Employee Joininig Date via encore api"}
   }
 }

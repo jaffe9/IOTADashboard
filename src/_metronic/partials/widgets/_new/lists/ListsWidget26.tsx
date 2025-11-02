@@ -6,13 +6,14 @@ import {
   updateUserId,
 } from '../../../../../apiFactory/apiHelper';
 import axios from 'axios';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button , Form} from 'react-bootstrap';
+import { updateJoiningDate } from '../../../../../apiFactory/apiHelper1';
 
 type Props = {
   className: string;
 };
 
-type tempUserRecord = {
+export type tempUserRecord = {
   fullName: string;
   employeeJoiningDate : string;
   id: number;
@@ -24,6 +25,44 @@ const ListsWidget26 = ({ className }: Props) => {
   const [tempUsers, setTempUsers] = useState<tempUserRecord[]>([]);
   const [showConfirm, setShowConfirm] = useState(false); //Showing the pop up card 
   const [selectedUser, setSelectedUser] = useState<tempUserRecord | null>(null);
+  // statemanagement for button 
+  const [showDateModal , setShowDateModal] = useState(false);
+  const [editingUser, setEditingUser]  = useState<tempUserRecord | null>(null)
+  const [newJoiningDate, setNewJoiningDate] = useState('')
+  //function to handle date click
+  const handleDateClick = (user:tempUserRecord) => {
+    setEditingUser(user)
+    setNewJoiningDate(user.employeeJoiningDate)
+    setShowDateModal(true)
+  }
+  // function to Open Date Model 
+const handleUpdateDate = async () => {
+  if (editingUser && newJoiningDate) {
+    try {
+      const result = await updateJoiningDate(editingUser);
+      
+      // Update local state to reflect change
+      setTempUsers((prev) =>
+        prev.map((user) =>
+          user.id === editingUser.id
+            ? { ...user, employeeJoiningDate: newJoiningDate }
+            : user
+        )
+      );
+      
+      setShowDateModal(false);
+      setEditingUser(null);
+    } catch (error) {
+      console.error('Error updating joining date:', error);
+    }
+  }
+};
+
+const handleCloseDateModal = () => {
+  setShowDateModal(false);
+  setEditingUser(null);
+  setNewJoiningDate('');
+};
 
   // Function to fetch the temp users' details
   const tempUserRecords = async () => {
@@ -94,7 +133,13 @@ const ListsWidget26 = ({ className }: Props) => {
                 <a href="#" className="text-primary fw-bold fs-6 me-2">
                   {record.fullName?.toUpperCase() || 'NO USERNAME'} {/* Display Full Name */}
                 </a>
-                <span className="text-danger">{record.employeeJoiningDate || "Date Not Found".toUpperCase() }</span>
+                <button
+                  type="button"
+                  className="btn btn-link text-danger text-decoration-none p-0"
+                  onClick={() => handleDateClick(record)}
+                >
+                  {record.employeeJoiningDate || "DATE NOT FOUND"}
+                </button>
                 <button
                   type="button"
                   className="btn btn-icon btn-sm h-auto btn-color-gray-500 btn-active-color-primary justify-content-end"
@@ -131,6 +176,34 @@ const ListsWidget26 = ({ className }: Props) => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {/* Date Edit Modal */}
+<Modal show={showDateModal} onHide={handleCloseDateModal} centered>
+  <Modal.Header closeButton>
+    <Modal.Title>Update Joining Date</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <p>
+      Update joining date for <strong>{editingUser?.fullName?.toUpperCase()}</strong>
+    </p>
+    <Form.Group>
+      <Form.Label>New Joining Date</Form.Label>
+      <Form.Control
+        type="date"
+        value={newJoiningDate}
+        onChange={(e) => setNewJoiningDate(e.target.value)}
+        min={new Date().toISOString().split('T')[0]}
+      />
+    </Form.Group>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={handleCloseDateModal}>
+      Cancel
+    </Button>
+    <Button variant="primary" onClick={handleUpdateDate} disabled={!newJoiningDate}>
+      Update
+    </Button>
+  </Modal.Footer>
+</Modal>
     </div>
   );
 };
