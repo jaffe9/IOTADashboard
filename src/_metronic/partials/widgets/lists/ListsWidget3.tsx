@@ -53,7 +53,7 @@ const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
       setExpiringRecords(sortedRecords);
 
       // Set filtered records for default year (2024)
-      setFilteredRecords(sortedRecords.filter((record: LeaveBalanceRecord) => record.year === 2024));
+      setFilteredRecords(sortedRecords.filter((record: LeaveBalanceRecord) => record.year === previousYear));
     } catch (error) {
       console.error('Error fetching leave balance:', error);
     }
@@ -132,16 +132,20 @@ const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
     setShowConfirm(false)
   }
   const currentYear = new Date().getFullYear()
-  const [activeTab, setActiveTab] = useState(currentYear)
   const previousYear = currentYear - 1;
   const nextYear = currentYear + 1;
+  const [activeTab, setActiveTab] = useState(previousYear)
+
+  // code start here to maintain table height 
+  const emptyRowCount = itemsPerPage - paginatedRecords.length;
+  const emptyRows = Array(emptyRowCount).fill(null)
   return (
     <div className={`card ${className}`}>
       {/* Card Header */}
       <div className="card-header border-0 pt-5">
         <h3 className="card-title align-items-start flex-column">
           <span className="card-label fw-bold fs-3 mb-1">Employee Leave Balance</span>
-          <span className="text-danger mt-1 fw-semibold fs-7">Upcoming Expiring Leaves</span>
+          <span className="text-danger mt-1 fw-semibold fs-7">Manage Employee Leaves</span>
         </h3>
         <div className="card-toolbar">
           <ul className="nav">
@@ -173,14 +177,14 @@ const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
       <div className="card-body py-3">
         <div className="tab-content">
           <div
-            className={`tab-pane fade ${activeTab === 2024 ? 'show active' : ''}`}
+            className={`tab-pane fade ${activeTab === previousYear ? 'show active' : ''}`}
           >
-            {renderTable(paginatedRecords, handleOpenModal, currentPage, totalPages, setCurrentPage)}
+            {renderTable(paginatedRecords, handleOpenModal, currentPage, totalPages, setCurrentPage,emptyRows)}
           </div>
           <div
-            className={`tab-pane fade ${activeTab === 2025 ? 'show active' : ''}`}
+            className={`tab-pane fade ${activeTab === currentYear ? 'show active' : ''}`}
           >
-            {renderTable(paginatedRecords, handleOpenModal, currentPage, totalPages, setCurrentPage)}
+            {renderTable(paginatedRecords, handleOpenModal, currentPage, totalPages, setCurrentPage,emptyRows)}
           </div>
           <div className="tab-pane fade" id="kt_table_widget_5_tab_3">
             {/* Tab 3 content (if applicable) */}
@@ -274,7 +278,8 @@ const renderTable = (
   handleOpenModal: any,
   currentPage: number,
   totalPages: number,
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>,
+  emptyRows : null[],
 ) => {
   return (
     <div className="table-responsive">
@@ -340,9 +345,24 @@ const renderTable = (
                 </th>
             </tr>
           ))}
+          {/** Empty Row to maintain table height  */}
+          {emptyRows.map((_, index) => (
+                  <tr key={`empty-${index}`} style={{ height: '45px' }}>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
+                ))}
         </tbody>
       </table>
-           {/* Pagination Controls */}
+      {/* Pagination Controls */}
       {records.length > 0 && (
         <div className="d-flex justify-content-between align-items-center mt-4">
           <button

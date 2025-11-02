@@ -11,6 +11,7 @@ import {
   User,
   InvoiceRequest
 } from "../../modules/apps/user-management/users-list/core/_models";
+import { checkInvoiceExist } from "../../../apiFactory/apiHelper1";
 
 
 
@@ -102,7 +103,12 @@ const EmployeeInvoice: FC = () => {
             setLoading(false);
             return;
           }
-
+          const exist = await checkInvoiceExist(data.associated_user_id,data.external_invoice_no,data.invoice_value);
+          if (exist){
+            alert(`The invoice ${data.external_invoice_no} is already uploaded !`)
+            setLoading(false)
+            return ;
+          }
           let invoiceUrl: string | null = null;
 
           if (file) {
@@ -129,7 +135,6 @@ const EmployeeInvoice: FC = () => {
             associated_user_id: data.associated_user_id,
             associatedAccountManager: data.associatedAccountManager,
           };
-
           console.log("Invoice data:", invoiceRequest);
           const apiResponse = await createEmployeeInvoice(invoiceRequest);
 

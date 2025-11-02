@@ -16,7 +16,7 @@ import {
 import ChipSelector from "./multiSelectDropDown";
 import { Value } from "sass";
 import { file } from "@form-validation/bundle/popular";
-import { uploadPicToSupabase } from "../../../apiFactory/apiHelper1";
+import { checkExistEmployee, uploadPicToSupabase } from "../../../apiFactory/apiHelper1";
 
 
 
@@ -84,6 +84,12 @@ const CreateEmployee: FC = () => {
           alert("Please select all required fields including employee picture")
           setLoading(false)
           return
+        }
+        const exist = await checkExistEmployee(data.fullName,data.occupation)
+        if(exist){
+          alert(`The Employee with name ${data.fullName} and Occupation ${data.occupation} already exist !`)
+          setLoading(false)
+          return;
         }
         let picUrl: string | null = null  
         picUrl = await uploadPicToSupabase(file)

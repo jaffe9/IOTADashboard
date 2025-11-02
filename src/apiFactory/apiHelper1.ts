@@ -2,6 +2,7 @@ import axios, { isAxiosError } from "axios";
 import { Proposal, Payslips } from "../app/modules/apps/user-management/users-list/core/_models";
 import { INationalIdInfo } from "../app/pages/NationalIdPage/createNationalId";
 import { ILeaveEntitlement } from "../app/pages/LeavePage/createLeaveEntitlment";
+import { ErrorsPage } from "../app/modules/errors/ErrorsPage";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpocGxrdGFvdnB5ZW5teXBranFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MjUxOTYzMywiZXhwIjoyMDA4MDk1NjMzfQ.i-QsgcR7aZTxpubO0dHGPs-li50B7GrVQKsuW866YLA`;
@@ -460,3 +461,54 @@ export const uploadPicToSupabase = async (file: File): Promise<string | null> =>
     return null;
   }
 };
+// -------------------------------- Check Invoice already exist ----------------------------------------
+export const checkInvoiceExist = async ( associated_user_id : number, externalInvoiceNo : string ,invoice_value : string)=>{
+    try {
+     const response = await axiosInstance.get(
+      `invoice?select=associated_user_id,external_invoice_no,invoice_value&associated_user_id=eq.${associated_user_id}&invoice_value=eq.${invoice_value}&external_invoice_no=eq.${externalInvoiceNo}`
+     )
+     console.log("This is response from checkinvoice exist:", response.data)
+     return response.data && response.data.length > 0; // this line will return true or false 
+    }catch(error){
+      if(axios.isAxiosError(error)){
+        console.error("Error from check Invoice exist : ", error.response?.data);
+      } else {
+        console.error("Internal server error while checking invoice nmber ")
+      }
+     return false;    
+    }
+}
+// ------------------------------- Check Time sheets already exist ------------------------------------------
+export const checkTimeSheetExist = async(employeeName : string, timesheetMonthYear:string)=>{
+  try {
+   const response = await axiosInstance.get(
+    `employeeTimesheet?select=employeeName,timesheetMonthYear&employeeName=eq.${employeeName}&timesheetMonthYear=eq.${timesheetMonthYear}`
+   )
+   console.log("Response from checkTimesheet exist : ", response.data , response.config.url)
+   return response.data && response.data.length > 0;
+  }catch(error){
+    if(isAxiosError(error)){
+      console.error("Error occured while checking existing timesheets line 486 : ", error.response?.data)
+    }else{
+      console.error("Internal server error :",error)
+    }
+    return false;
+  }
+}
+// ------------------------------- check Employee Already exist -----------------------------------------------
+export const checkExistEmployee = async(fullName : string, occupation : string) => {
+  try{
+    const response = await axiosInstance.get(
+      `tempUser?select=fullName,occupation&fullName=eq.${fullName}&occupation=eq.${occupation}`
+    )
+    // console.log("Response from checkExistEmployee :", response.data)
+    return response.data && response.data.length > 0;
+  }catch(error){
+    if(isAxiosError(error)){
+      console.error("This is error in checking existing employee :", error.response?.data)
+    }else {
+      console.error("Internal serve error :", error)
+    }
+    return false;
+  }
+}
