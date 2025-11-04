@@ -29,6 +29,7 @@ const ListsWidget26 = ({ className }: Props) => {
   const [showDateModal , setShowDateModal] = useState(false);
   const [editingUser, setEditingUser]  = useState<tempUserRecord | null>(null)
   const [newJoiningDate, setNewJoiningDate] = useState('')
+  const [errorMessage, setErrorMessage] = useState<any>('')
   //function to handle date click
   const handleDateClick = (user:tempUserRecord) => {
     setEditingUser(user)
@@ -39,7 +40,10 @@ const ListsWidget26 = ({ className }: Props) => {
 const handleUpdateDate = async () => {
   if (editingUser && newJoiningDate) {
     try {
-      const result = await updateJoiningDate(editingUser);
+      // Send the updated user object with new date
+      const updatedUser = { ...editingUser, employeeJoiningDate: newJoiningDate };
+      const result = await updateJoiningDate(updatedUser);
+      console.log("This is the result:", result);
       
       // Update local state to reflect change
       setTempUsers((prev) =>
@@ -50,10 +54,16 @@ const handleUpdateDate = async () => {
         )
       );
       
-      setShowDateModal(false);
-      setEditingUser(null);
-    } catch (error) {
+      // Close modal on success
+      handleCloseDateModal();
+      setErrorMessage(''); // Clear any previous errors
+    } catch (error: any) {
       console.error('Error updating joining date:', error);
+      // Extract error message from API response
+      const message = error?.response?.data?.message || 
+                     error?.message || 
+                     'Failed to update joining date';
+      setErrorMessage(message);
     }
   }
 };
@@ -62,6 +72,7 @@ const handleCloseDateModal = () => {
   setShowDateModal(false);
   setEditingUser(null);
   setNewJoiningDate('');
+  setErrorMessage(''); // Add this line
 };
 
   // Function to fetch the temp users' details
@@ -215,9 +226,10 @@ const handleCloseDateModal = () => {
         type="date"
         value={newJoiningDate}
         onChange={(e) => setNewJoiningDate(e.target.value)}
-        min={new Date().toISOString().split('T')[0]}
+        min={new Date().toISOString().split('T')[0]}  // Changed from toLocaleString()
       />
     </Form.Group>
+    {errorMessage && <div className="text-danger mt-2">{errorMessage}</div>}
   </Modal.Body>
   <Modal.Footer>
     <Button variant="secondary" onClick={handleCloseDateModal}>
