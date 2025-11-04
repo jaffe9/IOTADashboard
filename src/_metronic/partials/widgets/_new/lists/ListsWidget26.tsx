@@ -7,7 +7,7 @@ import {
 } from '../../../../../apiFactory/apiHelper';
 import axios from 'axios';
 import { Modal, Button , Form} from 'react-bootstrap';
-import { updateJoiningDate } from '../../../../../apiFactory/apiHelper1';
+import { updateJoiningDate, updateJoiningStatus } from '../../../../../apiFactory/apiHelper1';
 
 type Props = {
   className: string;
@@ -97,6 +97,19 @@ const handleCloseDateModal = () => {
     }
   };
 
+   const handleUpdateStatus = async (user: tempUserRecord) => {
+    try{
+     await updateJoiningStatus(user)
+     alert(`Marked Inactive for ${user.fullName}`)
+     setTempUsers((prev) => prev.filter((u) => u.id !== user.id));
+    }catch(error){
+      if(error){
+        console.error("Error in Marking User as inactive", error)
+      }else{
+        console.error(" 500 - Internal Server Error ", error)
+      }
+    }
+  };
   const handleConfirm = (user: tempUserRecord) => {
     setSelectedUser(user);
     setShowConfirm(true);
@@ -106,6 +119,14 @@ const handleCloseDateModal = () => {
     setSelectedUser(null);
     setShowConfirm(false);
   };
+
+  const handleStatus = () => {
+    if(selectedUser){
+      handleUpdateStatus(selectedUser)
+      setShowConfirm(false)
+      setSelectedUser(null)
+    }
+  }
 
   const handleConfirmMove = () => {
     if (selectedUser) {
@@ -168,6 +189,9 @@ const handleCloseDateModal = () => {
           <strong> {selectedUser?.fullName?.toUpperCase()}</strong> to a permanent user?
         </Modal.Body>
         <Modal.Footer>
+          <Button variant="danger" onClick={handleStatus}>
+            Mark In Active
+          </Button>
           <Button variant="secondary" onClick={handleCancel}>
             Cancel
           </Button>

@@ -212,7 +212,7 @@ export const getSalForPay = async (employeeId : string) => {
     const response = await axiosInstance.get(
       `user?id=eq.${employeeId}&select=*,salary(user_id,*)`
     );
-    console.log("Response for getSalaray for payslip  :", response.data)
+    // console.log("Response for getSalaray for payslip  :", response.data)
     return response.data;
   }catch(error){
     if(axios.isAxiosError(error)){
@@ -468,7 +468,7 @@ export const checkInvoiceExist = async ( associated_user_id : number, externalIn
      const response = await axiosInstance.get(
       `invoice?select=associated_user_id,external_invoice_no,invoice_value&associated_user_id=eq.${associated_user_id}&invoice_value=eq.${invoice_value}&external_invoice_no=eq.${externalInvoiceNo}`
      )
-     console.log("This is response from checkinvoice exist:", response.data)
+    //  console.log("This is response from checkinvoice exist:", response.data)
      return response.data && response.data.length > 0; // this line will return true or false 
     }catch(error){
       if(axios.isAxiosError(error)){
@@ -538,5 +538,32 @@ export const updateJoiningDate = async (j: tempUserRecord ) : Promise<{status:nu
     console.error("Unexpected Error has Occured :", error);
    }
    return {status : 500, message : "Error in updating Employee Joininig Date via encore api"}
+  }
+}
+//----------------------------------- Api for Status Check -------------------------------------------
+export const updateJoiningStatus = async (j: tempUserRecord ) : Promise<{status:number;message:string}> => {
+  console.log("Sending Emp Joining Status for Update to Encore ApI")
+  try{
+   const response = await axiosEncoreInstance.patch('/updateJoinigStatus',j,{
+    headers: {
+      "Content-Type" : 'application/json',
+      "Authorization" : 'slkjdfolhgiojooe'
+    }
+   });
+   if (response.status === 200){
+    console.log("Encore API Response : ", response.data);
+    return {status:response.data.status, message:response.data.message}
+   }else{
+    console.error("Error in Patch API : ", response.statusText);
+    return { status : response.data.status , message : "Failed"}
+   }
+   
+  }catch(error){
+   if(axios.isAxiosError(error)){
+    console.error("Encore API Error :" , error.response?.data || error.message);
+   }else{
+    console.error("Unexpected Error has Occured :", error);
+   }
+   return {status : 500, message : "Error in updating Employee Joininig Status via encore api"}
   }
 }

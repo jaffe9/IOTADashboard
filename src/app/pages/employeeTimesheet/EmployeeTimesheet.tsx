@@ -140,17 +140,17 @@ const EmployeeTimesheet: FC = () => {
         
         };
         console.log("This is the data from Employee Timesheet:", timeSheetRequest)
-        // const apiResponse = await createEmployeeTimesheet(timeSheetRequest)
-        // if (apiResponse.status === 201)
-        //   {
-        //     alert("TimeSheet Submitted Successfully");
-        //     setLoading(false);
-        //   }
-        //   else
-        //   {
-        //     alert("An error occurred, please try again later");
-        //     setLoading(false);
-        //   }
+        const apiResponse = await createEmployeeTimesheet(timeSheetRequest)
+        if (apiResponse.status === 201)
+          {
+            alert("TimeSheet Submitted Successfully");
+            setLoading(false);
+          }
+          else
+          {
+            alert("An error occurred, please try again later");
+            setLoading(false);
+          }
       }, 1000);
     },
   });

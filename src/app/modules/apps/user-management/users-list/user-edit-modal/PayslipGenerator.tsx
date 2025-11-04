@@ -68,7 +68,7 @@ const PayslipGenerator: FC<Props> = ({ employeeId }) => {
         //   `user?id=eq.${employeeId}&select=*,salary(user_id,*)`
         // )
          const response = await getSalForPay(employeeId);
-         console.log("This is the response form PayslipGeneration :", response)
+        //  console.log("This is the response form PayslipGeneration :", response)
       
 
         if (response && response.length > 0) {
