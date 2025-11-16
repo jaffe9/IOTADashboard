@@ -45,7 +45,7 @@ const setYear = `Year_${getYear}`
 
 
 // User Count
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: `${API_URL}`,
   headers: {
     'apikey': `${axios.defaults.headers.common['apikey']}`,
@@ -53,7 +53,7 @@ const axiosInstance = axios.create({
   }
 });
 
-const axiosEncoreInstance = axios.create({
+export const axiosEncoreInstance = axios.create({
   baseURL: 'https://staging-iwtapiserver-6x92.encr.app',
   headers: {
     'apikey': `${axios.defaults.headers.common['apikey']}`,

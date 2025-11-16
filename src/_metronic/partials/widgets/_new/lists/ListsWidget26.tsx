@@ -18,6 +18,7 @@ export type tempUserRecord = {
   employeeJoiningDate : string;
   id: number;
   userId: string;
+  contract_id : number;
   
 };
 
@@ -87,7 +88,16 @@ const handleCloseDateModal = () => {
   // Function to move the TempUser to user
   const handleMoveToUser = async (user: tempUserRecord) => {
     const { id, userId, ...tempDatas } = user;
+    const contractId = tempDatas.contract_id
+    
     try {
+      if(!contractId || contractId === undefined || contractId === null){
+        alert(`Pleasse create a contract for ${tempDatas.fullName} before moving to User` )
+        console.warn(`Move Blocked : No contract id for User ${tempDatas.fullName}`,{
+          contractId,tempDatas
+        });
+        return;
+      }
       const result = await movetempUserToUser(tempDatas);
       console.log('User moved successfully:', result);
       // To filter the data once the id is moved

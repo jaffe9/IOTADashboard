@@ -46,23 +46,7 @@ const ContractPage: FC = () => {
   const handleFileChange = (event:any ) =>{
     setFile(event.target.files[0])
   }
-  const handleContractUpload = async() =>{  
-    if(!file){
-      alert("Please Select .pdf fomrat Contract")
-      return ;
-    }
-     // Check if the uploaded file is in .pdf format
-  if (!file) {
-      alert("Only .pdf files are allowed. Please select a valid .pdf file.");
-    return;
-  }
-    try{
-     await uploadContractToSupabase(file)
-     alert("Contract uploaded Successfully !")
-    }catch(error){
-     console.error("Error Uploading Contract:",error)
-    }
-  }
+ 
 
   const handleAccountManagerChange = async (accountManagerid : number) => {
     updateData({
@@ -97,6 +81,15 @@ const ContractPage: FC = () => {
           setLoading(false)
           return
         }
+        let url : string | null = null;
+        if(file){
+        url = await uploadContractToSupabase(file)
+        if(!url){
+          alert("Contract upload Failed !")
+          setLoading(false);
+          return;
+        }
+        }
         let ContractRequest : ContractRequest = {
          client_id: data.client_id,
           contract_no : data.contract_no,
@@ -107,11 +100,11 @@ const ContractPage: FC = () => {
           contract_date : data.contract_date,
           contract_end_date : data.contract_end_date,
           associatedAccountManager : data.associatedAccountManager,
-          associated_user_id:data.associated_user_id
-
-
+          associated_user_id:data.associated_user_id,
+          contract_file_location:url,
         };
-        var apiResponse = await createContractPage(ContractRequest)
+        console.log("This is userName from create contract page :", data.username,"contract data : ",ContractRequest)
+        var apiResponse = await createContractPage(ContractRequest,data.username)
         if (apiResponse.status === 201)
           {
             alert("Contract Submitted Successfully");
@@ -376,10 +369,6 @@ const ContractPage: FC = () => {
                       placeholder="Upload Contract"
                       onChange={handleFileChange}
                       />
-                      <span className="input-group-badge badge badge-success cursor-pointer"
-                      onClick={handleContractUpload}>
-                        Click To Upload
-                        </span>
                         </div>
                      
                     </div>
@@ -424,7 +413,7 @@ const ContractPage: FC = () => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={loading}
-                    onClick={handleContractUpload}
+            
                   >
                     {!loading && "Save Changes"}
                     {loading && (

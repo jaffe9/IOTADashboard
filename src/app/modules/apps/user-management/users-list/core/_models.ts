@@ -210,6 +210,7 @@ export type ContractRequest = {
    "contract_end_date" : string;
    "billing_months" : number,
    "associatedAccountManager" : number,
+   "contract_file_location" : any
 
 }
 

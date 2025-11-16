@@ -5,7 +5,7 @@ import { ListOfTimesheet } from "../app/modules/apps/user-management/users-list/
 import { TimesheetRequest } from "../app/modules/apps/user-management/users-list/core/_models.ts";
 import { UserModel } from "../../src/app/modules/auth/core/_models.ts";
 import { create } from "domain";
-import { file } from "@form-validation/bundle/popular";
+import { date, file } from "@form-validation/bundle/popular";
 import { url } from "inspector";
 import { error } from "console";
 import { string } from "yup";
@@ -1153,26 +1153,59 @@ const config = {
     headers: {
       'apikey': `${axios.defaults.headers.common['apikey']}`,
       'Authorization': `${axios.defaults.headers.common['Authorization']}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Prefer : "return=representation"  // return the response of newly inserted row 
     },
   data : userdata //user data to be moved
 };
 
-try {
-  const response = await axios.request(config);
-  console.log(`User moved successfully : ${JSON.stringify(response.data)}`)
-  await axiosSupaFuncInstance.get('/database-access')
-  return response.data
+ try {
+    // Step 1: Create the new user
+    const response = await axios.request(config);
 
-}catch(e){
-  if (axios.isAxiosError(e)) {
-  console.error("Axios Error :", e.response?.data || e.message)
-  }else{
-    console.error("Error in Moving tempuser to uer", e)
+    if (!response.data || !response.data[0]) {
+      throw new Error("User creation failed or returned no data");
+    }
+
+    const newUser = response.data[0];
+    const newUserId = newUser.id;
+    const contractId = userdata.contract_id;
+
+    console.log(`User moved successfully: ${newUserId}`);
+    console.log(`Associated Contract ID: ${contractId}`);
+
+    // Step 2: Patch the contract with the new user's ID
+    if (contractId) {
+      const patchData = JSON.stringify({ associated_user_id: newUserId });
+
+      const patchConfig = {
+        method: "PATCH",
+        maxBodyLength: Infinity,
+        url: `${API_URL}/contract?id=eq.${contractId}`,
+        headers: {
+          apikey: `${axios.defaults.headers.common['apikey']}`,
+          Authorization: `${axios.defaults.headers.common['Authorization']}`,
+          'Content-Type': 'application/json'
+        },
+        data: patchData
+      };
+
+      const patchResponse = await axios.request(patchConfig);
+      console.log("Contract updated successfully:", patchResponse.data);
+    } else {
+      console.warn("No contract_id found in userdata. Skipping contract update.");
+    }
+
+    return response.data;
+
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      console.error("Axios Error:", e.response?.data || e.message);
+    } else {
+      console.error("Error in Moving tempUser to user:", e);
+    }
   }
-
-}
-}
+};
 
 // Table to update resources from user table 
 export const updateEmployeeData = async (t: temEmp): Promise<{status:number; message:string}> => {
@@ -1713,7 +1746,7 @@ export const uploadNoDueToSupabase = async (file: File): Promise<string | null> 
 //End of No due 
 // Start of Contract
 
-export const createContractPage = async (c: ContractRequest): Promise<{status:number; message:string}> => {
+export const createContractPage = async (c: ContractRequest, username: string): Promise<{status:number; message:string}> => {
   let data = JSON.stringify([
     {
       client_id: c.client_id,
@@ -1726,13 +1759,14 @@ export const createContractPage = async (c: ContractRequest): Promise<{status:nu
       contract_end_date : c.contract_end_date,
       associatedAccountManager : c.associatedAccountManager,
       status:null,
-      contract_file_location:null,
+      contract_file_location:c.contract_file_location,
       associated_user_id:null,
-
-
     }
   ]);
-  console.log("APIData:" + data);
+  
+  console.log("📤 Creating contract with data:", data);
+  console.log("👤 Username for PATCH:", username);
+  
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
@@ -1740,59 +1774,182 @@ export const createContractPage = async (c: ContractRequest): Promise<{status:nu
     headers: {
       'apikey': `${axios.defaults.headers.common['apikey']}`,
       'Authorization': `${axios.defaults.headers.common['Authorization']}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation' // Fixed: should be return=representation
     },
     data: data
   };
 
   try {
     const response = await axios.request(config);
-    
-    if (response.status === 201) {
-      return { status: response.status, message: "Success" }; // Return an object
-    } else {
-     return { status: response.status, message: "Failed" }; // Return an object
-    }
-  } catch (error) {
-    if (axios.isAxiosError(error)){
-      console.error("error:",error.response?.data  || error.message)
-    }else{
-      console.error("Unexpected error:",error);
-    }
+    console.log("📋 Contract creation response:", response.status, response.data);
 
+    if (response.status === 201 && response.data?.length > 0) {
+      const newContractId = response.data[0].id;
+      console.log("✅ New Contract ID:", newContractId);
+
+      // Patch tempUser table
+      if (newContractId && username) {
+        console.log(`🔄 Attempting to PATCH tempUser for username: "${username}"`);
+        
+        const patchUrl = `${API_URL}/tempUser?username=eq.${username}`;
+        console.log("🔗 PATCH URL:", patchUrl);
+        
+        const patchData = { contract_id: newContractId };
+        console.log("📝 PATCH data:", patchData);
+        
+        const patchConfig = {
+          method: "patch",
+          maxBodyLength: Infinity,
+          url: patchUrl,
+          headers: {
+            'apikey': `${axios.defaults.headers.common["apikey"]}`,
+            'Authorization': `${axios.defaults.headers.common["Authorization"]}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation' // Get updated row back
+          },
+          data: JSON.stringify(patchData),
+        };
+
+        try {
+          const patchResponse = await axios.request(patchConfig);
+          console.log("✅ PATCH Response:", {
+            status: patchResponse.status,
+            data: patchResponse.data,
+            headers: patchResponse.headers
+          });
+          
+          if (patchResponse.status === 204 || patchResponse.status === 200) {
+            console.log(`✅ TempUser ${username} updated with contract_id ${newContractId}`);
+            return { status: 201, message: "Contract created & linked successfully" };
+          } else {
+            console.warn(`⚠️ Unexpected PATCH status: ${patchResponse.status}`);
+            return { status: 201, message: "Contract created, TempUser update had unexpected status" };
+          }
+          
+        } catch (patchError) {
+          if (axios.isAxiosError(patchError)) {
+            console.error("❌ PATCH Error Details:", {
+              status: patchError.response?.status,
+              statusText: patchError.response?.statusText,
+              data: patchError.response?.data,
+              message: patchError.message,
+              url: patchError.config?.url
+            });
+            
+            // Check if it's a "no rows matched" scenario
+            if (patchError.response?.status === 404 || 
+                patchError.response?.data?.message?.includes('no rows')) {
+              return { 
+                status: 201, 
+                message: `Contract created but user "${username}" not found in tempUser table` 
+              };
+            }
+          } else {
+            console.error("❌ Unexpected PATCH error:", patchError);
+          }
+          
+          return { 
+            status: 201, 
+            message: "Contract created but TempUser update failed" 
+          };
+        }
+      } else {
+        console.warn("⚠️ Missing data for PATCH:", { newContractId, username });
+        return { status: 201, message: "Contract created (no username for linking)" };
+      }
+    } else {
+      console.error("❌ Unexpected contract creation response:", response.status);
+      return { status: response.status, message: "Failed to create contract" };
+    }
+    
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("❌ Contract creation error:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+    } else {
+      console.error("❌ Unexpected error:", error);
+    }
     return { status: 500, message: "Error Submitting Contract" };
   }
+};
+
+export const uploadContractToSupabase = async (file: File): Promise<string | null> => {
+  const filePath = `iwt_contracts/${setYear}/${file.name}`;
   
-}
-
-export const uploadContractToSupabase = async (file:File) => {
-  const Cconfig = {
-    method : "POST",
-    maxBodyLength : Infinity,
-    url : `${STORAGE_URL}/object/iwt_contracts/${setYear}/${file.name}` ,
-    headers : {
-      'Authorization' : `${axios.defaults.headers.common['Authorization']}`,
-      'Content-Type' : file.type
+  // Step 1: Upload the file
+  const uploadConfig = {
+    method: "POST",
+    maxBodyLength: Infinity,
+    url: `${STORAGE_URL}/object/${filePath}`,
+    headers: {
+      'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+      'Content-Type': file.type,
+      'apikey': `${axios.defaults.headers.common['apikey']}` // Add apikey header
     },
-    data : file,
+    data: file,
   };
-  try{
-    const response = await axios(Cconfig);
-    console.log('uploade response',response)
 
-    if (response.status === 200){
-      //Extract the file path 
-      const fileKey = response.data.file;
-      const publicUrl = `${STORAGE_URL}/object/iwt_contracts/${setYear}/${fileKey}`;
-      return publicUrl;
-    }else{
-      throw new Error('Contract Upload Failed')
-    }
-   }catch (error) {
-    console.error('Error in Contractconfig',error)
-  }
+  try {
+    const uploadResponse = await axios(uploadConfig);
     
-}
+    // Check if upload was successful
+    if (uploadResponse.status !== 200) {
+      throw new Error(`Contract Upload Failed! Status: ${uploadResponse.status}`);
+    }
+
+    console.log("✅ File uploaded successfully:", filePath);
+
+    // Step 2: Generate Signed URL - Use correct endpoint format
+    const signedUrlConfig = {
+      method: "POST",
+      url: `${STORAGE_URL}/object/sign/iwt_contracts/${setYear}/${file.name}`, // Changed format
+      headers: {
+        'Authorization': `${axios.defaults.headers.common['Authorization']}`,
+        'apikey': `${axios.defaults.headers.common['apikey']}`, // Add apikey
+        'Content-Type': 'application/json'
+      },
+      data: {
+        expiresIn: 60 * 60 * 24 * 365 * 20 // 20 years in seconds
+      }
+    };
+
+    const signedUrlResponse = await axios(signedUrlConfig);
+
+    if (signedUrlResponse.status !== 200 || !signedUrlResponse.data?.signedURL) {
+      throw new Error("Failed to generate signed URL");
+    }
+
+    const fullSignedUrl = `${STORAGE_URL}${signedUrlResponse.data.signedURL}`;
+    console.log("✅ Signed URL generated:", fullSignedUrl);
+
+    // Step 3: Shorten URL
+    const shortenResponse = await axios.get(`${CREATE_SHORT_URL}`, {
+      params: { url: fullSignedUrl },
+    });
+
+    if (shortenResponse.status === 200 && shortenResponse.data?.secureShortURL) {
+      return shortenResponse.data.secureShortURL;
+    } else {
+      throw new Error("Failed to generate short URL");
+    }
+
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error(` Supabase Storage Error:`, {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message ,
+      }, alert(`${error.response?.data} File already Exist, Kindly rename or correct file`));
+    } else {
+      console.error(' Unexpected error in uploadContractToSupabase:', error);
+    }
+    return null;
+  }
+};
 // End of Contract
 
 
